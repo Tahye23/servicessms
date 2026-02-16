@@ -14,9 +14,9 @@
     <include file="config/liquibase/changelog/20240109101405_added_entity_Entitedetest.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240305142411_added_entity_SendSms.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240306150839_added_entity_Application.xml" relativeToChangelogFile="false"/>
-    <!-- <include file="config/liquibase/changelog/20240306150840_added_entity_TokensApp.xml" relativeToChangelogFile="false"/> -->
-    <include file="config/liquibase/changelog/20240315152409_added_entity_Company.xml" relativeToChangelogFile="false"/> 
-    <include file="config/liquibase/changelog/20240719140754_added_entity_Dialogue.xml" relativeToChangelogFile="false"/> 
+     <include file="config/liquibase/changelog/20240306150840_added_entity_TokensApp.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240315152409_added_entity_Company.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240719140754_added_entity_Dialogue.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240722111345_added_entity_Contact.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240722114025_added_entity_Api.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240722125756_added_entity_Groupe.xml" relativeToChangelogFile="false"/>

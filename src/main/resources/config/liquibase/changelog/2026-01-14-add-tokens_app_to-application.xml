@@ -18,47 +18,7 @@
         <dropColumn columnName="last_token_refresh" tableName="application"/>
     </changeSet>
 
-    <!-- ChangeSet 3: Créer la table tokens_app -->
-    <changeSet id="20250114-refactor-03-create-tokens-app" author="migration">
-        
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="tokens_app"/>
-            </not>
-        </preConditions>
-
-   
-        <createTable tableName="tokens_app">
-
-            <column name="id" type="integer" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="application_id" type="integer">
-                <constraints nullable="true"/>
-            </column>
-            <column name="token" type="varchar(1000)">
-                <constraints nullable="true"/>
-            </column>
-            <column name="date_expiration" type="timestamp">
-                <constraints nullable="true"/>
-            </column>
-            <column name="is_expired" type="boolean" defaultValueBoolean="false">
-                <constraints nullable="false"/>
-            </column>
-            <column name="active" type="boolean" defaultValueBoolean="true">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_at" type="timestamp">
-                <constraints nullable="true"/>
-            </column>
-            <column name="last_used_at" type="timestamp">
-                <constraints nullable="true"/>
-            </column>
-            <column name="user_login" type="varchar(50)">
-                <constraints nullable="true"/>
-            </column>
-        </createTable>
-    </changeSet>
+    
 
     <!-- ChangeSet 4: Ajouter la clé étrangère application_id -->
     <changeSet id="20250114-refactor-04-add-fk-application" author="migration">
