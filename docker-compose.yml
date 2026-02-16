@@ -1,7 +1,7 @@
 version: '3'
 services:
   app:
-    image: 339713193116.dkr.ecr.eu-west-1.amazonaws.com/servicesms:migration-v1.7.66
+    image: 339713193116.dkr.ecr.eu-west-1.amazonaws.com/servicesms:migration-v1.7.68
     environment:
       - _JAVA_OPTIONS=-Xmx512m -Xms256m
       - SPRING_PROFILES_ACTIVE=prod,api-docs
