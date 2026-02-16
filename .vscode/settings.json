@@ -1,3 +1,5 @@
 {
-  "vscode.tsc.compiler.alertTSConfigChanges": "never"
+  "vscode.tsc.compiler.alertTSConfigChanges": "never",
+  "snyk.advanced.organization": "2e8bcef2-d7bf-45e3-84ba-0f3186e82716",
+  "snyk.advanced.autoSelectOrganization": true
 }
