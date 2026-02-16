@@ -20,14 +20,14 @@
 
     <!-- ChangeSet 3: Créer la table tokens_app -->
     <changeSet id="20250114-refactor-03-create-tokens-app" author="migration">
-        <comment>Create tokens_app table to manage application tokens with expiration dates</comment>
-    <preConditions onFail="MARK_RAN">
-        <not>
-            <tableExists tableName="tokens_app"/>
-        </not>
-    </preConditions>
+        
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="tokens_app"/>
+            </not>
+        </preConditions>
 
-    <comment>Create tokens_app table if not exists</comment>
+   
         <createTable tableName="tokens_app">
 
             <column name="id" type="integer" autoIncrement="true">
