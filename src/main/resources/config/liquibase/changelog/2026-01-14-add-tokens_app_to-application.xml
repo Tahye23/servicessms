@@ -10,7 +10,7 @@
     <changeSet id="20260114-1" author="jhipster">
         <comment>Drop deprecated api_token column from application table</comment>
         <dropColumn columnName="api_token" tableName="application"/>
-    </changeSet>
+    </changeSet>]
 
     <!-- ChangeSet 2: Supprimer la colonne last_token_refresh -->
     <changeSet id="20250114-refactor-02-drop-last-token-refresh" author="migration">
@@ -21,7 +21,15 @@
     <!-- ChangeSet 3: Créer la table tokens_app -->
     <changeSet id="20250114-refactor-03-create-tokens-app" author="migration">
         <comment>Create tokens_app table to manage application tokens with expiration dates</comment>
+    <preConditions onFail="MARK_RAN">
+        <not>
+            <tableExists tableName="tokens_app"/>
+        </not>
+    </preConditions>
+
+    <comment>Create tokens_app table if not exists</comment>
         <createTable tableName="tokens_app">
+
             <column name="id" type="integer" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
