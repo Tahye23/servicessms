@@ -1,0 +1,28 @@
+{
+  "migrationApp": {
+    "fileextrait": {
+      "home": {
+        "title": "Fileextraits",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Fileextrait",
+        "createOrEditLabel": "Créer ou éditer un Fileextrait",
+        "notFound": "Aucun Fileextrait trouvé"
+      },
+      "created": "Un nouveau Fileextrait a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Fileextrait avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Fileextrait avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Fileextrait {{ id }} ?"
+      },
+      "detail": {
+        "title": "Fileextrait"
+      },
+      "id": "ID",
+      "fexidfile": "Fexidfile",
+      "fexparent": "Fexparent",
+      "fexdata": "Fexdata",
+      "fextype": "Fextype",
+      "fexname": "Fexname"
+    }
+  }
+}

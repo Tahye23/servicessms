@@ -1,0 +1,72 @@
+<div class="flex justify-center">
+  <div class="w-full max-w-3xl bg-white rounded-xl shadow p-6">
+    @if (question()) {
+      <div>
+        <h2 class="text-2xl font-bold text-gray-800 mb-4" data-cy="questionDetailsHeading">
+          <span jhiTranslate="migrationApp.question.detail.title">Question</span>
+        </h2>
+
+        <hr class="my-4 border-gray-300" />
+
+        <jhi-alert-error></jhi-alert-error>
+        <jhi-alert></jhi-alert>
+
+        <dl class="space-y-4 text-gray-700">
+          <div class="flex justify-between border-b pb-2">
+            <dt class="font-medium text-gray-600"><span jhiTranslate="global.field.id">ID</span></dt>
+            <dd>{{ question()!.id }}</dd>
+          </div>
+
+          <div class="flex justify-between border-b pb-2">
+            <dt class="font-medium text-gray-600"><span jhiTranslate="migrationApp.question.qusordre">Qusordre</span></dt>
+            <dd>{{ question()!.qusordre }}</dd>
+          </div>
+
+          <div class="flex justify-between border-b pb-2">
+            <dt class="font-medium text-gray-600"><span jhiTranslate="migrationApp.question.qusmessage">Qusmessage</span></dt>
+            <dd>{{ question()!.qusmessage }}</dd>
+          </div>
+
+          <div class="flex justify-between border-b pb-2" *ngIf="question()!.qusenquette">
+            <dt class="font-medium text-gray-600"><span jhiTranslate="migrationApp.question.qusenquette">Qusenquette</span></dt>
+            <dd>
+              <a class="text-blue-600 hover:underline" [routerLink]="['/company', question()!.qusenquette?.id, 'view']">
+                {{ question()!.qusenquette?.id }}
+              </a>
+            </dd>
+          </div>
+
+          <div class="flex justify-between border-b pb-2" *ngIf="question()!.qustypequestion">
+            <dt class="font-medium text-gray-600"><span jhiTranslate="migrationApp.question.qustypequestion">Qustypequestion</span></dt>
+            <dd>
+              <a class="text-blue-600 hover:underline" [routerLink]="['/referentiel', question()!.qustypequestion?.id, 'view']">
+                {{ question()!.qustypequestion?.id }}
+              </a>
+            </dd>
+          </div>
+        </dl>
+
+        <div class="mt-6 flex space-x-4">
+          <button
+            type="submit"
+            (click)="previousState()"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+            data-cy="entityDetailsBackButton"
+          >
+            <fa-icon icon="arrow-left" class="mr-2"></fa-icon>
+            <span jhiTranslate="entity.action.back">Retour</span>
+          </button>
+
+          <button
+            type="button"
+            [routerLink]="['/question', question()!.id, 'edit']"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700"
+          >
+            <fa-icon icon="pencil-alt" class="mr-2"></fa-icon>
+            <span jhiTranslate="entity.action.edit">Editer</span>
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

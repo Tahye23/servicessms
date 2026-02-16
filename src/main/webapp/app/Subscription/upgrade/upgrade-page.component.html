@@ -1,0 +1,275 @@
+<section id="pricing" class="py-20 bg-white" *ngIf="!loading; else loadingTpl">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-bold text-gray-900 mb-4">Choisissez votre plan</h2>
+      <p class="text-xl text-gray-600">Passez à la vitesse supérieure avec nos plans premium</p>
+      <p *ngIf="reason" class="mt-2 text-red-600 font-semibold">Raison : {{ reason }}</p>
+    </div>
+
+    <!-- Plans WhatsApp -->
+    <div class="mb-20" *ngIf="plansWhatsapp.length > 0">
+      <h3 class="text-3xl font-bold text-gray-800 mb-12 text-center">Plans WhatsApp Business</h3>
+      <div class="grid lg:grid-cols-3 gap-8">
+        <div
+          *ngFor="let plan of plansWhatsapp"
+          class="pricing-card rounded-3xl p-8 pt-12 shadow-lg hover:shadow-xl transition-all duration-300 border-2 relative"
+          [ngClass]="{
+            'bg-white border-gray-200': !plan.abpPopular,
+            'bg-gradient-to-br from-blue-600 to-blue-700 border-blue-500 transform scale-105': plan.abpPopular
+          }"
+        >
+          <div *ngIf="plan.abpPopular" class="absolute top-0 left-1/2 -translate-x-1/2 mt-3 z-10">
+            <span class="bg-green-500 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg"> POPULAIRE </span>
+          </div>
+
+          <div *ngIf="plan.active === false" class="absolute top-4 right-4">
+            <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium"> Inactif </span>
+          </div>
+
+          <div class="text-center mb-8">
+            <h4 class="text-2xl font-bold mb-2" [ngClass]="plan.abpPopular ? 'text-white' : 'text-gray-900'">
+              {{ plan.abpName }}
+            </h4>
+            <p class="mb-6" [ngClass]="plan.abpPopular ? 'text-blue-100' : 'text-gray-600'">
+              {{ plan.abpDescription }}
+            </p>
+            <div class="mb-6" *ngIf="!plan.customPlan">
+              <span
+                *ngIf="plan.abpPrice !== null && plan.abpPrice !== undefined"
+                class="text-2xl font-bold"
+                [ngClass]="plan.abpPopular ? 'text-white' : 'text-blue-600'"
+              >
+                {{ plan.abpPrice }}{{ plan.abpCurrency || 'MRU' }}
+              </span>
+              <span
+                *ngIf="plan.abpPrice === null || plan.abpPrice === undefined"
+                class="text-xl font-bold"
+                [ngClass]="plan.abpPopular ? 'text-white' : 'text-gray-800'"
+              >
+                {{ plan.abpPeriod || 'Sur mesure' }}
+              </span>
+              <span
+                *ngIf="plan.abpPrice !== null && plan.abpPrice !== undefined && plan.abpPeriod"
+                class="text-sm block mt-1"
+                [ngClass]="plan.abpPopular ? 'text-blue-200' : 'text-gray-500'"
+              >
+                {{ formatPeriod(plan.abpPeriod) }}
+              </span>
+            </div>
+            <div class="mb-6" *ngIf="plan.customPlan">
+              <span class="text-xl font-bold" [ngClass]="plan.abpPopular ? 'text-white' : 'text-gray-800'">
+                {{ 'Sur mesure' }}
+              </span>
+            </div>
+            <div *ngIf="showPlanLimits(plan) && !plan.customPlan" class="mb-4 grid grid-cols-2 gap-2 text-xs">
+              <div
+                *ngIf="plan.whatsappLimit !== null && plan.whatsappLimit !== undefined"
+                class="p-2 rounded-lg"
+                [ngClass]="plan.abpPopular ? 'bg-white/20' : 'bg-green-50'"
+              >
+                <div class="font-bold" [ngClass]="plan.abpPopular ? 'text-white' : 'text-green-600'">
+                  {{ formatLimit(plan.whatsappLimit) }}
+                </div>
+                <div [ngClass]="plan.abpPopular ? 'text-blue-200' : 'text-green-600'">WhatsApp/mois</div>
+              </div>
+              <div
+                *ngIf="plan.usersLimit !== null && plan.usersLimit !== undefined"
+                class="p-2 rounded-lg"
+                [ngClass]="plan.abpPopular ? 'bg-white/20' : 'bg-blue-50'"
+              >
+                <div class="font-bold" [ngClass]="plan.abpPopular ? 'text-white' : 'text-blue-600'">
+                  {{ formatLimit(plan.usersLimit) }}
+                </div>
+                <div [ngClass]="plan.abpPopular ? 'text-blue-200' : 'text-blue-600'">Utilisateurs</div>
+              </div>
+            </div>
+          </div>
+
+          <ul class="space-y-4 mb-8">
+            <li *ngFor="let feature of plan.abpFeatures" class="flex items-center">
+              <div
+                class="w-5 h-5 rounded-full flex items-center justify-center mr-3"
+                [ngClass]="plan.abpPopular ? 'bg-white' : 'bg-green-500'"
+              >
+                <svg class="w-3 h-3" [ngClass]="plan.abpPopular ? 'text-blue-600' : 'text-white'" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+              </div>
+              <span [ngClass]="plan.abpPopular ? 'text-white' : 'text-gray-700'">
+                {{ feature }}
+              </span>
+            </li>
+          </ul>
+
+          <button
+            (click)="selectPlan(plan.id)"
+            [disabled]="plan.active === false"
+            class="w-full py-4 rounded-2xl font-semibold text-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            [ngClass]="getPlanButtonClass(plan)"
+          >
+            {{ plan.abpButtonText || 'Choisir ce plan' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plans SMS -->
+    <div class="mb-20" *ngIf="plansSms.length > 0">
+      <h3 class="text-3xl font-bold text-gray-800 mb-12 text-center">Plans SMS Marketing</h3>
+      <div class="grid lg:grid-cols-3 gap-8">
+        <div
+          *ngFor="let plan of plansSms"
+          class="pricing-card bg-white rounded-3xl p-8 border-2 border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300"
+        >
+          <div *ngIf="plan.active === false" class="absolute top-4 right-4">
+            <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium"> Inactif </span>
+          </div>
+
+          <div class="text-center mb-8">
+            <h4 class="text-2xl font-bold text-gray-900 mb-2">{{ plan.abpName }}</h4>
+            <p class="text-gray-600 mb-6">{{ plan.abpDescription }}</p>
+            <div class="mb-6" *ngIf="!plan.customPlan">
+              <span *ngIf="plan.abpPrice !== null && plan.abpPrice !== undefined" class="text-2xl font-bold text-green-600">
+                {{ plan.abpPrice }}{{ plan.abpCurrency || 'MRU' }}
+              </span>
+              <span *ngIf="plan.abpPrice === null || plan.abpPrice === undefined" class="text-xl font-bold text-gray-800">
+                {{ plan.abpPeriod || 'Sur mesure' }}
+              </span>
+              <span
+                *ngIf="plan.abpPrice !== null && plan.abpPrice !== undefined && plan.abpPeriod"
+                class="text-gray-500 text-sm block mt-1"
+              >
+                {{ formatPeriod(plan.abpPeriod) }}
+              </span>
+            </div>
+            <div class="mb-6" *ngIf="plan.customPlan">
+              <span class="text-xl font-bold text-gray-800">
+                {{ 'Sur mesure' }}
+              </span>
+            </div>
+            <div *ngIf="showPlanLimits(plan) && !plan.customPlan" class="mb-4 grid grid-cols-2 gap-2 text-xs">
+              <div *ngIf="plan.smsLimit !== null && plan.smsLimit !== undefined" class="p-2 bg-green-50 rounded-lg">
+                <div class="font-bold text-green-600">{{ formatLimit(plan.smsLimit) }}</div>
+                <div class="text-green-600">SMS/mois</div>
+              </div>
+              <div *ngIf="plan.usersLimit !== null && plan.usersLimit !== undefined" class="p-2 bg-blue-50 rounded-lg">
+                <div class="font-bold text-blue-600">{{ formatLimit(plan.usersLimit) }}</div>
+                <div class="text-blue-600">Utilisateurs</div>
+              </div>
+            </div>
+          </div>
+
+          <ul class="space-y-4 mb-8">
+            <li *ngFor="let feature of plan.abpFeatures" class="flex items-center">
+              <div class="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+              </div>
+              <span class="text-gray-700">{{ feature }}</span>
+            </li>
+          </ul>
+
+          <button
+            (click)="selectPlan(plan.id)"
+            [disabled]="plan.active === false"
+            class="w-full py-4 rounded-2xl font-semibold text-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            [ngClass]="getPlanButtonClass(plan)"
+          >
+            {{ plan.abpButtonText || 'Choisir ce plan' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plans Premium -->
+    <div class="mb-20" *ngIf="plansPremium.length > 0">
+      <h3 class="text-3xl font-bold text-gray-800 mb-12 text-center">Plans Premium</h3>
+      <div class="grid lg:grid-cols-3 gap-8">
+        <div
+          *ngFor="let plan of plansPremium"
+          class="pricing-card bg-white rounded-3xl p-8 border-2 border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300"
+        >
+          <div *ngIf="plan.active === false" class="absolute top-4 right-4">
+            <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium"> Inactif </span>
+          </div>
+
+          <div class="text-center mb-8">
+            <h4 class="text-2xl font-bold text-gray-900 mb-2">{{ plan.abpName }}</h4>
+            <p class="text-gray-600 mb-6">{{ plan.abpDescription }}</p>
+            <div class="mb-6" *ngIf="!plan.customPlan">
+              <span *ngIf="plan.abpPrice !== null && plan.abpPrice !== undefined" class="text-2xl font-bold text-purple-600">
+                {{ plan.abpPrice }}{{ plan.abpCurrency || 'MRU' }}
+              </span>
+              <span *ngIf="plan.abpPrice === null || plan.abpPrice === undefined" class="text-xl font-bold text-gray-800">
+                {{ plan.abpPeriod || 'Sur mesure' }}
+              </span>
+              <span
+                *ngIf="plan.abpPrice !== null && plan.abpPrice !== undefined && plan.abpPeriod"
+                class="text-gray-500 text-sm block mt-1"
+              >
+                {{ formatPeriod(plan.abpPeriod) }}
+              </span>
+            </div>
+            <div class="mb-6" *ngIf="plan.customPlan">
+              <span class="text-xl font-bold text-gray-800">
+                {{ 'Sur mesure' }}
+              </span>
+            </div>
+            <div *ngIf="showPlanLimits(plan) && !plan.customPlan" class="mb-4 grid grid-cols-2 gap-2 text-xs">
+              <div *ngIf="plan.smsLimit !== null && plan.smsLimit !== undefined" class="p-2 bg-purple-50 rounded-lg">
+                <div class="font-bold text-purple-600">{{ formatLimit(plan.smsLimit) }}</div>
+                <div class="text-purple-600">SMS/mois</div>
+              </div>
+              <div *ngIf="plan.whatsappLimit !== null && plan.whatsappLimit !== undefined" class="p-2 bg-pink-50 rounded-lg">
+                <div class="font-bold text-pink-600">{{ formatLimit(plan.whatsappLimit) }}</div>
+                <div class="text-pink-600">WhatsApp/mois</div>
+              </div>
+              <div *ngIf="plan.usersLimit !== null && plan.usersLimit !== undefined" class="p-2 bg-blue-50 rounded-lg">
+                <div class="font-bold text-blue-600">{{ formatLimit(plan.usersLimit) }}</div>
+                <div class="text-blue-600">Utilisateurs</div>
+              </div>
+            </div>
+          </div>
+
+          <ul class="space-y-4 mb-8">
+            <li *ngFor="let feature of plan.abpFeatures" class="flex items-center">
+              <div class="w-5 h-5 bg-purple-600 rounded-full flex items-center justify-center mr-3">
+                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+              </div>
+              <span class="text-gray-700">{{ feature }}</span>
+            </li>
+          </ul>
+
+          <button
+            (click)="selectPlan(plan.id)"
+            [disabled]="plan.active === false"
+            class="w-full py-4 rounded-2xl font-semibold text-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-purple-600 text-white hover:bg-purple-700"
+          >
+            {{ plan.abpButtonText || 'Choisir ce plan' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<ng-template #loadingTpl>
+  <div class="flex justify-center py-20">
+    <i class="pi pi-spin pi-spinner text-6xl text-indigo-600"></i>
+  </div>
+</ng-template>

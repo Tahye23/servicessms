@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+
+<changeSet id="20250418-1-add-sms-entity" author="jhipster">
+    <preConditions onFail="MARK_RAN" onError="HALT">
+        <not>
+            <tableExists tableName="sms"/>
+        </not>
+    </preConditions>
+        <createTable tableName="sms">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_sms"/>
+            </column>
+            <column name="send_sms_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sender" type="VARCHAR(255)"/>
+            <column name="receiver" type="VARCHAR(255)"/>
+            <column name="msgdata" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="total_message" type="INT"/>
+            <column name="is_sent" type="BOOLEAN"/>
+            <column name="send_date" type="TIMESTAMP"/>
+            <column name="status" type="VARCHAR(255)"/>
+            <column name="bulk_id" type="VARCHAR(255)"/>
+            <column name="bulk_created_at" type="TIMESTAMP"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="sms"
+            baseColumnNames="send_sms_id"
+            constraintName="fk_sms_send_sms"
+            referencedTableName="send_sms"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <createIndex indexName="idx_sms_bulk_id" tableName="sms">
+            <column name="bulk_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="20251020111346-1" author="saadna">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <not>
+                <columnExists tableName="sms" columnName="user_login"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="sms">
+
+            <column name="user_login" type="VARCHAR(255)">
+
+            </column>
+
+
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

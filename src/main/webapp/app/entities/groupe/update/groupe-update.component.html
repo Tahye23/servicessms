@@ -1,0 +1,181 @@
+<!-- Container principal -->
+<div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+  <div class="w-full max-w-4xl bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border border-white/30 p-8 sm:p-12">
+    <!-- Breadcrumb -->
+    <nav class="flex text-sm text-gray-600 mb-8" aria-label="Breadcrumb">
+      <ol class="inline-flex items-center space-x-2">
+        <li>
+          <a href="/groupe" class="flex items-center hover:text-blue-600 transition-colors">
+            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+              <path
+                d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"
+              ></path>
+            </svg>
+            Groupes
+          </a>
+        </li>
+        <li>
+          <svg class="w-5 h-5 text-gray-400 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </li>
+        <li class="text-gray-700 font-semibold">Groupes</li>
+      </ol>
+    </nav>
+
+    <!-- Titre -->
+    <header class="mb-10 text-center sm:text-left">
+      <h1 class="text-4xl font-extrabold text-gray-900 mb-2">
+        {{ editForm.controls.id.value ? 'Modifier le groupe' : 'Créer un nouveau groupe' }}
+      </h1>
+      <p class="text-gray-600 text-lg">
+        {{
+          editForm.controls.id.value
+            ? 'Modifiez les informations de votre groupe'
+            : 'Remplissez les informations pour créer un nouveau groupe'
+        }}
+      </p>
+    </header>
+
+    <!-- Formulaire -->
+    <form [formGroup]="editForm" (ngSubmit)="save()" class="space-y-8">
+      <!-- Identifiant (readonly) -->
+      <div *ngIf="editForm.controls.id.value !== null" class="space-y-1">
+        <label for="field_id" class="block text-sm font-medium text-gray-700">Identifiant</label>
+        <input
+          id="field_id"
+          type="number"
+          formControlName="id"
+          readonly
+          class="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-3 text-gray-500 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <p class="text-xs text-gray-400">L'identifiant est généré automatiquement.</p>
+      </div>
+
+      <!-- Titre du groupe -->
+      <div class="space-y-1">
+        <label for="field_grotitre" class="block text-sm font-medium text-gray-700">
+          Titre du groupe <span class="text-red-500">*</span>
+        </label>
+        <input
+          id="field_grotitre"
+          type="text"
+          formControlName="grotitre"
+          placeholder="Ex: Clients Premium, Équipe Marketing..."
+          class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-gray-400 transition duration-200 disabled:cursor-not-allowed"
+          [class.border-red-500]="editForm.get('grotitre')?.invalid && editForm.get('grotitre')?.touched"
+        />
+        <p *ngIf="editForm.get('grotitre')?.invalid && editForm.get('grotitre')?.touched" class="text-sm text-red-600">
+          Le titre du groupe est obligatoire.
+        </p>
+        <p class="text-xs text-gray-400">Choisissez un nom descriptif pour identifier facilement ce groupe.</p>
+      </div>
+
+      <!-- Type de groupe -->
+      <div class="space-y-1">
+        <label for="field_groupType" class="block text-sm font-medium text-gray-700">Type de groupe</label>
+        <select
+          id="field_groupType"
+          formControlName="groupType"
+          class="w-full rounded-xl border border-gray-300 px-4 py-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-gray-400 transition duration-200"
+        >
+          <option value="">Sélectionner le type</option>
+          <option value="production">Groupe de production</option>
+          <option value="test">Groupe de test</option>
+        </select>
+        <p class="text-xs text-gray-400">Les groupes de test permettent de tester vos campagnes avant envoi.</p>
+      </div>
+
+      <!-- Assignation utilisateur (si admin) -->
+      <!--<div *ngIf="isAdmin()" class="space-y-1">
+        <label for="field_extendedUser" class="block text-sm font-medium text-gray-700">Utilisateur propriétaire</label>
+        <select
+          id="field_extendedUser"
+          formControlName="extendedUser"
+          [compareWith]="compareExtendedUser"
+          class="w-full rounded-xl border border-gray-300 px-4 py-3 bg-white
+                 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-gray-400
+                 transition duration-200"
+        >
+          <option [ngValue]="null">Aucun utilisateur sélectionné</option>
+          <option *ngFor="let extendedUserOption of extendedUsersSharedCollection; "
+                  [ngValue]="extendedUserOption">
+            {{ extendedUserOption.user?.login }}
+          </option>
+        </select>
+        <p class="text-xs text-gray-400">L'utilisateur sélectionné sera le propriétaire de ce groupe.</p>
+      </div>-->
+
+      <!-- Aperçu rapide -->
+      <div *ngIf="editForm.get('grotitre')?.value" class="bg-blue-50 border border-blue-200 rounded-xl p-4 mt-6">
+        <h4 class="text-sm font-semibold text-blue-900 mb-2 flex items-center gap-2">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+            />
+          </svg>
+          Aperçu
+        </h4>
+        <div class="flex flex-wrap gap-4 text-sm text-blue-900">
+          <div class="flex items-center gap-2">
+            <span class="font-medium">Titre :</span>
+            <span>{{ editForm.get('grotitre')?.value }}</span>
+            <span
+              *ngIf="editForm.get('groupType')?.value === 'test'"
+              class="px-2 py-0.5 bg-yellow-200 text-yellow-900 rounded-full text-xs font-semibold select-none"
+            >
+              Test
+            </span>
+            <span
+              *ngIf="editForm.get('groupType')?.value === 'production'"
+              class="px-2 py-0.5 bg-green-200 text-green-900 rounded-full text-xs font-semibold select-none"
+            >
+              Production
+            </span>
+          </div>
+          <div *ngIf="editForm.get('extendedUser')?.value" class="flex items-center gap-2">
+            <span class="font-medium">Propriétaire :</span>
+            <span>{{ editForm.get('extendedUser')?.value?.user?.login }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Boutons actions -->
+      <div class="flex flex-col sm:flex-row sm:justify-end gap-4 mt-8">
+        <button
+          type="button"
+          (click)="previousState()"
+          class="w-full sm:w-auto px-6 py-3 rounded-xl border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition duration-200 font-semibold shadow-sm flex items-center justify-center gap-2"
+        >
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          Annuler
+        </button>
+
+        <button
+          type="submit"
+          [disabled]="editForm.invalid || isSaving"
+          class="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none flex items-center justify-center gap-2"
+        >
+          <svg *ngIf="!isSaving" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <svg *ngIf="isSaving" class="h-5 w-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            />
+          </svg>
+          {{ isSaving ? 'Enregistrement...' : editForm.controls.id.value ? 'Mettre à jour' : 'Créer le groupe' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

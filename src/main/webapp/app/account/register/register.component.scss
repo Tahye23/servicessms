@@ -1,0 +1,381 @@
+// Variables
+$primary-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+$success-color: #10b981;
+$error-color: #ef4444;
+$warning-color: #f59e0b;
+
+// Mixins
+@mixin smooth-transition($duration: 0.3s) {
+  transition: all $duration ease-in-out;
+}
+
+@mixin glass-effect {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+// Styles principaux
+.register-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 50%, #f3e8ff 100%);
+
+  // Animations d'entrée
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
+
+  .animate-slide-in {
+    animation: slideIn 0.5s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  // Logo avec animation
+  .logo-container {
+    @include smooth-transition;
+
+    &:hover {
+      transform: scale(1.05) rotate(5deg);
+    }
+  }
+
+  // Indicateur d'étapes
+  .step-indicator {
+    .step-circle {
+      @include smooth-transition;
+
+      &.active {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+      }
+    }
+
+    .step-connector {
+      .progress-bar {
+        @include smooth-transition(0.5s);
+      }
+    }
+  }
+
+  // Formulaire
+  .register-form {
+    @include glass-effect;
+
+    .form-input {
+      @include smooth-transition;
+
+      &:focus {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      }
+
+      &.input-error {
+        animation: shake 0.5s ease-in-out;
+      }
+
+      &.input-success {
+        box-shadow: 0 0 0 3px rgba($success-color, 0.1);
+      }
+    }
+
+    @keyframes shake {
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+      25% {
+        transform: translateX(-5px);
+      }
+      75% {
+        transform: translateX(5px);
+      }
+    }
+
+    // Boutons
+    .btn-primary {
+      background: $primary-gradient;
+      @include smooth-transition;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+
+      &:disabled {
+        background: #9ca3af;
+        transform: none;
+        box-shadow: none;
+      }
+    }
+
+    .btn-secondary {
+      @include smooth-transition;
+
+      &:hover {
+        transform: translateY(-1px);
+        background-color: #f3f4f6;
+      }
+    }
+  }
+
+  // Indicateur de force du mot de passe
+  .password-strength {
+    .strength-bar {
+      @include smooth-transition;
+
+      &.strength-weak {
+        background-color: $error-color;
+      }
+
+      &.strength-medium {
+        background-color: $warning-color;
+      }
+
+      &.strength-strong {
+        background-color: #3b82f6;
+      }
+
+      &.strength-very-strong {
+        background-color: $success-color;
+      }
+    }
+  }
+
+  // Messages d'erreur et de succès
+  .error-message {
+    animation: slideDown 0.3s ease-out;
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  }
+
+  .success-message {
+    animation: bounceIn 0.6s ease-out;
+
+    @keyframes bounceIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.3);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.05);
+      }
+      70% {
+        transform: scale(0.9);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  }
+
+  // Spinner de chargement
+  .loading-spinner {
+    animation: spin 1s linear infinite;
+
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  }
+
+  // Avantages du plan FREE
+  .plan-benefits {
+    @include glass-effect;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+
+    .benefit-item {
+      @include smooth-transition;
+
+      &:hover {
+        transform: translateX(4px);
+      }
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 640px) {
+    .register-form {
+      margin: 1rem;
+      padding: 1.5rem;
+      border-radius: 1rem;
+    }
+
+    .step-indicator {
+      .step-text {
+        display: none;
+      }
+    }
+
+    .form-grid-2 {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // Effet de hover pour les liens
+  .link-hover {
+    @include smooth-transition;
+
+    &:hover {
+      transform: translateY(-1px);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  // Checkbox personnalisée
+  .custom-checkbox {
+    @include smooth-transition;
+
+    &:checked {
+      background-color: #3b82f6;
+      border-color: #3b82f6;
+      transform: scale(1.1);
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+  }
+
+  // États de validation
+  .validation-success {
+    border-color: $success-color;
+    background-color: rgba($success-color, 0.05);
+  }
+
+  .validation-error {
+    border-color: $error-color;
+    background-color: rgba($error-color, 0.05);
+  }
+
+  // Animation pour les icônes
+  .icon-bounce {
+    animation: iconBounce 2s infinite;
+
+    @keyframes iconBounce {
+      0%,
+      20%,
+      50%,
+      80%,
+      100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-6px);
+      }
+      60% {
+        transform: translateY(-3px);
+      }
+    }
+  }
+
+  // Effet de pulsation pour les éléments importants
+  .pulse-effect {
+    animation: pulse 2s infinite;
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+      }
+    }
+  }
+
+  // Dégradé animé pour le fond
+  .animated-background {
+    background: linear-gradient(-45deg, #f0f9ff, #e0e7ff, #f3e8ff, #fef3c7);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+  }
+}
+
+// Styles pour le mode sombre (optionnel)
+@media (prefers-color-scheme: dark) {
+  .register-container {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+
+    .register-form {
+      background: rgba(30, 41, 59, 0.95);
+      border-color: rgba(71, 85, 105, 0.3);
+      color: #f1f5f9;
+    }
+
+    .form-input {
+      background-color: rgba(51, 65, 85, 0.5);
+      border-color: rgba(71, 85, 105, 0.5);
+      color: #f1f5f9;
+
+      &::placeholder {
+        color: #94a3b8;
+      }
+
+      &:focus {
+        background-color: rgba(30, 41, 59, 0.8);
+      }
+    }
+
+    .text-gray-700 {
+      color: #cbd5e1 !important;
+    }
+
+    .text-gray-600 {
+      color: #94a3b8 !important;
+    }
+  }
+}

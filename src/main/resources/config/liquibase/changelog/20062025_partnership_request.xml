@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Ajout de l'entité PartnershipRequest.
+    -->
+    <changeSet id="20240620154500-1" author="jhipster">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <not>
+                <tableExists tableName="partnership_request"/>
+            </not>
+        </preConditions>
+        <createTable tableName="partnership_request">
+
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="first_name" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="last_name" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="email" type="varchar(254)">
+                <constraints nullable="false" />
+            </column>
+            <column name="phone" type="varchar(20)">
+                <constraints nullable="false" />
+            </column>
+            <column name="company_name" type="varchar(150)">
+                <constraints nullable="false" />
+            </column>
+            <column name="industry" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="project_description" type="varchar(2000)">
+                <constraints nullable="false" />
+            </column>
+            <column name="monthly_volume" type="varchar(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="launch_date" type="varchar(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="selected_plan_id" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <column name="selected_plan_name" type="varchar(100)">
+                <constraints nullable="true" />
+            </column>
+            <column name="status" type="varchar(20)" defaultValue="PENDING">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_date" type="${datetimeType}" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+            <column name="processed_date" type="${datetimeType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="admin_notes" type="varchar(1000)">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+        <dropDefaultValue tableName="partnership_request" columnName="created_date" columnDataType="${datetimeType}"/>
+    </changeSet>
+
+    <!-- Ajout des index pour améliorer les performances -->
+    <changeSet id="20240620154500-2" author="jhipster">
+        <createIndex indexName="idx_partnership_request_email" tableName="partnership_request">
+            <column name="email"/>
+        </createIndex>
+
+        <createIndex indexName="idx_partnership_request_status" tableName="partnership_request">
+            <column name="status"/>
+        </createIndex>
+
+        <createIndex indexName="idx_partnership_request_created_date" tableName="partnership_request">
+            <column name="created_date"/>
+        </createIndex>
+
+        <createIndex indexName="idx_partnership_request_company_name" tableName="partnership_request">
+            <column name="company_name"/>
+        </createIndex>
+
+        <createIndex indexName="idx_partnership_request_industry" tableName="partnership_request">
+            <column name="industry"/>
+        </createIndex>
+
+        <createIndex indexName="idx_partnership_request_plan_id" tableName="partnership_request">
+            <column name="selected_plan_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Ajout d'une contrainte pour éviter les doublons -->
+    <changeSet id="20240620154500-3" author="jhipster">
+        <addUniqueConstraint
+            tableName="partnership_request"
+            columnNames="email, selected_plan_id, status"
+            constraintName="uc_partnership_request_email_plan_status"/>
+    </changeSet>
+
+
+    <!-- Ajout de commentaires sur les colonnes pour la documentation -->
+    <changeSet id="20240620154500-5" author="jhipster">
+        <setTableRemarks tableName="partnership_request" remarks="Table stockant les demandes de partenariat des clients"/>
+        <setColumnRemarks tableName="partnership_request" columnName="status" remarks="Statut: PENDING, APPROVED, REJECTED, IN_REVIEW"/>
+        <setColumnRemarks tableName="partnership_request" columnName="monthly_volume" remarks="Volume mensuel estimé de messages"/>
+        <setColumnRemarks tableName="partnership_request" columnName="launch_date" remarks="Date de lancement souhaitée du projet"/>
+        <setColumnRemarks tableName="partnership_request" columnName="admin_notes" remarks="Notes internes pour le suivi administratif"/>
+    </changeSet>
+
+</databaseChangeLog>

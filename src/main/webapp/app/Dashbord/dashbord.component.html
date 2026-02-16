@@ -1,0 +1,671 @@
+<!-- États de chargement et d'erreur -->
+<div *ngIf="loading()" class="flex justify-center items-center min-h-[400px]">
+  <div class="flex flex-col items-center space-y-4">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+    <span class="text-gray-600 font-medium">Chargement des données...</span>
+  </div>
+</div>
+
+<div
+  *ngIf="errorMessage() && !loading()"
+  class="max-w-2xl mx-auto text-center bg-red-50 border-l-4 border-red-500 p-6 rounded-lg mb-8 shadow-sm"
+>
+  <div class="flex items-center justify-center mb-2">
+    <i class="pi pi-exclamation-triangle text-red-500 text-xl mr-2"></i>
+    <h3 class="text-lg font-semibold text-red-800">Erreur</h3>
+  </div>
+  <p class="text-red-700">{{ errorMessage() }}</p>
+  <button (click)="refreshDashboard()" class="mt-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
+    Réessayer
+  </button>
+</div>
+
+<!-- Dashboard principal -->
+<div *ngIf="!loading() && !errorMessage()" class="min-h-screen">
+  <div class="container mx-auto px-4 py-8 max-w-7xl">
+    <!-- Alerte crédits faibles -->
+    <div *ngIf="hasLowCredits" class="mb-6 bg-orange-50 border-l-4 border-orange-400 p-4 rounded-lg shadow-sm">
+      <div class="flex items-center">
+        <i class="pi pi-exclamation-triangle text-orange-600 text-xl mr-3"></i>
+        <div class="flex-1">
+          <h3 class="text-lg font-semibold text-orange-800">Attention - Crédits faibles</h3>
+          <p class="text-orange-700">{{ lowCreditsMessage }}</p>
+        </div>
+        <button (click)="navigateToUpgrade()" class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors">
+          Recharger
+        </button>
+      </div>
+    </div>
+
+    <!-- Header avec titre et informations d'abonnement -->
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-gray-900 mb-2">
+        👋 Bienvenue, <span class="text-indigo-600">{{ auth_account()?.firstName || auth_account()?.login }}</span>
+      </h1>
+      <p class="text-gray-600 text-lg mb-4">Voici un aperçu de votre consommation et statistiques</p>
+    </div>
+
+    <!-- ===== CARTES DE CRÉDITS D'ABONNEMENT ===== -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+      <!-- SMS disponibles -->
+      <div
+        class="bg-white rounded-2xl shadow-lg hover:shadow-xl p-6 border border-gray-100 transition-all duration-300 hover:-translate-y-1"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <div class="bg-blue-100 rounded-full p-3">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              class="text-blue-600 w-6 h-6"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8" />
+              <rect x="2" y="5" width="20" height="14" rx="2" ry="2" />
+            </svg>
+          </div>
+          <div class="text-right">
+            <div class="text-xs uppercase tracking-wide text-gray-500 font-semibold">SMS disponibles</div>
+            <div class="text-2xl font-bold mt-1" [class]="getSmsStatusClass()">
+              {{ subscriptionInfo()?.smsRemaining || 0 }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Barre de progression -->
+        <div class="w-full bg-gray-200 rounded-full h-2 mb-3">
+          <div
+            class="h-2 rounded-full transition-all duration-500"
+            [ngClass]="{
+              'bg-green-500': (subscriptionInfo()?.smsRemaining || 0) > 20,
+              'bg-orange-500': (subscriptionInfo()?.smsRemaining || 0) <= 20 && (subscriptionInfo()?.smsRemaining || 0) > 5,
+              'bg-red-500': (subscriptionInfo()?.smsRemaining || 0) <= 5
+            }"
+            [style.width.%]="getUsagePercentage('sms')"
+          ></div>
+        </div>
+
+        <button
+          (click)="navigateToSMS()"
+          [disabled]="!canUseSMS"
+          class="w-full py-2 px-4 rounded-lg text-sm font-medium transition-colors"
+          [ngClass]="{
+            'bg-blue-600 text-white hover:bg-blue-700': canUseSMS,
+            'bg-gray-300 text-gray-500 cursor-not-allowed': !canUseSMS
+          }"
+        >
+          {{ canUseSMS ? 'Envoyer SMS' : 'Améliorer le plan' }}
+        </button>
+      </div>
+
+      <!-- WhatsApp disponibles -->
+      <div
+        class="bg-white rounded-2xl shadow-lg hover:shadow-xl p-6 border border-gray-100 transition-all duration-300 hover:-translate-y-1"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <div class="bg-green-100 rounded-full p-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="text-green-600 w-6 h-6">
+              <path
+                d="M20.52 3.48A11.77 11.77 0 0012 0C5.372 0 0 5.373 0 12c0 2.108.55 4.14 1.6 5.933L0 24l6.22-1.6a11.85 11.85 0 005.72 1.49c6.63 0 12-5.37 12-12 0-3.2-1.25-6.2-3.4-8.42zM12 21.52a9.79 9.79 0 01-4.93-1.34l-.35-.2-3.69 1 1-3.6-.23-.36A9.77 9.77 0 012.22 12c0-5.42 4.4-9.82 9.8-9.82 2.62 0 5.1 1.02 6.95 2.87a9.8 9.8 0 012.9 6.94c0 5.42-4.4 9.82-9.82 9.82zm5.43-7.37c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15s-.77.96-.95 1.16c-.18.2-.36.22-.67.07a8.3 8.3 0 01-2.43-1.5 9.34 9.34 0 01-1.73-2.15c-.18-.3 0-.46.13-.6.13-.13.3-.35.46-.53.15-.18.2-.3.3-.5.1-.2 0-.37-.05-.52-.1-.15-.67-1.62-.92-2.22-.24-.57-.5-.5-.67-.51l-.58-.01c-.2 0-.52.07-.8.37s-1.05 1.03-1.05 2.5 1.08 2.9 1.23 3.1c.15.2 2.12 3.23 5.13 4.53.72.31 1.28.5 1.72.64.72.23 1.37.2 1.88.12.57-.1 1.75-.71 2-1.4.25-.68.25-1.27.18-1.4-.07-.15-.27-.25-.57-.4z"
+              />
+            </svg>
+          </div>
+          <div class="text-right">
+            <div class="text-xs uppercase tracking-wide text-gray-500 font-semibold">WhatsApp disponibles</div>
+            <div class="text-2xl font-bold mt-1" [class]="getWhatsAppStatusClass()">
+              {{ subscriptionInfo()?.whatsappRemaining || 0 }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Barre de progression -->
+        <div class="w-full bg-gray-200 rounded-full h-2 mb-3">
+          <div
+            class="h-2 rounded-full transition-all duration-500"
+            [ngClass]="{
+              'bg-green-500': (subscriptionInfo()?.whatsappRemaining || 0) > 20,
+              'bg-orange-500': (subscriptionInfo()?.whatsappRemaining || 0) <= 20 && (subscriptionInfo()?.whatsappRemaining || 0) > 5,
+              'bg-red-500': (subscriptionInfo()?.whatsappRemaining || 0) <= 5
+            }"
+            [style.width.%]="getUsagePercentage('whatsapp')"
+          ></div>
+        </div>
+
+        <button
+          (click)="navigateToWhatsApp()"
+          [disabled]="!canUseWhatsApp"
+          class="w-full py-2 px-4 rounded-lg text-sm font-medium transition-colors"
+          [ngClass]="{
+            'bg-green-600 text-white hover:bg-green-700': canUseWhatsApp,
+            'bg-gray-300 text-gray-500 cursor-not-allowed': !canUseWhatsApp
+          }"
+        >
+          {{ canUseWhatsApp ? 'Envoyer WhatsApp' : 'Améliorer le plan' }}
+        </button>
+      </div>
+
+      <!-- Messages succès -->
+      <div
+        class="bg-white rounded-2xl shadow-lg hover:shadow-xl p-6 border border-gray-100 transition-all duration-300 hover:-translate-y-1"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <div class="bg-emerald-100 rounded-full p-3">
+            <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7 12l3 3 7-7" />
+              <rect x="3" y="4" width="18" height="16" rx="3" />
+            </svg>
+          </div>
+          <div class="text-right">
+            <div class="text-xs uppercase tracking-wide text-gray-500 font-semibold">Messages succès</div>
+            <div class="text-2xl font-bold text-emerald-600 mt-1">
+              {{ stats()?.total | number: '1.0-0' }}
+            </div>
+          </div>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div
+            class="bg-gradient-to-r from-emerald-500 to-emerald-600 h-2 rounded-full transition-all duration-500"
+            style="width: 100%"
+          ></div>
+        </div>
+      </div>
+
+      <!-- Limite messages journalière -->
+      <div
+        class="bg-white rounded-2xl shadow-lg hover:shadow-xl p-6 border border-gray-100 transition-all duration-300 hover:-translate-y-1"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <div class="bg-indigo-100 rounded-full p-3">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6 text-indigo-600"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21.75 7.5v9a2.25 2.25 0 01-2.25 2.25h-15A2.25 2.25 0 012.25 16.5v-9m1.64-3.03A2.25 2.25 0 014.5 3h15a2.25 2.25 0 012.25 2.25v.54a2.25 2.25 0 01-.61 1.57L12 13.5 3.36 5.31z"
+              />
+            </svg>
+          </div>
+          <div class="text-right">
+            <div class="text-xs uppercase tracking-wide text-gray-500 font-semibold">Limite messages journalière</div>
+            <div
+              class="text-2xl font-bold mt-1"
+              [ngClass]="{
+                'text-red-600': dailyMessageLimit < 500,
+                'text-yellow-500': dailyMessageLimit >= 500 && dailyMessageLimit < 1500,
+                'text-indigo-600': dailyMessageLimit >= 1500
+              }"
+            >
+              {{ dailyMessageLimit | number: '1.0-0' }}
+            </div>
+            <div class="text-xs text-gray-400 mt-1">Messages autorisés par jour</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-lg p-6 mb-12">
+      <h3 class="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+        <svg *ngIf="true" class="w-6 h-6 text-yellow-500 mr-2" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <!-- Bolt icon SVG path -->
+          <path d="M13 2L3 14h7v8l10-12h-7z" />
+        </svg>
+        Actions rapides
+      </h3>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div
+          *ngFor="let action of getQuickActions()"
+          class="flex flex-col items-center p-4 rounded-xl transition-all duration-200 hover:bg-gray-50 cursor-pointer"
+          [class.opacity-50]="!action.available"
+          [attr.title]="action.tooltip"
+          (click)="action.available ? action.action() : null"
+        >
+          <div
+            class="p-3 rounded-full mb-3"
+            [ngClass]="{
+              'bg-blue-100 text-blue-600': action.available,
+              'bg-gray-100 text-gray-400': !action.available
+            }"
+          >
+            <!-- SVG switch based on iconType -->
+            <ng-container [ngSwitch]="action.iconType">
+              <svg
+                *ngSwitchCase="'sms'"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                class="w-6 h-6"
+              >
+                <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <rect x="2" y="5" width="20" height="14" rx="2" ry="2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+
+              <svg
+                *ngSwitchCase="'whatsapp'"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                class="w-6 h-6"
+              >
+                <path
+                  d="M17.472 14.382a7.488 7.488 0 01-3.04 1.244l-.01.004-2.037.394-.93.888a.496.496 0 01-.77-.04l-.05-.072a13.81 13.81 0 01-2.567-4.568 9.514 9.514 0 01.523-7.545 9.555 9.555 0 011.31-1.858c.128-.153.38-.282.572-.366.211-.096.32-.1.523-.036l2.484.93c.207.08.287.18.376.34a7.372 7.372 0 011.713 4.948z"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M15.105 9.14l-.65-.357c-.13-.07-.303-.14-.303-.14s-.263 0-.485.136a1.262 1.262 0 00-.478.55c-.155.346-.053.66.035.88.058.14.073.2.16.298l.476.537c.18.203.245.326.154.51a.708.708 0 01-.3.282c-.155.08-.495.06-.82-.19a2.52 2.52 0 01-1.064-1.27c-.177-.588-.07-1.022.285-1.24.423-.26.712-.218.866-.22.063 0 .113-.012.163-.018l.137-.02c.21-.03.383-.062.542-.087.23-.037.41-.067.534-.088.11-.018.2-.01.278.042.1.068.174.217.15.4z"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+
+              <svg
+                *ngSwitchCase="'users'"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                class="w-6 h-6"
+              >
+                <path d="M17 20h5v-2a3 3 0 00-5.356-1.857" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M9 20H4v-2a3 3 0 015.356-1.857" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <circle cx="12" cy="7" r="4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+
+              <svg
+                *ngSwitchCase="'file'"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                class="w-6 h-6"
+              >
+                <path
+                  d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path d="M14 2v6h6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+
+              <svg *ngSwitchDefault class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </ng-container>
+          </div>
+
+          <span
+            class="text-sm font-medium text-center"
+            [ngClass]="{
+              'text-gray-900': action.available,
+              'text-gray-400': !action.available
+            }"
+          >
+            {{ action.label }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtres période -->
+    <div class="flex justify-center mb-12">
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-2" role="group">
+        <button
+          *ngFor="let option of stateOptions"
+          [ngClass]="{
+            'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-lg transform scale-105': value === option.value,
+            'text-gray-700 hover:bg-indigo-50 hover:text-indigo-700': value !== option.value
+          }"
+          class="px-6 py-3 text-sm font-semibold rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 ease-in-out mx-1"
+          (click)="value = option.value; getStatsByDateRange()"
+          [attr.title]="option.description"
+        >
+          <i [class]="option.icon" class="mr-2 text-sm"></i>
+          {{ option.label }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Sélecteur de dates personnalisées -->
+    <div *ngIf="value === '5'" class="flex justify-center mb-12">
+      <div class="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label> <i class="pi pi-calendar mr-2"></i>Sélectionner une période </mat-label>
+          <mat-date-range-input [rangePicker]="picker">
+            <input matStartDate placeholder="Date de début" [(ngModel)]="customStartDate" (dateChange)="onCustomDateChange()" />
+            <input matEndDate placeholder="Date de fin" [(ngModel)]="customEndDate" (dateChange)="onCustomDateChange()" />
+          </mat-date-range-input>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- KPI Cards avec total consommé et volume total -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+      <!-- Total consommé -->
+      <div
+        class="bg-white rounded-2xl shadow-lg hover:shadow-xl p-8 border border-gray-100 transition-all duration-300 hover:-translate-y-1"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <div class="bg-pink-100 rounded-full p-3">
+            <svg class="w-7 h-7 text-pink-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 2C12 2 7 7 7 12a5 5 0 1010 0c0-5-5-10-5-10z" />
+            </svg>
+          </div>
+          <div class="text-right">
+            <div class="text-xs uppercase tracking-wide text-gray-500 font-semibold">Total consommé</div>
+            <div class="text-3xl font-bold text-pink-600 mt-1">
+              {{ stats()?.totalConsomme | number: '1.0-2' }}
+              <span class="text-lg text-gray-500">MRU</span>
+            </div>
+          </div>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div
+            class="bg-gradient-to-r from-pink-500 to-pink-600 h-2 rounded-full transition-all duration-500"
+            [style.width.%]="((stats()?.totalConsomme || 0) / ((stats()?.abonnementSolde || 0) + (stats()?.totalConsomme || 0))) * 100"
+          ></div>
+        </div>
+        <div class="flex justify-between text-xs text-gray-500 mt-1">
+          <span>Consommé</span>
+          <span
+            >{{
+              ((stats()?.totalConsomme || 0) / ((stats()?.abonnementSolde || 0) + (stats()?.totalConsomme || 0))) * 100 | number: '1.0-0'
+            }}%</span
+          >
+        </div>
+      </div>
+
+      <!-- Volume total de messages -->
+      <div
+        class="bg-white rounded-2xl shadow-lg hover:shadow-xl p-8 border border-gray-100 transition-all duration-300 hover:-translate-y-1"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <div class="bg-purple-100 rounded-full p-3">
+            <svg class="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              />
+            </svg>
+          </div>
+          <div class="text-right">
+            <div class="text-xs uppercase tracking-wide text-gray-500 font-semibold">Volume total</div>
+            <div class="text-3xl font-bold text-purple-600 mt-1">
+              {{ volumeTotal | number: '1.0-0' }}
+            </div>
+            <div class="text-xs text-gray-400 mt-1">Messages envoyés</div>
+          </div>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div
+            class="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full transition-all duration-500"
+            style="width: 100%"
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section graphiques -->
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 text-center mb-8">Analyse des données</h2>
+
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-12">
+        <!-- Graphique en secteurs -->
+        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl p-8 border border-gray-100 transition-all duration-300">
+          <div class="text-center mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Répartition du volume</h3>
+            <div class="w-12 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full"></div>
+          </div>
+
+          <div *ngIf="pieChartData.series" class="mb-6">
+            <apx-chart
+              [series]="pieChartData.series"
+              [chart]="pieChartData.chart"
+              [labels]="pieChartData.labels"
+              [colors]="pieChartData.colors"
+              [legend]="pieChartData.legend"
+              [plotOptions]="pieChartData.plotOptions"
+            >
+            </apx-chart>
+          </div>
+
+          <div class="text-center pt-4 border-t border-gray-100">
+            <div class="text-sm text-gray-600 mb-1">Volume total</div>
+            <div class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              {{ volumeTotal }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Graphique en barres -->
+        <div class="xl:col-span-2 bg-white rounded-2xl shadow-lg hover:shadow-xl p-8 border border-gray-100 transition-all duration-300">
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Évolution temporelle</h3>
+            <div class="w-12 h-1 bg-gradient-to-r from-green-500 to-blue-500 rounded-full"></div>
+          </div>
+
+          <div *ngIf="barChartData.series">
+            <apx-chart
+              [series]="barChartData.series"
+              [chart]="barChartData.chart"
+              [colors]="barChartData.colors"
+              [xaxis]="barChartData.xaxis"
+              [plotOptions]="barChartData.plotOptions"
+              [title]="barChartData.title"
+              [dataLabels]="barChartData.dataLabels"
+              [legend]="barChartData.legend"
+            >
+            </apx-chart>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cards stats SMS/WhatsApp détaillées -->
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 text-center mb-8">Statistiques détaillées</h2>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div
+          *ngFor="let t of stats()?.typeStats"
+          class="bg-white rounded-2xl shadow-lg hover:shadow-2xl p-8 border border-gray-100 transition-all duration-300 hover:-translate-y-1 group"
+        >
+          <!-- Header de la card -->
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center space-x-3">
+              <div
+                [ngClass]="{
+                  'bg-blue-100': t.type === 'SMS',
+                  'bg-green-100': t.type === 'WHATSAPP'
+                }"
+                class="p-3 rounded-full transition-transform group-hover:scale-110"
+              >
+                <span class="text-2xl">
+                  <svg
+                    *ngIf="t.type === 'SMS'"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    class="text-blue-600 w-6 h-6"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8" />
+                    <rect x="2" y="5" width="20" height="14" rx="2" ry="2" />
+                  </svg>
+
+                  <svg
+                    *ngIf="t.type === 'WHATSAPP'"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    class="text-green-600 w-6 h-6"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M17.472 14.382a7.488 7.488 0 01-3.04 1.244l-.01.004-2.037.394-.93.888a.496.496 0 01-.77-.04l-.05-.072a13.81 13.81 0 01-2.567-4.568 9.514 9.514 0 01.523-7.545 9.555 9.555 0 011.31-1.858c.128-.153.38-.282.572-.366.211-.096.32-.1.523-.036l2.484.93c.207.08.287.18.376.34a7.372 7.372 0 011.713 4.948z"
+                    />
+                    <path
+                      d="M15.105 9.14l-.65-.357c-.13-.07-.303-.14-.303-.14s-.263 0-.485.136a1.262 1.262 0 00-.478.55c-.155.346-.053.66.035.88.058.14.073.2.16.298l.476.537c.18.203.245.326.154.51a.708.708 0 01-.3.282c-.155.08-.495.06-.82-.19a2.52 2.52 0 01-1.064-1.27c-.177-.588-.07-1.022.285-1.24.423-.26.712-.218.866-.22.063 0 .113-.012.163-.018l.137-.02c.21-.03.383-.062.542-.087.23-.037.41-.067.534-.088.11-.018.2-.01.278.042.1.068.174.217.15.4z"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-gray-800">{{ t.type }}</h3>
+                <p class="text-sm text-gray-500">Communications</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-3xl font-bold text-gray-900">{{ t.total }}</div>
+              <div class="text-xs text-gray-500">Total</div>
+            </div>
+          </div>
+
+          <!-- Métriques avec barres de progression -->
+          <div class="space-y-4 mb-6">
+            <!-- Succès -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                <span class="text-sm font-medium text-gray-700">Succès</span>
+              </div>
+              <div class="flex items-center space-x-3">
+                <div class="w-24 bg-gray-200 rounded-full h-2">
+                  <div
+                    class="bg-green-500 h-2 rounded-full transition-all duration-500"
+                    [style.width.%]="t.total > 0 ? (t.success / t.total) * 100 : 0"
+                  ></div>
+                </div>
+                <span class="font-bold text-green-700 text-sm w-12 text-right">{{ t.success }}</span>
+              </div>
+            </div>
+
+            <!-- Échecs -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                <span class="text-sm font-medium text-gray-700">Échecs</span>
+              </div>
+              <div class="flex items-center space-x-3">
+                <div class="w-24 bg-gray-200 rounded-full h-2">
+                  <div
+                    class="bg-red-500 h-2 rounded-full transition-all duration-500"
+                    [style.width.%]="t.total > 0 ? (t.failed / t.total) * 100 : 0"
+                  ></div>
+                </div>
+                <span class="font-bold text-red-700 text-sm w-12 text-right">{{ t.failed }}</span>
+              </div>
+            </div>
+
+            <!-- En attente -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                <span class="text-sm font-medium text-gray-700">En attente</span>
+              </div>
+              <div class="flex items-center space-x-3">
+                <div class="w-24 bg-gray-200 rounded-full h-2">
+                  <div
+                    class="bg-yellow-500 h-2 rounded-full transition-all duration-500"
+                    [style.width.%]="t.total > 0 ? (t.pending / t.total) * 100 : 0"
+                  ></div>
+                </div>
+                <span class="font-bold text-yellow-700 text-sm w-12 text-right">{{ t.pending }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prix unitaire -->
+          <div class="pt-4 border-t border-gray-100">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600">Prix unitaire</span>
+              <div class="bg-indigo-50 px-3 py-1 rounded-full">
+                <span class="text-base font-bold text-indigo-700"> {{ t.unitPrice | number: '1.3-3' }} MRU </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action selon l'abonnement -->
+          <div class="mt-4 pt-4 border-t border-gray-100">
+            <button
+              *ngIf="t.type === 'SMS'"
+              (click)="navigateToSMS()"
+              [disabled]="!canUseSMS"
+              class="w-full py-2 px-4 rounded-lg text-sm font-medium transition-colors"
+              [ngClass]="{
+                'bg-blue-600 text-white hover:bg-blue-700': canUseSMS,
+                'bg-gray-300 text-gray-500 cursor-not-allowed': !canUseSMS
+              }"
+            >
+              {{ canUseSMS ? 'Envoyer SMS' : 'Plan SMS requis' }}
+            </button>
+
+            <button
+              *ngIf="t.type === 'WHATSAPP'"
+              (click)="navigateToWhatsApp()"
+              [disabled]="!canUseWhatsApp"
+              class="w-full py-2 px-4 rounded-lg text-sm font-medium transition-colors"
+              [ngClass]="{
+                'bg-green-600 text-white hover:bg-green-700': canUseWhatsApp,
+                'bg-gray-300 text-gray-500 cursor-not-allowed': !canUseWhatsApp
+              }"
+            >
+              {{ canUseWhatsApp ? 'Envoyer WhatsApp' : 'Plan WhatsApp requis' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer avec informations supplémentaires -->
+    <div class="text-center mt-12 pb-8">
+      <div class="bg-white rounded-2xl shadow-lg p-6 max-w-2xl mx-auto">
+        <div class="flex items-center justify-center space-x-4 mb-4">
+          <button
+            (click)="refreshDashboard()"
+            class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+          >
+            <i class="pi pi-refresh mr-2"></i>
+            Actualiser
+          </button>
+
+          <button
+            *ngIf="subscriptionInfo()?.canManageTemplates"
+            (click)="navigateToTemplates()"
+            class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm"
+          >
+            <i class="pi pi-file mr-2"></i>
+            Créer un modèle
+          </button>
+        </div>
+
+        <p class="text-gray-600 text-sm">
+          <i class="pi pi-info-circle mr-2"></i>
+          Données mises à jour en temps réel • Dernière synchronisation : {{ now | date: 'short' }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

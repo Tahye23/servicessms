@@ -1,0 +1,95 @@
+<div class="flex justify-center">
+  <div class="w-full max-w-3xl bg-white p-8 rounded-xl shadow-md">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center space-x-2">
+        <span jhiTranslate="migrationApp.userTokenApi.home.createOrEditLabel">Créer ou éditer un User Token Api</span>
+      </h2>
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        @if (editForm.controls.id.value !== null) {
+          <div class="flex flex-col">
+            <label for="field_id" class="text-sm text-gray-600 mb-1" jhiTranslate="migrationApp.userTokenApi.id">ID</label>
+            <input
+              type="number"
+              id="field_id"
+              name="id"
+              class="border rounded-lg px-3 py-2 text-gray-700 bg-gray-100"
+              formControlName="id"
+              [readonly]="true"
+            />
+          </div>
+        }
+
+        <div class="flex flex-col">
+          <label for="field_api" class="text-sm text-gray-600 mb-1" jhiTranslate="migrationApp.userTokenApi.api">Api</label>
+          <select
+            id="field_api"
+            name="api"
+            class="border rounded-lg px-3 py-2 text-gray-700"
+            formControlName="api"
+            [compareWith]="compareApi"
+          >
+            <option [ngValue]="null">-- Aucun --</option>
+            @for (apiOption of apisSharedCollection; track $index) {
+              <option [ngValue]="apiOption">{{ apiOption.id }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="flex flex-col">
+          <label for="field_token" class="text-sm text-gray-600 mb-1" jhiTranslate="migrationApp.userTokenApi.token">Token</label>
+          <select
+            id="field_token"
+            name="token"
+            class="border rounded-lg px-3 py-2 text-gray-700"
+            formControlName="token"
+            [compareWith]="compareTokensApp"
+          >
+            <option [ngValue]="null">-- Aucun --</option>
+            @for (tokensAppOption of tokensAppsSharedCollection; track $index) {
+              <option [ngValue]="tokensAppOption">{{ tokensAppOption.id }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="flex flex-col">
+          <label for="field_user" class="text-sm text-gray-600 mb-1" jhiTranslate="migrationApp.userTokenApi.user">User</label>
+          <select
+            id="field_user"
+            name="user"
+            class="border rounded-lg px-3 py-2 text-gray-700"
+            formControlName="user"
+            [compareWith]="compareExtendedUser"
+          >
+            <option [ngValue]="null">-- Aucun --</option>
+            @for (extendedUserOption of extendedUsersSharedCollection; track $index) {
+              <option [ngValue]="extendedUserOption">{{ extendedUserOption.id }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="flex space-x-4 mt-8">
+        <button
+          type="button"
+          (click)="previousState()"
+          class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+        >
+          <fa-icon icon="ban" class="mr-2"></fa-icon>
+          <span jhiTranslate="entity.action.cancel">Annuler</span>
+        </button>
+
+        <button
+          type="submit"
+          [disabled]="editForm.invalid || isSaving"
+          class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          <fa-icon icon="save" class="mr-2"></fa-icon>
+          <span jhiTranslate="entity.action.save">Sauvegarder</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

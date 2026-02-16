@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!-- ChangeSet 1: Supprimer la colonne api_token -->
+    <changeSet id="20260114-1" author="jhipster">
+        <comment>Drop deprecated api_token column from application table</comment>
+        <dropColumn columnName="api_token" tableName="application"/>
+    </changeSet>
+
+    <!-- ChangeSet 2: Supprimer la colonne last_token_refresh -->
+    <changeSet id="20250114-refactor-02-drop-last-token-refresh" author="migration">
+        <comment>Drop deprecated last_token_refresh column from application table</comment>
+        <dropColumn columnName="last_token_refresh" tableName="application"/>
+    </changeSet>
+
+    <!-- ChangeSet 3: Créer la table tokens_app -->
+    <changeSet id="20250114-refactor-03-create-tokens-app" author="migration">
+        <comment>Create tokens_app table to manage application tokens with expiration dates</comment>
+        <createTable tableName="tokens_app">
+            <column name="id" type="integer" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="application_id" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="token" type="varchar(1000)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="date_expiration" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+            <column name="is_expired" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="active" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+            <column name="last_used_at" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+            <column name="user_login" type="varchar(50)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- ChangeSet 4: Ajouter la clé étrangère application_id -->
+    <changeSet id="20250114-refactor-04-add-fk-application" author="migration">
+        <comment>Add foreign key constraint from tokens_app to application with CASCADE DELETE</comment>
+        <addForeignKeyConstraint baseColumnNames="application_id"
+                                 baseTableName="tokens_app"
+                                 constraintName="fk_tokens_app_application_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="application"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <!-- ChangeSet 5: Index sur application_id -->
+    <changeSet id="20250114-refactor-05-idx-application-id" author="migration">
+        <comment>Add index on application_id column for foreign key performance</comment>
+        <createIndex indexName="idx_tokens_app_application_id" tableName="tokens_app">
+            <column name="application_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- ChangeSet 6: Index sur token -->
+    <changeSet id="20250114-refactor-06-idx-token" author="migration">
+        <comment>Add index on token column for token lookup</comment>
+        <createIndex indexName="idx_tokens_app_token" tableName="tokens_app">
+            <column name="token"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- ChangeSet 7: Index sur user_login -->
+    <changeSet id="20250114-refactor-07-idx-user-login" author="migration">
+        <comment>Add index on user_login column for user token filtering</comment>
+        <createIndex indexName="idx_tokens_app_user_login" tableName="tokens_app">
+            <column name="user_login"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- ChangeSet 8: Index composite active + date_expiration -->
+    <changeSet id="20250114-refactor-08-idx-active-expiration" author="migration">
+        <comment>Add composite index on active and date_expiration for token filtering queries</comment>
+        <createIndex indexName="idx_tokens_app_active_expiration" tableName="tokens_app">
+            <column name="active"/>
+            <column name="date_expiration"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

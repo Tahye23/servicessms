@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity TokensApp.
+    -->
+    <changeSet id="20240306150840-1" author="jhipster">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <not>
+                <tableExists tableName="tokens_app"/>
+            </not>
+        </preConditions>
+        <createTable tableName="tokens_app">
+            <column name="id" type="integer">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="date_expiration" type="${datetimeType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="token" type="text">
+                <constraints nullable="true" />
+            </column>
+            <column name="application_id" type="integer">
+                <constraints nullable="true" />
+            </column>
+             <column name="is_expired" type="boolean">
+             </column>
+
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+        <dropDefaultValue tableName="tokens_app" columnName="date_expiration" columnDataType="${datetimeType}"/>
+    </changeSet>
+
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
+    <!--
+        Load sample data generated with Faker.js
+        - This data can be easily edited using a CSV editor (or even MS Excel) and
+          is located in the 'src/main/resources/config/liquibase/fake-data' directory
+        - By default this data is applied when running with the JHipster 'dev' profile.
+          This can be customized by adding or removing 'faker' in the 'spring.liquibase.contexts'
+          Spring Boot configuration key.
+    -->
+    <!-- Ajout des nouveaux champs pour TokensApp -->
+    <changeSet id="20250826120000-2" author="saadna">
+        <comment>Ajout des champs active, created_at et last_used_at à la table tokens_app</comment>
+
+        <!-- Ajout du champ active -->
+        <addColumn tableName="tokens_app">
+            <column name="active" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <!-- Ajout du champ created_at -->
+        <addColumn tableName="tokens_app">
+            <column name="created_at" type="${datetimeType}" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <!-- Ajout du champ last_used_at -->
+        <addColumn tableName="tokens_app">
+            <column name="last_used_at" type="${datetimeType}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <!-- Mise à jour de la taille de la colonne token pour les JWT -->
+        <modifyDataType tableName="tokens_app" columnName="token" newDataType="varchar(1000)"/>
+
+        <!-- Mise à jour des enregistrements existants -->
+        <sql>
+            UPDATE tokens_app SET active = true WHERE active IS NULL;
+        </sql>
+
+        <!-- Création des index pour améliorer les performances -->
+        <createIndex tableName="tokens_app" indexName="idx_tokens_app_active">
+            <column name="active"/>
+        </createIndex>
+
+        <createIndex tableName="tokens_app" indexName="idx_tokens_app_token">
+            <column name="token"/>
+        </createIndex>
+
+        <createIndex tableName="tokens_app" indexName="idx_tokens_app_date_expiration">
+            <column name="date_expiration"/>
+        </createIndex>
+
+        <createIndex tableName="tokens_app" indexName="idx_tokens_app_application_id">
+            <column name="application_id"/>
+        </createIndex>
+
+        <!-- Ajout de commentaires sur les colonnes -->
+        <sql>
+            COMMENT ON COLUMN tokens_app.active IS 'Indique si le token est actif ou désactivé';
+            COMMENT ON COLUMN tokens_app.created_at IS 'Date et heure de création du token';
+            COMMENT ON COLUMN tokens_app.last_used_at IS 'Date et heure de dernière utilisation du token';
+        </sql>
+
+        <!-- Nettoyage des valeurs par défaut temporaires -->
+        <dropDefaultValue tableName="tokens_app" columnName="created_at" columnDataType="${datetimeType}"/>
+    </changeSet>
+    <changeSet id="20250826130000-2" author="saadna">
+        <addColumn tableName="tokens_app">
+            <column name="user_login" type="varchar(50)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <createIndex tableName="tokens_app" indexName="idx_tokens_app_user_login">
+            <column name="user_login"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

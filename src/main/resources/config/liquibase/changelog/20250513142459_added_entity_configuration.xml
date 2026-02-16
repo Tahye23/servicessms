@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity Contact.
+    -->
+    <changeSet id="20250513-1" author="jhipster">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <not>
+                <tableExists tableName="configuration"/>
+            </not>
+        </preConditions>
+        <createTable tableName="configuration">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_login" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="access_token" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="business_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone_number_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="custom_fields" type="TEXT">
+            </column>
+            <column name="app_id" type="VARCHAR(255)">
+            </column>
+            <column name="isAproved" type="VARCHAR(255)">
+            </column>
+            <column name="verified" type="BOOLEAN" defaultValueBoolean="false">
+            </column>
+        </createTable>
+    </changeSet>
+
+
+
+</databaseChangeLog>

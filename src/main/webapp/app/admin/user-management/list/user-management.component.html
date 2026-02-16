@@ -1,0 +1,727 @@
+<div class="min-h-screen p-2 sm:p-4 lg:p-8">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header responsive -->
+    <header class="mb-4 sm:mb-6 lg:mb-8">
+      <div class="bg-white/90 backdrop-blur-lg shadow-lg rounded-2xl lg:rounded-3xl p-4 sm:p-6 lg:p-8 border border-white/30">
+        <!-- Titre - Stack sur mobile -->
+        <div class="mb-4 lg:mb-6">
+          <div class="flex items-center mb-3">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-2 sm:p-3 lg:p-4 rounded-xl lg:rounded-2xl shadow-lg">
+              <svg class="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+                />
+              </svg>
+            </div>
+            <div class="ml-3 lg:ml-6">
+              <h1
+                class="text-xl sm:text-2xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-800 bg-clip-text text-transparent"
+              >
+                Gestion des Utilisateurs
+              </h1>
+              <p class="text-gray-600 text-sm sm:text-base lg:text-lg hidden sm:block">Administrez vos utilisateurs</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Barre de recherche - Full width sur mobile -->
+        <div class="mb-4">
+          <div class="relative">
+            <input
+              type="text"
+              [(ngModel)]="searchTerm"
+              (input)="onSearch()"
+              placeholder="Rechercher..."
+              class="w-full pl-10 pr-4 py-3 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 text-sm sm:text-base"
+            />
+            <svg
+              class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Filtres - Stack sur mobile -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+          <select
+            [(ngModel)]="statusFilter"
+            (change)="applyFilters()"
+            class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+          >
+            <option value="">Tous les statuts</option>
+            <option value="active">Actifs</option>
+            <option value="inactive">Inactifs</option>
+          </select>
+
+          <!-- Dans le template, remplacer le select de rôle par : -->
+
+          <select
+            [(ngModel)]="roleFilter"
+            (change)="applyFilters()"
+            class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+          >
+            <option value="">Tous les rôles</option>
+            <option *ngFor="let role of availableRoles()" [value]="role">
+              {{ role.replace('ROLE_', '') | titlecase }}
+            </option>
+          </select>
+
+          <button
+            (click)="loadAll()"
+            [disabled]="isLoading()"
+            class="flex items-center justify-center px-4 py-2 bg-white shadow-md rounded-lg text-gray-700 hover:bg-gray-50 transition-all duration-300 border border-gray-200 disabled:opacity-50 text-sm"
+          >
+            <svg class="h-4 w-4 mr-2" [class.animate-spin]="isLoading()" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            {{ isLoading() ? 'Chargement...' : 'Actualiser' }}
+          </button>
+
+          <button
+            [routerLink]="['./new']"
+            class="flex items-center justify-center px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg rounded-lg text-white hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 text-sm font-medium"
+          >
+            <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Nouveau
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Alertes -->
+    <jhi-alert-error></jhi-alert-error>
+    <jhi-alert></jhi-alert>
+
+    <!-- Statistiques - Limitées à la page actuelle -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 lg:gap-6 mb-4 sm:mb-6 lg:mb-8">
+      <div class="bg-white/80 backdrop-blur-sm rounded-xl lg:rounded-2xl p-3 sm:p-4 lg:p-6 shadow-lg border border-white/30">
+        <div class="flex items-center">
+          <div class="p-2 lg:p-3 rounded-full bg-blue-100 text-blue-600">
+            <svg class="h-4 w-4 lg:h-6 lg:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+              />
+            </svg>
+          </div>
+          <div class="ml-2 lg:ml-4">
+            <p class="text-xs lg:text-sm font-medium text-gray-600">Total</p>
+            <p class="text-lg lg:text-2xl font-bold text-gray-900">{{ totalItems() }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white/80 backdrop-blur-sm rounded-xl lg:rounded-2xl p-3 sm:p-4 lg:p-6 shadow-lg border border-white/30">
+        <div class="flex items-center">
+          <div class="p-2 lg:p-3 rounded-full bg-green-100 text-green-600">
+            <svg class="h-4 w-4 lg:h-6 lg:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="ml-2 lg:ml-4">
+            <p class="text-xs lg:text-sm font-medium text-gray-600">Actifs (page)</p>
+            <p class="text-lg lg:text-2xl font-bold text-gray-900">{{ getActiveUsersCount() }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white/80 backdrop-blur-sm rounded-xl lg:rounded-2xl p-3 sm:p-4 lg:p-6 shadow-lg border border-white/30">
+        <div class="flex items-center">
+          <div class="p-2 lg:p-3 rounded-full bg-red-100 text-red-600">
+            <svg class="h-4 w-4 lg:h-6 lg:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div class="ml-2 lg:ml-4">
+            <p class="text-xs lg:text-sm font-medium text-gray-600">Inactifs (page)</p>
+            <p class="text-lg lg:text-2xl font-bold text-gray-900">{{ getInactiveUsersCount() }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white/80 backdrop-blur-sm rounded-xl lg:rounded-2xl p-3 sm:p-4 lg:p-6 shadow-lg border border-white/30">
+        <div class="flex items-center">
+          <div class="p-2 lg:p-3 rounded-full bg-purple-100 text-purple-600">
+            <svg class="h-4 w-4 lg:h-6 lg:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="ml-2 lg:ml-4">
+            <p class="text-xs lg:text-sm font-medium text-gray-600">Récents (page)</p>
+            <p class="text-lg lg:text-2xl font-bold text-gray-900">{{ getRecentUsersCount() }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loader -->
+    <div *ngIf="isLoading() && !users().length" class="flex items-center justify-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 lg:h-16 lg:w-16 border-b-2 border-blue-600"></div>
+    </div>
+
+    <!-- Liste des utilisateurs - Vue Cards pour mobile et tablet, Table pour desktop -->
+    <div *ngIf="users().length > 0">
+      <!-- Vue Mobile et Tablet (Cards) -->
+      <div class="xl:hidden space-y-3 sm:space-y-4">
+        <div
+          *ngFor="let user of paginatedUsers(); trackBy: trackIdentity"
+          class="bg-white/90 backdrop-blur-sm rounded-xl lg:rounded-2xl p-4 sm:p-6 shadow-lg border border-white/30 hover:shadow-xl transition-all duration-300"
+        >
+          <!-- Header de la card -->
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center flex-1 min-w-0">
+              <div class="relative flex-shrink-0">
+                <div
+                  class="h-10 w-10 sm:h-12 sm:w-12 bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm sm:text-lg"
+                >
+                  {{ user.login!.charAt(0).toUpperCase() }}
+                </div>
+                <div
+                  class="absolute -bottom-1 -right-1 h-3 w-3 sm:h-4 sm:w-4 rounded-full border-2 border-white"
+                  [class.bg-green-400]="user.activated"
+                  [class.bg-red-400]="!user.activated"
+                ></div>
+              </div>
+              <div class="ml-3 flex-1 min-w-0">
+                <h3 class="font-semibold text-gray-900 text-sm sm:text-base truncate">{{ user.login }}</h3>
+                <p class="text-xs sm:text-sm text-gray-500">#{{ user.id }}</p>
+              </div>
+            </div>
+
+            <!-- Statut mobile -->
+            <div class="flex-shrink-0 ml-2">
+              <button
+                *ngIf="!user.activated"
+                (click)="setActive(user, true)"
+                class="px-2 py-1 sm:px-3 sm:py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold"
+              >
+                Inactif
+              </button>
+              <button
+                *ngIf="user.activated"
+                (click)="setActive(user, false)"
+                [disabled]="!currentAccount() || currentAccount()?.login === user.login"
+                class="px-2 py-1 sm:px-3 sm:py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold disabled:opacity-50"
+              >
+                Actif
+              </button>
+            </div>
+          </div>
+
+          <!-- Informations principales -->
+          <div class="space-y-3 mb-4">
+            <div>
+              <p class="text-xs sm:text-sm text-gray-500 mb-1">Email</p>
+              <p class="font-medium text-gray-900 text-sm sm:text-base truncate">{{ user.email }}</p>
+            </div>
+
+            <div *ngIf="user.firstName || user.lastName">
+              <p class="text-xs sm:text-sm text-gray-500 mb-1">Nom complet</p>
+              <p class="font-medium text-gray-900 text-sm sm:text-base">{{ user.firstName }} {{ user.lastName }}</p>
+            </div>
+
+            <div *ngIf="user.authorities?.length">
+              <p class="text-xs sm:text-sm text-gray-500 mb-2">Rôles</p>
+              <div class="flex flex-wrap gap-1">
+                <span
+                  *ngFor="let authority of user.authorities"
+                  class="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium"
+                >
+                  {{ authority }}
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <p class="text-xs sm:text-sm text-gray-500 mb-1">Créé le</p>
+              <p class="font-medium text-gray-900 text-sm">{{ user.createdDate | date: 'dd/MM/yyyy HH:mm' }}</p>
+            </div>
+          </div>
+
+          <!-- Actions mobile -->
+          <div class="flex justify-end space-x-2 pt-4 border-t border-gray-100">
+            <button [routerLink]="['./', user.login, 'view']" class="p-2 text-indigo-600 hover:bg-indigo-100 rounded-lg transition-colors">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+            </button>
+
+            <button [routerLink]="['./', user.login, 'edit']" class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
+              </svg>
+            </button>
+
+            <button
+              (click)="deleteUser(user)"
+              [disabled]="!currentAccount() || currentAccount()?.login === user.login"
+              class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vue Desktop (Table) - Seulement sur XL+ -->
+      <div class="hidden xl:block bg-white/90 backdrop-blur-lg shadow-2xl rounded-3xl overflow-hidden border border-white/30">
+        <!-- En-tête de table -->
+        <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6 border-b border-gray-200">
+          <div class="flex justify-between items-center">
+            <div>
+              <h3 class="text-xl font-bold text-gray-800">Liste des utilisateurs</h3>
+              <p class="text-sm text-gray-600 mt-1">{{ totalItems() }} utilisateurs {{ searchTerm ? 'trouvés' : 'au total' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="overflow-x-auto">
+          <table class="min-w-full">
+            <thead class="bg-gradient-to-r from-slate-100 to-gray-100">
+              <tr>
+                <th class="px-7 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Utilisateur</th>
+                <th class="px-7 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Contact</th>
+                <th class="px-7 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Statut</th>
+                <th class="px-7 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Rôles</th>
+                <th class="px-7 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr
+                *ngFor="let user of paginatedUsers(); let i = index; trackBy: trackIdentity"
+                class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-300"
+                [class.bg-gradient-to-r]="i % 2 === 0"
+                [class.from-gray-50]="i % 2 === 0"
+                [class.to-slate-50]="i % 2 === 0"
+              >
+                <!-- Utilisateur -->
+                <td class="px-7 py-3">
+                  <div class="flex items-center">
+                    <div class="relative">
+                      <div
+                        class="h-10 w-10 bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg"
+                      >
+                        {{ user.login!.charAt(0).toUpperCase() }}
+                      </div>
+                      <div
+                        class="absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white"
+                        [class.bg-green-400]="user.activated"
+                        [class.bg-red-400]="!user.activated"
+                      ></div>
+                    </div>
+                    <div class="ml-4">
+                      <div class="font-semibold text-gray-900 text-lg">{{ user.login }}</div>
+                      <div class="text-sm text-gray-500">#{{ user.id }}</div>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Contact -->
+                <td class="px-7 py-3">
+                  <div class="text-gray-900 font-medium">{{ user.email }}</div>
+                  <div *ngIf="user.firstName || user.lastName" class="text-sm text-gray-500">{{ user.firstName }} {{ user.lastName }}</div>
+                </td>
+
+                <!-- Statut -->
+                <td class="px-7 py-3">
+                  <button
+                    *ngIf="!user.activated"
+                    (click)="setActive(user, true)"
+                    class="inline-flex items-center px-4 py-2 bg-red-100 text-red-700 rounded-full text-sm font-semibold hover:bg-red-200 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md"
+                  >
+                    <div class="w-2 h-2 bg-red-400 rounded-full mr-2 animate-pulse"></div>
+                    Désactivé
+                  </button>
+                  <button
+                    *ngIf="user.activated"
+                    (click)="setActive(user, false)"
+                    [disabled]="!currentAccount() || currentAccount()?.login === user.login"
+                    class="inline-flex items-center px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-semibold hover:bg-green-200 transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+                  >
+                    <div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                    Activé
+                  </button>
+                </td>
+
+                <!-- Rôles -->
+                <td class="px-7 py-3">
+                  <div class="flex flex-wrap gap-2">
+                    <span
+                      *ngFor="let authority of user.authorities"
+                      class="inline-flex items-center px-3 py-1 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 rounded-full text-xs font-semibold shadow-sm"
+                    >
+                      {{ authority }}
+                    </span>
+                  </div>
+                </td>
+
+                <!-- Actions -->
+                <td class="px-7 py-3">
+                  <div class="flex space-x-3">
+                    <button
+                      [routerLink]="['./', user.login, 'view']"
+                      class="p-2 text-indigo-600 hover:bg-indigo-100 rounded-xl transition-all duration-300 hover:scale-110 shadow-sm hover:shadow-md"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                        />
+                      </svg>
+                    </button>
+
+                    <button
+                      [routerLink]="['./', user.login, 'edit']"
+                      class="p-2 text-blue-600 hover:bg-blue-100 rounded-xl transition-all duration-300 hover:scale-110 shadow-sm hover:shadow-md"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        />
+                      </svg>
+                    </button>
+
+                    <button
+                      (click)="deleteUser(user)"
+                      [disabled]="!currentAccount() || currentAccount()?.login === user.login"
+                      class="p-2 text-red-600 hover:bg-red-100 rounded-xl transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message vide -->
+    <div *ngIf="!isLoading() && users().length === 0" class="text-center py-8 lg:py-12">
+      <div class="bg-white/80 backdrop-blur-sm rounded-2xl lg:rounded-3xl p-8 lg:p-12 shadow-xl border border-white/30">
+        <svg class="mx-auto h-12 w-12 lg:h-16 lg:w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+          />
+        </svg>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Aucun utilisateur trouvé</h3>
+        <p class="text-gray-600 mb-6 text-sm sm:text-base">
+          {{ searchTerm ? 'Aucun utilisateur ne correspond à votre recherche.' : 'Commencez par créer votre premier utilisateur.' }}
+        </p>
+        <button
+          [routerLink]="['./new']"
+          class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl text-sm sm:text-base"
+        >
+          Créer un utilisateur
+        </button>
+      </div>
+    </div>
+
+    <!-- Pagination responsive -->
+    <div *ngIf="totalItems() > itemsPerPage" class="mt-4 sm:mt-6 lg:mt-8">
+      <div class="bg-white/90 backdrop-blur-lg shadow-xl rounded-2xl lg:rounded-3xl p-4 sm:p-6 lg:p-8 border border-white/30">
+        <!-- Informations de pagination - Stack sur mobile -->
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+          <div class="bg-gradient-to-r from-gray-100 to-gray-200 rounded-full px-4 py-2 lg:px-6 lg:py-3">
+            <span class="text-gray-700 font-medium text-sm lg:text-base">
+              Affichage {{ getStartIndex() }} - {{ getEndIndex() }} sur
+              <span class="font-bold text-blue-600">{{ totalItems() }}</span> utilisateurs
+            </span>
+          </div>
+
+          <!-- Sélecteur d'éléments par page -->
+          <div class="flex items-center space-x-3">
+            <label class="text-sm text-gray-600 hidden sm:block">Éléments par page:</label>
+            <select
+              [(ngModel)]="itemsPerPage"
+              (change)="onItemsPerPageChange()"
+              class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
+            >
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Contrôles de pagination - Responsive -->
+        <div class="space-y-4">
+          <!-- Navigation principale - Mobile first -->
+          <div class="flex justify-between items-center">
+            <!-- Bouton précédent -->
+            <button
+              (click)="navigateToPage(page - 1)"
+              [disabled]="page <= 1"
+              class="flex items-center px-3 py-2 sm:px-4 sm:py-2 lg:px-6 lg:py-3 bg-white shadow-lg rounded-lg lg:rounded-xl text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-xl border border-gray-200 text-sm lg:text-base"
+            >
+              <svg class="w-4 h-4 lg:w-5 lg:h-5 mr-1 lg:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+              <span class="hidden sm:inline">Précédent</span>
+              <span class="sm:hidden">Préc.</span>
+            </button>
+
+            <!-- Informations page actuelle -->
+            <div
+              class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-3 py-2 sm:px-4 sm:py-2 lg:px-8 lg:py-3 rounded-lg lg:rounded-xl shadow-lg"
+            >
+              <span class="font-semibold text-sm lg:text-base">{{ page }}</span>
+              <span class="mx-1 lg:mx-2 opacity-75 text-sm lg:text-base">/</span>
+              <span class="font-semibold text-sm lg:text-base">{{ getTotalPages() }}</span>
+            </div>
+
+            <!-- Bouton suivant -->
+            <button
+              (click)="navigateToPage(page + 1)"
+              [disabled]="page >= getTotalPages()"
+              class="flex items-center px-3 py-2 sm:px-4 sm:py-2 lg:px-6 lg:py-3 bg-white shadow-lg rounded-lg lg:rounded-xl text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-xl border border-gray-200 text-sm lg:text-base"
+            >
+              <span class="hidden sm:inline">Suivant</span>
+              <span class="sm:hidden">Suiv.</span>
+              <svg class="w-4 h-4 lg:w-5 lg:h-5 ml-1 lg:ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Navigation rapide par numéros - Masquée sur mobile -->
+          <div class="hidden sm:flex justify-center">
+            <div class="flex space-x-1 lg:space-x-2">
+              <!-- Première page -->
+              <button
+                *ngIf="page > 3"
+                (click)="navigateToPage(1)"
+                class="px-3 py-2 lg:px-4 lg:py-2 bg-white shadow-md rounded-lg text-gray-700 hover:bg-gray-50 transition-all duration-200 border border-gray-200 font-medium text-sm lg:text-base"
+              >
+                1
+              </button>
+
+              <span *ngIf="page > 4" class="px-2 py-2 text-gray-500">...</span>
+
+              <!-- Pages visibles -->
+              <button
+                *ngFor="let pageNum of getVisiblePages()"
+                (click)="navigateToPage(pageNum)"
+                [class.bg-blue-600]="pageNum === page"
+                [class.text-white]="pageNum === page"
+                [class.bg-white]="pageNum !== page"
+                [class.text-gray-700]="pageNum !== page"
+                class="px-3 py-2 lg:px-4 lg:py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-gray-200 font-medium text-sm lg:text-base"
+              >
+                {{ pageNum }}
+              </button>
+
+              <span *ngIf="page < getTotalPages() - 3" class="px-2 py-2 text-gray-500">...</span>
+
+              <!-- Dernière page -->
+              <button
+                *ngIf="page < getTotalPages() - 2"
+                (click)="navigateToPage(getTotalPages())"
+                class="px-3 py-2 lg:px-4 lg:py-2 bg-white shadow-md rounded-lg text-gray-700 hover:bg-gray-50 transition-all duration-200 border border-gray-200 font-medium text-sm lg:text-base"
+              >
+                {{ getTotalPages() }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Navigation rapide mobile avec input -->
+          <div class="sm:hidden flex justify-center items-center space-x-3">
+            <button
+              (click)="navigateToPage(1)"
+              [disabled]="page <= 1"
+              class="px-3 py-2 bg-white shadow-md rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 border border-gray-200 text-sm"
+            >
+              ⏮️
+            </button>
+
+            <div class="flex items-center space-x-2">
+              <span class="text-sm text-gray-600">Page</span>
+              <input
+                type="number"
+                [(ngModel)]="page"
+                (change)="onPageInputChange()"
+                [min]="1"
+                [max]="getTotalPages()"
+                class="w-16 px-2 py-1 border border-gray-300 rounded text-center text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              <span class="text-sm text-gray-600">sur {{ getTotalPages() }}</span>
+            </div>
+
+            <button
+              (click)="navigateToPage(getTotalPages())"
+              [disabled]="page >= getTotalPages()"
+              class="px-3 py-2 bg-white shadow-md rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 border border-gray-200 text-sm"
+            >
+              ⏭️
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Styles CSS personnalisés pour la responsivité -->
+<style>
+  /* Animations fluides */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
+
+  /* Backdrop blur pour navigateurs non supportés */
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .backdrop-blur-lg {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  /* Scrollbar personnalisée pour WebKit */
+  .overflow-x-auto::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+
+  /* Amélioration de la lisibilité sur petits écrans */
+  @media (max-width: 640px) {
+    .truncate {
+      max-width: 150px;
+    }
+  }
+
+  /* Transition fluide pour les changements de layout */
+  * {
+    transition:
+      padding 0.3s ease,
+      margin 0.3s ease,
+      font-size 0.3s ease;
+  }
+
+  /* Focus visible pour l'accessibilité */
+  button:focus,
+  input:focus,
+  select:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+
+  /* Hover effects responsifs */
+  @media (hover: hover) {
+    .hover\:scale-105:hover {
+      transform: scale(1.05);
+    }
+
+    .group:hover .group-hover\:scale-110 {
+      transform: scale(1.1);
+    }
+  }
+
+  /* Optimisation pour les écrans tactiles */
+  @media (pointer: coarse) {
+    button,
+    .cursor-pointer {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+</style>

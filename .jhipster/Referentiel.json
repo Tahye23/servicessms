@@ -1,0 +1,36 @@
+{
+  "annotations": {
+    "changelogDate": "20240906141054"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "refCode",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "refRadical",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "refFrTitle",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "refArTitle",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "refEnTitle",
+      "fieldType": "String"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "Referentiel",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

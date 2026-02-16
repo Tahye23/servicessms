@@ -1,0 +1,29 @@
+{
+  "migrationApp": {
+    "oTPStorage": {
+      "home": {
+        "title": "OTPStorages",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau OTP Storage",
+        "createOrEditLabel": "Créer ou éditer un OTP Storage",
+        "notFound": "Aucun OTP Storage trouvé"
+      },
+      "created": "Un nouveau OTP Storage a été créé avec l'identifiant {{ param }}",
+      "updated": "Le OTP Storage avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le OTP Storage avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le OTP Storage {{ id }} ?"
+      },
+      "detail": {
+        "title": "OTP Storage"
+      },
+      "id": "ID",
+      "otsOTP": "Ots OTP",
+      "phoneNumber": "Phone Number",
+      "otsdateexpir": "Otsdateexpir",
+      "isOtpUsed": "Is Otp Used",
+      "isExpired": "Is Expired",
+      "User": "User"
+    }
+  }
+}

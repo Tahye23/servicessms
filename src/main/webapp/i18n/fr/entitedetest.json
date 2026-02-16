@@ -1,0 +1,28 @@
+{
+  "migrationApp": {
+    "entitedetest": {
+      "home": {
+        "title": "Entitedetests",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Entitedetest",
+        "createOrEditLabel": "Créer ou éditer un Entitedetest",
+        "notFound": "Aucun Entitedetest trouvé"
+      },
+      "created": "Un nouveau Entitedetest a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Entitedetest avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Entitedetest avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Entitedetest {{ id }} ?"
+      },
+      "detail": {
+        "title": "Entitedetest"
+      },
+      "id": "ID",
+      "identite": "Identite",
+      "nom": "Nom",
+      "nombrec": "Nombrec",
+      "chamb": "Chamb",
+      "champdate": "Champdate"
+    }
+  }
+}

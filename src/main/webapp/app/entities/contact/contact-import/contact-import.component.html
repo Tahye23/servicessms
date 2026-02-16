@@ -1,0 +1,469 @@
+<div *ngIf="isVisible" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 p-3 overflow-y-auto">
+  <div class="min-h-screen flex items-center justify-center">
+    <div class="bg-white rounded-2xl shadow-2xl border border-gray-100 w-full max-w-5xl mx-auto relative">
+      <div class="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-100 rounded-t-2xl p-4 z-10">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="relative">
+              <div
+                class="w-12 h-12 bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg"
+              >
+                <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
+                  />
+                </svg>
+              </div>
+              <div
+                class="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                [class]="hasProgress ? 'bg-orange-400 animate-pulse' : isCompleted ? 'bg-green-400' : 'bg-gray-300'"
+              ></div>
+            </div>
+            <div>
+              <h1 class="text-xl lg:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                Import de Contacts
+              </h1>
+              <p class="text-gray-500 text-xs mt-1">Ajoutez vos contacts rapidement et facilement</p>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <div
+              *ngIf="hasProgress"
+              class="flex items-center space-x-2 bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-xs font-medium"
+            >
+              <div class="w-1.5 h-1.5 bg-orange-500 rounded-full animate-bounce"></div>
+              <span>{{ progressPercentage }}%</span>
+            </div>
+            <div
+              *ngIf="isCompleted"
+              class="flex items-center space-x-2 bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium"
+            >
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>Terminé</span>
+            </div>
+
+            <button
+              (click)="close()"
+              class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-500 transition-colors"
+            >
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 pb-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-7 space-y-6">
+            <div class="group">
+              <label class="block text-sm font-semibold text-gray-900 mb-3"> 🎯 Groupe de destination </label>
+              <div class="relative">
+                <div
+                  *ngIf="!selectedGroupInput"
+                  class="dropdown-container bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:border-blue-300 transition-all focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100"
+                >
+                  <div class="flex items-center p-3">
+                    <div class="flex-shrink-0 w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-2">
+                      <svg class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857"
+                        />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      [(ngModel)]="searchTerm"
+                      (focus)="toggleDropdown()"
+                      (input)="onSearchChange()"
+                      placeholder="Chercher un groupe..."
+                      class="flex-1 bg-transparent border-none outline-none text-gray-900 placeholder-gray-500 text-sm"
+                    />
+                    <svg
+                      class="w-4 h-4 text-gray-400 transition-transform"
+                      [class.rotate-180]="dropdownOpen"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+
+                  <!-- Dropdown animé -->
+                  <div
+                    *ngIf="dropdownOpen"
+                    class="absolute top-full left-0 right-0 bg-white border-2 border-gray-100 rounded-xl shadow-xl mt-1 z-50 max-h-52 overflow-y-auto"
+                  >
+                    <div
+                      *ngFor="let group of groups; trackBy: trackByGroupId"
+                      (click)="selectGroup(group)"
+                      class="p-3 hover:bg-blue-50 cursor-pointer transition-colors border-b border-gray-50 last:border-0"
+                    >
+                      <div class="font-medium text-gray-900 text-sm">{{ group.grotitre }}</div>
+                      <div class="text-xs text-gray-500 mt-1">{{ group.id }} • Cliquez pour sélectionner</div>
+                    </div>
+                    <div *ngIf="!groups.length" class="p-6 text-center text-gray-500">
+                      <svg class="w-8 h-8 mx-auto mb-2 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="1"
+                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857"
+                        />
+                      </svg>
+                      <p class="text-xs">Aucun groupe trouvé</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Groupe sélectionné -->
+                <div *ngIf="selectedGroup" class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                      <div class="w-6 h-6 bg-blue-500 rounded-md flex items-center justify-center">
+                        <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p class="font-medium text-blue-900 text-sm">{{ selectedGroup.grotitre }}</p>
+                        <p class="text-xs text-blue-600">Groupe sélectionné</p>
+                      </div>
+                    </div>
+                    <button *ngIf="!selectedGroupInput" (click)="selectedGroup = null" class="text-blue-400 hover:text-blue-600">
+                      <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="group">
+              <label class="block text-sm font-semibold text-gray-900 mb-3"> 📁 Fichier CSV </label>
+
+              <div *ngIf="!uploadedFiles?.length" class="relative">
+                <label
+                  class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gradient-to-br from-gray-50 to-blue-50 hover:from-blue-50 hover:to-indigo-50 hover:border-blue-400 transition-all group"
+                >
+                  <div class="text-center p-4">
+                    <svg
+                      class="w-10 h-10 mx-auto mb-2 text-gray-400 group-hover:text-blue-500 transition-colors"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.5"
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                      />
+                    </svg>
+                    <p class="text-sm font-medium text-gray-700 group-hover:text-blue-700 mb-1">
+                      Glissez votre fichier ici ou <span class="text-blue-600 underline">parcourez</span>
+                    </p>
+                    <p class="text-xs text-gray-500 mb-2">Format CSV • Maximum 100MB</p>
+                    <div class="inline-flex items-center space-x-1 text-xs text-gray-400 bg-white/60 px-2 py-1 rounded">
+                      <span>📋</span>
+                      <span>nom,prenom,telephone</span>
+                    </div>
+                  </div>
+                  <input type="file" class="hidden" accept=".csv" (change)="onFileSelect($event)" />
+                </label>
+              </div>
+
+              <div
+                *ngIf="uploadedFiles?.length"
+                class="p-3 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl"
+              >
+                <div class="flex items-center space-x-3">
+                  <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                      <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="font-medium text-gray-900 truncate text-sm">{{ uploadedFiles[0].name }}</p>
+                    <p class="text-xs text-green-600">{{ formatFileSize(uploadedFiles[0].size) }} • Prêt à importer</p>
+                  </div>
+                  <button
+                    (click)="removeFile()"
+                    class="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded bg-red-100 hover:bg-red-200 text-red-600 transition-colors"
+                  >
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="!hasResults || isCompleted" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                (click)="importContacts(false)"
+                [disabled]="!selectedGroup || !uploadedFiles.length || (isLoading && !isCompleted)"
+                class="group relative overflow-hidden bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-300 disabled:to-gray-400 text-white rounded-xl px-4 py-3 font-semibold transition-all disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98] text-sm"
+              >
+                <div class="flex items-center justify-center space-x-2">
+                  <svg *ngIf="!isLoading" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4" />
+                  </svg>
+                  <svg *ngIf="isLoading && !hasResults" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                  <span>{{ isLoading && !hasResults ? 'Analyse...' : '🔍 Analyser' }}</span>
+                </div>
+              </button>
+
+              <button
+                (click)="importContacts(true)"
+                [disabled]="!selectedGroup || !uploadedFiles.length || (isLoading && !isCompleted)"
+                class="group relative overflow-hidden bg-gradient-to-r from-emerald-600 to-green-700 hover:from-emerald-700 hover:to-green-800 disabled:from-gray-300 disabled:to-gray-400 text-white rounded-xl px-4 py-3 font-semibold transition-all disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98] text-sm"
+              >
+                <div class="flex items-center justify-center space-x-2">
+                  <svg *ngIf="!isLoading" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <svg *ngIf="isLoading && !hasResults" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                  <span>{{ isLoading && !hasResults ? 'Import...' : '🚀 Importer' }}</span>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <div class="lg:col-span-5 space-y-4">
+            <div
+              *ngIf="hasProgress"
+              class="bg-gradient-to-br from-orange-50 to-amber-50 border-2 border-orange-200 rounded-2xl p-4 shadow-lg"
+            >
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-orange-900">Import en cours</h3>
+                <div class="flex items-center space-x-1 text-orange-700 text-xs font-medium">
+                  <div class="w-1.5 h-1.5 bg-orange-500 rounded-full animate-bounce"></div>
+                  <span>{{ progressPercentage }}%</span>
+                </div>
+              </div>
+
+              <!-- Progress bar moderne -->
+              <div class="relative h-3 bg-orange-200 rounded-full overflow-hidden mb-3">
+                <div
+                  class="absolute inset-0 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full transition-all duration-1000 ease-out"
+                  [style.width]="progressPercentage + '%'"
+                >
+                  <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+                </div>
+              </div>
+
+              <!-- Stats grid -->
+              <div class="grid grid-cols-2 gap-3">
+                <div class="bg-white/60 rounded-xl p-3 text-center">
+                  <p class="text-lg font-bold text-orange-900">{{ progressStatus?.current | number }}</p>
+                  <p class="text-xs text-orange-600 uppercase tracking-wide">Traités</p>
+                </div>
+                <div class="bg-white/60 rounded-xl p-3 text-center">
+                  <p class="text-lg font-bold text-orange-900">{{ progressStatus?.insertionRate | number: '1.0-0' }}/s</p>
+                  <p class="text-xs text-orange-600 uppercase tracking-wide">Vitesse</p>
+                </div>
+              </div>
+
+              <div *ngIf="progressStatus?.estimatedTimeRemaining" class="mt-3 text-center text-xs text-orange-700">
+                <span class="bg-orange-100 px-2 py-1 rounded-full">
+                  ⏱️ {{ formatTime(progressStatus?.estimatedTimeRemaining || 0) }} restant
+                </span>
+              </div>
+            </div>
+
+            <div *ngIf="hasResults" class="bg-white border-2 border-gray-200 rounded-2xl shadow-lg overflow-hidden">
+              <!-- Header gradient -->
+              <div class="bg-gradient-to-r from-emerald-500 to-green-600 p-4 text-white">
+                <h3 class="text-lg font-bold flex items-center">
+                  <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  Résultats
+                </h3>
+                <p class="text-emerald-100 mt-1 text-sm">{{ summaryMessage }}</p>
+              </div>
+
+              <div class="p-4 space-y-4">
+                <!-- Stats principales -->
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="text-center">
+                    <div
+                      class="w-12 h-12 mx-auto bg-gradient-to-br from-emerald-100 to-green-100 rounded-xl flex items-center justify-center mb-2"
+                    >
+                      <span class="text-lg font-bold text-emerald-700">{{ totalAddedToGroup }}</span>
+                    </div>
+                    <p class="text-xs font-medium text-gray-900">Ajoutés au groupe</p>
+                    <p class="text-xs text-emerald-600">{{ successPercentage }}% de réussite</p>
+                  </div>
+                  <div class="text-center">
+                    <div
+                      class="w-12 h-12 mx-auto bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl flex items-center justify-center mb-2"
+                    >
+                      <span class="text-lg font-bold text-blue-700">{{ importResult?.totalFileLines | number }}</span>
+                    </div>
+                    <p class="text-xs font-medium text-gray-900">Lignes traitées</p>
+                    <p class="text-xs text-blue-600">du fichier CSV</p>
+                  </div>
+                </div>
+
+                <!-- Détails expandable -->
+                <div class="border-t pt-3">
+                  <div class="flex flex-wrap gap-1">
+                    <div
+                      *ngIf="newContactsCreated > 0"
+                      class="inline-flex items-center space-x-1 bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full text-xs"
+                    >
+                      <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+                      <span>{{ newContactsCreated }} nouveaux</span>
+                    </div>
+                    <div
+                      *ngIf="existingContactsAddedToGroup > 0"
+                      class="inline-flex items-center space-x-1 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs"
+                    >
+                      <span class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+                      <span>{{ existingContactsAddedToGroup }} existants</span>
+                    </div>
+                    <div
+                      *ngIf="fileDuplicates > 0"
+                      class="inline-flex items-center space-x-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs"
+                    >
+                      <span class="w-1.5 h-1.5 bg-yellow-500 rounded-full"></span>
+                      <span>{{ fileDuplicates }} doublons</span>
+                    </div>
+                    <div
+                      *ngIf="errorLines > 0"
+                      class="inline-flex items-center space-x-1 bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs"
+                    >
+                      <span class="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
+                      <span>{{ errorLines }} erreurs</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="space-y-2">
+                  <div class="flex space-x-2">
+                    <button
+                      *ngIf="importResult?.errorFileLocation && errorLines > 0"
+                      (click)="downloadFile(importResult!.errorFileLocation, 'error')"
+                      class="flex-1 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg px-2 py-1 text-xs font-medium transition-colors"
+                    >
+                      📥 Erreurs
+                    </button>
+                    <button
+                      *ngIf="importResult?.duplicateFileLocation && fileDuplicates > 0"
+                      (click)="downloadFile(importResult!.fileDuplicateFileLocation, 'file-duplicate')"
+                      class="flex-1 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-lg px-2 py-1 text-xs font-medium transition-colors"
+                    >
+                      📥 Doublons
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              *ngIf="!hasResults && !hasProgress"
+              class="bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 border-2 border-indigo-200 rounded-2xl p-4 shadow-lg"
+            >
+              <h3 class="text-base font-bold text-indigo-900 mb-3 flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                Guide rapide
+              </h3>
+
+              <div class="space-y-3">
+                <div class="flex items-start space-x-2">
+                  <div
+                    class="w-6 h-6 bg-indigo-200 rounded-full flex items-center justify-center text-indigo-800 font-bold text-xs flex-shrink-0"
+                  >
+                    1
+                  </div>
+                  <div class="text-xs">
+                    <p class="font-medium text-indigo-900">Sélectionnez un groupe</p>
+                    <p class="text-indigo-700">Vos contacts y seront ajoutés</p>
+                  </div>
+                </div>
+
+                <div class="flex items-start space-x-2">
+                  <div
+                    class="w-6 h-6 bg-indigo-200 rounded-full flex items-center justify-center text-indigo-800 font-bold text-xs flex-shrink-0"
+                  >
+                    2
+                  </div>
+                  <div class="text-xs">
+                    <p class="font-medium text-indigo-900">Uploadez votre CSV</p>
+                    <p class="text-indigo-700">Format: nom,prenom,telephone</p>
+                  </div>
+                </div>
+
+                <div class="flex items-start space-x-2">
+                  <div
+                    class="w-6 h-6 bg-indigo-200 rounded-full flex items-center justify-center text-indigo-800 font-bold text-xs flex-shrink-0"
+                  >
+                    3
+                  </div>
+                  <div class="text-xs">
+                    <p class="font-medium text-indigo-900">Lancez l'import</p>
+                    <p class="text-indigo-700">Analysez d'abord ou importez directement</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-3 p-2 bg-white/60 rounded-xl">
+                <p class="text-xs text-indigo-800 text-center">💡 Les doublons sont détectés automatiquement</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-toast #toast></app-toast>

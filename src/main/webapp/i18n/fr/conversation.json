@@ -1,0 +1,29 @@
+{
+  "migrationApp": {
+    "conversation": {
+      "home": {
+        "title": "Conversations",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Conversation",
+        "createOrEditLabel": "Créer ou éditer un Conversation",
+        "notFound": "Aucun Conversation trouvé"
+      },
+      "created": "Un nouveau Conversation a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Conversation avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Conversation avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Conversation {{ id }} ?"
+      },
+      "detail": {
+        "title": "Conversation"
+      },
+      "id": "ID",
+      "covdatedebut": "Covdatedebut",
+      "covdatefin": "Covdatefin",
+      "contact": "Contact",
+      "question": "Question",
+      "covenquette": "Covenquette",
+      "covstate": "Covstate"
+    }
+  }
+}

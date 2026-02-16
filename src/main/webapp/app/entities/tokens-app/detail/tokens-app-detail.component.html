@@ -1,0 +1,77 @@
+<div class="flex justify-center py-8">
+  <div class="w-full max-w-3xl bg-white shadow-md rounded-xl p-8">
+    @if (tokensApp()) {
+      <div>
+        <!-- Titre -->
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center space-x-2" data-cy="tokensAppDetailsHeading">
+          <svg class="w-6 h-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span jhiTranslate="migrationApp.tokensApp.detail.title">Tokens App</span>
+        </h2>
+
+        <jhi-alert-error></jhi-alert-error>
+        <jhi-alert></jhi-alert>
+
+        <!-- Détail tokens -->
+        <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm text-gray-700">
+          <div>
+            <dt class="font-semibold text-gray-600 mb-1" jhiTranslate="migrationApp.tokensApp.id">Id</dt>
+            <dd class="text-gray-800">{{ tokensApp()!.id }}</dd>
+          </div>
+
+          <div>
+            <dt class="font-semibold text-gray-600 mb-1" jhiTranslate="migrationApp.tokensApp.dateExpiration">Date Expiration</dt>
+            <dd class="text-gray-800">{{ tokensApp()!.dateExpiration | formatMediumDatetime }}</dd>
+          </div>
+
+          <div>
+            <dt class="font-semibold text-gray-600 mb-1" jhiTranslate="migrationApp.tokensApp.token">Token</dt>
+            <dd class="text-gray-800">{{ tokensApp()!.token }}</dd>
+          </div>
+
+          <div>
+            <dt class="font-semibold text-gray-600 mb-1" jhiTranslate="migrationApp.tokensApp.application">Application</dt>
+            <dd>
+              @if (tokensApp()!.application) {
+                <a [routerLink]="['/application', tokensApp()!.application?.id, 'view']" class="text-blue-600 hover:underline">
+                  {{ tokensApp()!.application?.id }}
+                </a>
+              }
+            </dd>
+          </div>
+        </dl>
+
+        <!-- Actions -->
+        <div class="flex justify-end space-x-4 mt-8">
+          <button
+            type="button"
+            (click)="previousState()"
+            class="flex items-center bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg px-4 py-2 transition"
+          >
+            <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            <span jhiTranslate="entity.action.back">Retour</span>
+          </button>
+
+          <button
+            type="button"
+            [routerLink]="['/tokens-app', tokensApp()!.id, 'edit']"
+            class="flex items-center bg-blue-600 text-white hover:bg-blue-700 rounded-lg px-4 py-2 transition"
+          >
+            <svg class="w-4 h-4 mr-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M11 5h2M11 12h2m-6 7h12a2 2 0 002-2V7a2 2 0 00-2-2H9a2 2 0 00-2 2v12z"
+              />
+            </svg>
+            <span jhiTranslate="entity.action.edit">Éditer</span>
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,36 @@
+{
+  "annotations": {
+    "changelogDate": "20240806115914"
+  },
+  "dto": "no",
+  "fields": [
+    {
+      "fieldName": "fexidfile",
+      "fieldType": "UUID"
+    },
+    {
+      "fieldName": "fexparent",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "fexdata",
+      "fieldType": "byte[]",
+      "fieldTypeBlobContent": "any"
+    },
+    {
+      "fieldName": "fextype",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "fexname",
+      "fieldType": "String"
+    }
+  ],
+  "jpaMetamodelFiltering": false,
+  "name": "Fileextrait",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

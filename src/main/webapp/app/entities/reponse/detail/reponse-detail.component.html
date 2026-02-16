@@ -1,0 +1,67 @@
+<div *ngIf="reponse()" class="flex justify-center">
+  <div class="w-full max-w-3xl bg-white p-8 rounded-xl shadow-md">
+    <h2 class="text-2xl font-bold mb-4 text-gray-800 flex items-center gap-2">
+      <span class="text-primary-600">📋</span>
+      <span jhiTranslate="migrationApp.reponse.detail.title">Réponse</span>
+    </h2>
+
+    <hr class="my-4 border-gray-300" />
+
+    <jhi-alert-error></jhi-alert-error>
+    <jhi-alert></jhi-alert>
+
+    <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm text-gray-700">
+      <div>
+        <dt class="font-medium text-gray-600" jhiTranslate="global.field.id">ID</dt>
+        <dd class="mt-1 text-gray-900">{{ reponse()!.id }}</dd>
+      </div>
+
+      <div>
+        <dt class="font-medium text-gray-600" jhiTranslate="migrationApp.reponse.repvaleur">Repvaleur</dt>
+        <dd class="mt-1 text-gray-900">{{ reponse()!.repvaleur }}</dd>
+      </div>
+
+      <div>
+        <dt class="font-medium text-gray-600" jhiTranslate="migrationApp.reponse.repquestion">Repquestion</dt>
+        <dd class="mt-1 text-blue-600">
+          @if (reponse()!.repquestion) {
+            <a [routerLink]="['/question', reponse()!.repquestion?.id, 'view']">
+              {{ reponse()!.repquestion?.id }}
+            </a>
+          }
+        </dd>
+      </div>
+
+      <div>
+        <dt class="font-medium text-gray-600" jhiTranslate="migrationApp.reponse.repcontact">Repcontact</dt>
+        <dd class="mt-1 text-blue-600">
+          @if (reponse()!.repcontact) {
+            <a [routerLink]="['/contact', reponse()!.repcontact?.id, 'view']">
+              {{ reponse()!.repcontact?.id }}
+            </a>
+          }
+        </dd>
+      </div>
+    </dl>
+
+    <div class="mt-6 flex space-x-3">
+      <button
+        type="button"
+        (click)="previousState()"
+        class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition"
+      >
+        <fa-icon icon="arrow-left" class="mr-2"></fa-icon>
+        <span jhiTranslate="entity.action.back">Retour</span>
+      </button>
+
+      <button
+        type="button"
+        [routerLink]="['/reponse', reponse()!.id, 'edit']"
+        class="inline-flex items-center px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition"
+      >
+        <fa-icon icon="pencil-alt" class="mr-2"></fa-icon>
+        <span jhiTranslate="entity.action.edit">Éditer</span>
+      </button>
+    </div>
+  </div>
+</div>

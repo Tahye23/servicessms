@@ -1,0 +1,26 @@
+{
+  "migrationApp": {
+    "userTokenApi": {
+      "home": {
+        "title": "UserTokenApis",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau User Token Api",
+        "createOrEditLabel": "Créer ou éditer un User Token Api",
+        "notFound": "Aucun User Token Api trouvé"
+      },
+      "created": "Un nouveau User Token Api a été créé avec l'identifiant {{ param }}",
+      "updated": "Le User Token Api avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le User Token Api avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le User Token Api {{ id }} ?"
+      },
+      "detail": {
+        "title": "User Token Api"
+      },
+      "id": "ID",
+      "api": "Api",
+      "token": "Token",
+      "user": "User"
+    }
+  }
+}

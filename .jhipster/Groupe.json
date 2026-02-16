@@ -1,0 +1,30 @@
+{
+  "annotations": {
+    "changelogDate": "20240722125756"
+  },
+  "fields": [
+    {
+      "fieldName": "grotitre",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "user",
+      "fieldType": "String"
+    }
+  ],
+  "name": "Groupe",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "extendedUser",
+      "otherEntityRelationshipName": "groupe",
+      "relationshipName": "extendedUser",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "no"
+}

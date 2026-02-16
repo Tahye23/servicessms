@@ -1,0 +1,21 @@
+{
+  "annotations": {
+    "changelogDate": "20240719140754"
+  },
+  "fields": [
+    {
+      "fieldName": "dialogueId",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "contenu",
+      "fieldType": "String"
+    }
+  ],
+  "name": "Dialogue",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "no"
+}

@@ -1,0 +1,727 @@
+// Variables principales
+:root {
+  --primary-blue: #3b82f6;
+  --primary-purple: #8b5cf6;
+  --success-green: #10b981;
+  --warning-orange: #f59e0b;
+  --danger-red: #ef4444;
+  --neutral-slate: #64748b;
+}
+
+// Styles globaux pour le composant
+.partnership-request-list {
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+
+  // Scrollbar personnalisée
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(59, 130, 246, 0.3) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.3);
+    border-radius: 3px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.5);
+  }
+}
+
+// Animations CSS
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// Classes d'animation
+.animate-slide-up {
+  animation: slideInUp 0.5s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.2s ease-out;
+}
+
+// Effets de transition personnalisés
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+// Effets de glassmorphism
+.glass-effect {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-dark {
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+// Styles pour les cartes modernes
+.modern-card {
+  @apply bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+  &:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  }
+
+  // Animation d'entrée pour les cartes
+  &.animate-in {
+    animation: slideInUp 0.6s ease-out;
+  }
+
+  // Effet de survol avec gradient
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+}
+
+// Styles pour les boutons
+.btn-primary {
+  @apply bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl shadow-lg;
+  transition: all 0.3s ease;
+
+  &:hover {
+    @apply from-blue-600 to-purple-600 shadow-xl;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    @apply opacity-50 cursor-not-allowed;
+    transform: none;
+  }
+}
+
+.btn-success {
+  @apply bg-gradient-to-r from-emerald-500 to-green-500 text-white rounded-xl shadow-lg;
+  transition: all 0.3s ease;
+
+  &:hover {
+    @apply from-emerald-600 to-green-600 shadow-xl;
+    transform: translateY(-2px);
+  }
+}
+
+.btn-danger {
+  @apply bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl shadow-lg;
+  transition: all 0.3s ease;
+
+  &:hover {
+    @apply from-red-600 to-pink-600 shadow-xl;
+    transform: translateY(-2px);
+  }
+}
+
+.btn-secondary {
+  @apply bg-slate-100 text-slate-700 rounded-xl border border-slate-200;
+  transition: all 0.3s ease;
+
+  &:hover {
+    @apply bg-slate-200 border-slate-300;
+    transform: translateY(-1px);
+  }
+}
+
+// Styles pour les formulaires
+.form-input {
+  @apply w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl;
+  @apply focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white;
+  @apply transition-all duration-200 focus:outline-none;
+
+  &::placeholder {
+    @apply text-slate-400;
+  }
+}
+
+.form-select {
+  @extend .form-input;
+  @apply cursor-pointer;
+
+  &::-ms-expand {
+    display: none;
+  }
+}
+
+// Styles pour les badges de statut
+.status-badge {
+  @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold;
+
+  &.status-pending {
+    @apply bg-orange-100 text-orange-800 border border-orange-200;
+  }
+
+  &.status-approved {
+    @apply bg-emerald-100 text-emerald-800 border border-emerald-200;
+  }
+
+  &.status-rejected {
+    @apply bg-red-100 text-red-800 border border-red-200;
+  }
+
+  &.status-in-review {
+    @apply bg-cyan-100 text-cyan-800 border border-cyan-200;
+  }
+
+  .status-dot {
+    @apply w-2 h-2 rounded-full mr-2 animate-pulse;
+
+    &.dot-pending {
+      @apply bg-orange-400;
+    }
+    &.dot-approved {
+      @apply bg-emerald-400;
+    }
+    &.dot-rejected {
+      @apply bg-red-400;
+    }
+    &.dot-in-review {
+      @apply bg-cyan-400;
+    }
+  }
+}
+
+// Styles pour le tableau
+.modern-table {
+  @apply bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20;
+
+  thead {
+    @apply bg-slate-50;
+
+    th {
+      @apply px-6 py-4 text-left text-sm font-semibold text-slate-700;
+      @apply border-b border-slate-200;
+    }
+  }
+
+  tbody {
+    tr {
+      @apply border-b border-slate-100;
+      transition: all 0.2s ease;
+
+      &:hover {
+        @apply bg-gradient-to-r from-blue-50/50 to-purple-50/50;
+        transform: scale(1.005);
+      }
+
+      td {
+        @apply px-6 py-4;
+      }
+    }
+  }
+}
+
+// Styles pour la pagination
+.pagination {
+  @apply bg-slate-50/80 border-t border-slate-200/50 px-6 py-4;
+  @apply flex items-center justify-between;
+
+  .pagination-info {
+    @apply text-sm text-slate-700;
+  }
+
+  .pagination-controls {
+    @apply flex items-center space-x-2;
+
+    button {
+      @apply p-2 text-slate-600 hover:text-slate-800 hover:bg-slate-100;
+      @apply rounded-lg transition-all duration-200;
+      @apply disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+  }
+}
+
+// Styles pour le FAB (Floating Action Button)
+.fab-container {
+  @apply fixed bottom-8 right-8 z-50;
+
+  .fab-menu {
+    @apply absolute bottom-16 right-0 space-y-3;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transform-origin: bottom right;
+
+    &.hidden {
+      transform: scale(0);
+      opacity: 0;
+    }
+
+    &.visible {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    button {
+      @apply w-12 h-12 rounded-xl shadow-lg hover:shadow-xl;
+      @apply transition-all duration-300;
+      @apply flex items-center justify-center text-white;
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  .fab-main {
+    @apply w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500;
+    @apply hover:from-blue-600 hover:to-purple-600;
+    @apply text-white rounded-2xl shadow-2xl hover:shadow-xl;
+    @apply transition-all duration-300 hover:scale-110;
+    @apply flex items-center justify-center;
+
+    svg {
+      transition: transform 0.3s ease;
+
+      &.rotated {
+        transform: rotate(45deg);
+      }
+    }
+  }
+}
+
+// Styles pour les notifications
+.notification {
+  @apply fixed top-4 right-4 z-50 px-6 py-3 rounded-xl shadow-lg;
+  @apply transition-all duration-300;
+  animation: slideInUp 0.3s ease-out;
+
+  &.success {
+    @apply bg-emerald-500 text-white;
+  }
+
+  &.error {
+    @apply bg-red-500 text-white;
+  }
+
+  &.info {
+    @apply bg-blue-500 text-white;
+  }
+
+  &.fadeOut {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+// Styles pour l'état vide
+.empty-state {
+  @apply text-center py-20;
+
+  .empty-icon {
+    @apply w-24 h-24 bg-gradient-to-br from-slate-200 to-slate-300;
+    @apply rounded-3xl flex items-center justify-center mx-auto mb-6;
+  }
+
+  .empty-title {
+    @apply text-2xl font-bold text-slate-900 mb-3;
+  }
+
+  .empty-description {
+    @apply text-slate-500 mb-8 leading-relaxed;
+  }
+}
+
+// Styles pour le loading
+.loading-container {
+  @apply flex flex-col items-center justify-center py-20;
+
+  .loading-spinner {
+    @apply relative;
+
+    .spinner-outer {
+      @apply w-16 h-16 border-4 border-blue-200 border-t-blue-600;
+      @apply rounded-full animate-spin;
+    }
+
+    .spinner-inner {
+      @apply absolute inset-0 flex items-center justify-center;
+
+      .spinner-dot {
+        @apply w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500;
+        @apply rounded-full animate-pulse;
+      }
+    }
+  }
+
+  .loading-text {
+    @apply text-slate-600 mt-6 font-medium;
+  }
+}
+
+// Utilitaires pour le responsive
+@media (max-width: 768px) {
+  .modern-card {
+    @apply mx-4;
+
+    &:hover {
+      transform: translateY(-4px) scale(1.01);
+    }
+  }
+
+  .fab-container {
+    @apply bottom-6 right-6;
+
+    .fab-main {
+      @apply w-14 h-14;
+    }
+  }
+
+  .modern-table {
+    @apply mx-4 text-sm;
+
+    th,
+    td {
+      @apply px-3 py-2;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .btn-primary,
+  .btn-success,
+  .btn-danger,
+  .btn-secondary {
+    @apply text-sm px-4 py-2;
+  }
+
+  .status-badge {
+    @apply text-xs px-2 py-1;
+  }
+
+  .notification {
+    @apply top-2 right-2 left-2 text-sm;
+  }
+}
+
+// Mode sombre (optionnel)
+@media (prefers-color-scheme: dark) {
+  .partnership-request-list {
+    .modern-card {
+      @apply bg-slate-800/90 border-slate-700/50;
+    }
+
+    .modern-table {
+      @apply bg-slate-800/90;
+
+      thead {
+        @apply bg-slate-700;
+
+        th {
+          @apply text-slate-200 border-slate-600;
+        }
+      }
+
+      tbody {
+        tr {
+          @apply border-slate-700;
+
+          &:hover {
+            @apply bg-slate-700/50;
+          }
+
+          td {
+            @apply text-slate-200;
+          }
+        }
+      }
+    }
+
+    .form-input,
+    .form-select {
+      @apply bg-slate-700 border-slate-600 text-slate-200;
+      @apply focus:border-blue-400 focus:bg-slate-600;
+
+      &::placeholder {
+        @apply text-slate-400;
+      }
+    }
+
+    .btn-secondary {
+      @apply bg-slate-700 text-slate-200 border-slate-600;
+
+      &:hover {
+        @apply bg-slate-600 border-slate-500;
+      }
+    }
+
+    .pagination {
+      @apply bg-slate-700/80 border-slate-600;
+
+      .pagination-info {
+        @apply text-slate-300;
+      }
+
+      button {
+        @apply text-slate-300 hover:text-slate-100 hover:bg-slate-600;
+      }
+    }
+  }
+}
+
+// Classes utilitaires personnalisées
+.text-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.shadow-soft {
+  box-shadow:
+    0 2px 15px -3px rgba(0, 0, 0, 0.07),
+    0 10px 20px -2px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-strong {
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.border-gradient {
+  border: 1px solid;
+  border-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%) 1;
+}
+
+// Améliorations pour l'accessibilité
+.focus-visible {
+  &:focus-visible {
+    @apply outline-none ring-4 ring-blue-500/20;
+  }
+}
+
+// Styles pour les interactions tactiles
+@media (hover: none) and (pointer: coarse) {
+  .modern-card,
+  .btn-primary,
+  .btn-success,
+  .btn-danger,
+  .btn-secondary {
+    &:hover {
+      transform: none;
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  .fab-main {
+    &:hover {
+      transform: none;
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+}
+
+// Animations pour les éléments de liste
+.list-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.list-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.3s ease;
+}
+
+.list-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.list-exit-active {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: all 0.3s ease;
+}
+
+// Styles pour les tooltips (si nécessaire)
+.tooltip {
+  @apply absolute z-50 px-3 py-2 bg-slate-800 text-white text-sm rounded-lg;
+  @apply opacity-0 pointer-events-none transition-opacity duration-200;
+
+  &.visible {
+    @apply opacity-100;
+  }
+
+  &::before {
+    content: '';
+    @apply absolute w-0 h-0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid theme('colors.slate.800');
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+// Styles pour les modales (si nécessaire)
+.modal-overlay {
+  @apply fixed inset-0 z-50 bg-black/50 backdrop-blur-sm;
+  @apply flex items-center justify-center p-4;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  @apply bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-hidden;
+  animation: scaleIn 0.2s ease-out;
+}
+
+.modal-header {
+  @apply px-6 py-4 border-b border-slate-200;
+}
+
+.modal-body {
+  @apply px-6 py-4 overflow-y-auto;
+}
+
+.modal-footer {
+  @apply px-6 py-4 border-t border-slate-200 flex justify-end space-x-3;
+}
+
+// Performance optimizations
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.reduce-motion {
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+// Print styles
+@media print {
+  .partnership-request-list {
+    .fab-container,
+    .notification,
+    .modal-overlay {
+      display: none !important;
+    }
+
+    .modern-card,
+    .modern-table {
+      box-shadow: none !important;
+      border: 1px solid #e2e8f0 !important;
+      background: white !important;
+    }
+
+    .btn-primary,
+    .btn-success,
+    .btn-danger,
+    .btn-secondary {
+      background: white !important;
+      color: black !important;
+      border: 1px solid black !important;
+    }
+  }
+}

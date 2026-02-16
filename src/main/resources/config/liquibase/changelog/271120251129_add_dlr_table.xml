@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <!-- Table pour stocker les DLR (Delivery Reports) de Kannel -->
+    <changeSet id="20250127000001-1" author="your-name">
+        <createTable tableName="sms_dlr">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <!-- Message ID retourné par Kannel lors de l'envoi -->
+            <column name="message_id" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- ID du SMS dans notre table sms -->
+            <column name="sms_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+
+            <!-- Numéro destinataire -->
+            <column name="phone_number" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Code statut DLR Kannel (1=delivered, 2=failed, etc.) -->
+            <column name="dlr_status_code" type="integer">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Statut texte (delivered, failed, buffered, etc.) -->
+            <column name="dlr_status" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Timestamp du DLR -->
+            <column name="dlr_timestamp" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+
+            <!-- SMSC ID (identifiant opérateur) -->
+            <column name="smsc_id" type="varchar(50)">
+                <constraints nullable="true"/>
+            </column>
+
+            <!-- Code erreur si échec -->
+            <column name="error_code" type="varchar(50)">
+                <constraints nullable="true"/>
+            </column>
+
+            <!-- Message d'erreur -->
+            <column name="error_message" type="text">
+                <constraints nullable="true"/>
+            </column>
+
+            <!-- Date de réception du DLR -->
+            <column name="received_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Traité ou non -->
+            <column name="processed" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Date de traitement -->
+            <column name="processed_at" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Index pour recherche rapide par message_id -->
+    <changeSet id="20250127000001-2" author="your-name">
+        <createIndex indexName="idx_sms_dlr_message_id" tableName="sms_dlr">
+            <column name="message_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Index pour recherche par sms_id -->
+    <changeSet id="20250127000001-3" author="your-name">
+        <createIndex indexName="idx_sms_dlr_sms_id" tableName="sms_dlr">
+            <column name="sms_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Index pour recherche par phone_number -->
+    <changeSet id="20250127000001-4" author="your-name">
+        <createIndex indexName="idx_sms_dlr_phone" tableName="sms_dlr">
+            <column name="phone_number"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Index pour les DLR non traités -->
+    <changeSet id="20250127000001-5" author="your-name">
+        <createIndex indexName="idx_sms_dlr_processed" tableName="sms_dlr">
+            <column name="processed"/>
+            <column name="received_at"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Index unique pour éviter les doublons -->
+    <changeSet id="20250127000001-6" author="your-name">
+        <createIndex indexName="idx_sms_dlr_unique" tableName="sms_dlr" unique="true">
+            <column name="message_id"/>
+            <column name="dlr_status_code"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,50 @@
+{
+  "annotations": {
+    "changelogDate": "20240722133140"
+  },
+  "fields": [
+    {
+      "fieldName": "covdatedebut",
+      "fieldType": "ZonedDateTime"
+    },
+    {
+      "fieldName": "covdatefin",
+      "fieldType": "ZonedDateTime"
+    }
+  ],
+  "name": "Conversation",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "contact",
+      "relationshipName": "contact",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "question",
+      "relationshipName": "question",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "company",
+      "relationshipName": "covenquette",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "referentiel",
+      "relationshipName": "covstate",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "no"
+}

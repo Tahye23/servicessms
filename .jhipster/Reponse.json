@@ -1,0 +1,32 @@
+{
+  "annotations": {
+    "changelogDate": "20240722134201"
+  },
+  "fields": [
+    {
+      "fieldName": "repvaleur",
+      "fieldType": "String"
+    }
+  ],
+  "name": "Reponse",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "question",
+      "relationshipName": "repquestion",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "contact",
+      "relationshipName": "repcontact",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "no"
+}

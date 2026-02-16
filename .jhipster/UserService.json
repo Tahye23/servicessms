@@ -1,0 +1,36 @@
+{
+  "annotations": {
+    "changelogDate": "20240722130550"
+  },
+  "fields": [
+    {
+      "fieldName": "urSService",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "urSUser",
+      "fieldType": "String"
+    }
+  ],
+  "name": "UserService",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "service",
+      "relationshipName": "service",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "extendedUser",
+      "relationshipName": "user",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "no"
+}

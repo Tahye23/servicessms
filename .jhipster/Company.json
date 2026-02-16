@@ -1,0 +1,56 @@
+{
+  "annotations": {
+    "changelogDate": "20240315152409"
+  },
+  "applications": ["RichattServices"],
+  "entityTableName": "company",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "activity",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "camtitre",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "camdatecreation",
+      "fieldType": "LocalDate"
+    },
+    {
+      "fieldName": "camdatefin",
+      "fieldType": "ZonedDateTime"
+    },
+    {
+      "fieldName": "camispub",
+      "fieldType": "Boolean"
+    }
+  ],
+  "name": "Company",
+  "relationships": [
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "extendedUser",
+      "relationshipName": "camUser",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "referentiel",
+      "relationshipName": "camstatus",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "skipDbChangelog": true
+}

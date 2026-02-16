@@ -1,0 +1,25 @@
+{
+  "annotations": {
+    "changelogDate": "20240722114025"
+  },
+  "fields": [
+    {
+      "fieldName": "apiNom",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "apiUrl",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "apiVersion",
+      "fieldType": "Integer"
+    }
+  ],
+  "name": "Api",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "no"
+}

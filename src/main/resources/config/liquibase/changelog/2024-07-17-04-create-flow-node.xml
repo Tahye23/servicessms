@@ -1,0 +1,102 @@
+
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+      http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="2024-07-17-04-create-flow-node" author="saadna">
+        <createTable tableName="flow_node">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="node_id" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="node_type" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="node_order" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="position_x" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="position_y" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="label" type="VARCHAR(100)"/>
+            <column name="description" type="VARCHAR(1000)"/>
+            <column name="text_content" type="TEXT"/>
+            <column name="image_url" type="VARCHAR(255)"/>
+            <column name="file_url" type="VARCHAR(255)"/>
+            <column name="file_name" type="VARCHAR(255)"/>
+            <column name="webhook_url" type="VARCHAR(255)"/>
+            <column name="webhook_method" type="VARCHAR(255)"/>
+            <column name="response_type" type="VARCHAR(255)"/>
+            <column name="is_required" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="timeout_seconds" type="INTEGER"/>
+            <column name="use_variables" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="store_in_variable" type="VARCHAR(255)"/>
+            <column name="variable_name" type="VARCHAR(255)"/>
+            <column name="variable_value" type="VARCHAR(255)"/>
+            <column name="variable_operation" type="VARCHAR(255)"/>
+            <column name="condition_type" type="VARCHAR(255)"/>
+            <column name="condition_variable" type="VARCHAR(255)"/>
+            <column name="condition_operator" type="VARCHAR(255)"/>
+            <column name="condition_value" type="VARCHAR(255)"/>
+            <column name="flow_id" type="BIGINT"/>
+            <column name="next_node_id" type="VARCHAR(255)"/>
+            <column name="default_next_node_id" type="VARCHAR(255)"/>
+
+            <!-- Audit fields (hérités de AbstractAuditingEntity) -->
+            <column name="created_by" type="VARCHAR(50)"/>
+            <column name="created_date" type="TIMESTAMP"/>
+            <column name="last_modified_by" type="VARCHAR(50)"/>
+            <column name="last_modified_date" type="TIMESTAMP"/>
+        </createTable>
+
+        <!-- Foreign Key pour flow_id vers chatbot_flow.id -->
+        <addForeignKeyConstraint
+            baseTableName="flow_node"
+            baseColumnNames="flow_id"
+            referencedTableName="chatbot_flow"
+            referencedColumnNames="id"
+            constraintName="fk_flow_node_flow"/>
+
+        <createSequence sequenceName="sequenceGenerator" startValue="1"/>
+    </changeSet>
+<changeSet id="2024-07-17-04-add-colone-node" author="saadna">
+    <addColumn tableName="flow_node">
+        <column name="validation_message" type="VARCHAR(255)">
+        </column>
+
+    </addColumn>
+    </changeSet>
+    <changeSet id="2024-07-17-04-add-colone-node2" author="saadna">
+        <addColumn tableName="flow_node">
+            <column name="wait_for_user_response" type="BOOLEAN" defaultValueBoolean="true">
+            </column>
+
+        </addColumn>
+    </changeSet>
+    <changeSet id="2024-07-17-04-add-colones-node_2707" author="saadna">
+        <addColumn tableName="flow_node">
+            <column name="max_value" type="INTEGER" >
+            </column>
+            <column name="max_length" type="INTEGER" >
+            </column>
+            <column name="min_length" type="INTEGER" >
+            </column>
+            <column name="min_value" type="INTEGER" >
+            </column>
+
+            <column name="max_file_size" type="double" >
+            </column>
+            <column name="allowed_extensions" type="VARCHAR(255)">
+            </column>
+
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

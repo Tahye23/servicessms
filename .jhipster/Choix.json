@@ -1,0 +1,32 @@
+{
+  "annotations": {
+    "changelogDate": "20240722133531"
+  },
+  "fields": [
+    {
+      "fieldName": "chovaleur",
+      "fieldType": "String"
+    }
+  ],
+  "name": "Choix",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "question",
+      "relationshipName": "choquestion",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "question",
+      "relationshipName": "choquestionSuivante",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "no"
+}

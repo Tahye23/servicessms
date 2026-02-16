@@ -1,0 +1,10 @@
+{
+  "migrationApp": {
+    "Etq": {
+      "null": "",
+      "FERME": "FERME",
+      "EXPIRE": "EXPIRE",
+      "ENCOURS": "ENCOURS"
+    }
+  }
+}

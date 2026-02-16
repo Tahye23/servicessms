@@ -1,0 +1,77 @@
+{
+  "annotations": {
+    "changelogDate": "20240305142411"
+  },
+  "dto": "no",
+  "entityTableName": "send_sms",
+  "fields": [
+    {
+      "fieldName": "sender",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "receiver",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "msgdata",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "sendateEnvoi",
+      "fieldType": "ZonedDateTime"
+    },
+    {
+      "fieldName": "dialogue",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "isSent",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "isbulk",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "Titre",
+      "fieldType": "String"
+    }
+  ],
+  "jpaMetamodelFiltering": false,
+  "name": "SendSms",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "extendedUser",
+      "relationshipName": "user",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "contact",
+      "relationshipName": "destinateur",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "groupe",
+      "relationshipName": "destinataires",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "referentiel",
+      "relationshipName": "Statut",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

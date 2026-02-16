@@ -1,0 +1,26 @@
+{
+  "migrationApp": {
+    "api": {
+      "home": {
+        "title": "Apis",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Api",
+        "createOrEditLabel": "Créer ou éditer un Api",
+        "notFound": "Aucun Api trouvé"
+      },
+      "created": "Un nouveau Api a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Api avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Api avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Api {{ id }} ?"
+      },
+      "detail": {
+        "title": "Api"
+      },
+      "id": "ID",
+      "apiNom": "Api Nom",
+      "apiUrl": "Api Url",
+      "apiVersion": "Api Version"
+    }
+  }
+}

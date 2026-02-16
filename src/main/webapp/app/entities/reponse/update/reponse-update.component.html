@@ -1,0 +1,109 @@
+<div class="flex justify-center">
+  <div class="w-full max-w-3xl bg-white p-8 rounded-xl shadow-md">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <!-- Titre -->
+      <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
+        <span class="text-primary-600">📝</span>
+        <span jhiTranslate="migrationApp.reponse.home.createOrEditLabel">Créer ou éditer un Réponse</span>
+      </h2>
+
+      <!-- Alertes -->
+      <jhi-alert-error></jhi-alert-error>
+
+      <!-- Champs du formulaire -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Champ ID -->
+        @if (editForm.controls.id.value !== null) {
+          <div>
+            <label for="field_id" class="block text-sm font-medium text-gray-700" jhiTranslate="migrationApp.reponse.id">ID</label>
+            <input
+              type="number"
+              id="field_id"
+              name="id"
+              data-cy="id"
+              formControlName="id"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 bg-gray-100"
+              [readonly]="true"
+            />
+          </div>
+        }
+
+        <!-- Champ Repvaleur -->
+        <div>
+          <label for="field_repvaleur" class="block text-sm font-medium text-gray-700" jhiTranslate="migrationApp.reponse.repvaleur"
+            >Repvaleur</label
+          >
+          <input
+            type="text"
+            id="field_repvaleur"
+            name="repvaleur"
+            data-cy="repvaleur"
+            formControlName="repvaleur"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          />
+        </div>
+
+        <!-- Champ Repquestion -->
+        <div>
+          <label for="field_repquestion" class="block text-sm font-medium text-gray-700" jhiTranslate="migrationApp.reponse.repquestion"
+            >Repquestion</label
+          >
+          <select
+            id="field_repquestion"
+            name="repquestion"
+            data-cy="repquestion"
+            formControlName="repquestion"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            [compareWith]="compareQuestion"
+          >
+            <option [ngValue]="null"></option>
+            @for (questionOption of questionsSharedCollection; track $index) {
+              <option [ngValue]="questionOption">{{ questionOption.id }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Champ Repcontact -->
+        <div>
+          <label for="field_repcontact" class="block text-sm font-medium text-gray-700" jhiTranslate="migrationApp.reponse.repcontact"
+            >Repcontact</label
+          >
+          <select
+            id="field_repcontact"
+            name="repcontact"
+            data-cy="repcontact"
+            formControlName="repcontact"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            [compareWith]="compareContact"
+          >
+            <option [ngValue]="null"></option>
+            @for (contactOption of contactsSharedCollection; track $index) {
+              <option [ngValue]="contactOption">{{ contactOption.id }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Boutons -->
+      <div class="mt-8 flex space-x-3">
+        <button
+          type="button"
+          (click)="previousState()"
+          class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition"
+        >
+          <fa-icon icon="ban" class="mr-2"></fa-icon>
+          <span jhiTranslate="entity.action.cancel">Annuler</span>
+        </button>
+
+        <button
+          type="submit"
+          [disabled]="editForm.invalid || isSaving"
+          class="inline-flex items-center px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition"
+        >
+          <fa-icon icon="save" class="mr-2"></fa-icon>
+          <span jhiTranslate="entity.action.save">Sauvegarder</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

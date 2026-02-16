@@ -1,0 +1,179 @@
+<style>
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th,
+  td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 2px solid #ccc; /* La couleur et l'épaisseur de la barre */
+  }
+</style>
+
+<p-card
+  [style]="{
+    border: '2px solid white ',
+    borderRadius: '20px',
+    margin: '30px'
+  }"
+  header="Dialogues "
+>
+  <h2 id="page-heading" data-cy="DialogueHeading">
+    <div class="d-flex justify-content-start">
+      <p-button
+        [style]="{
+          border: '2px solid ',
+          borderRadius: '10px',
+          width: '180px',
+          fontSize: '14px',
+          margin: '3px'
+        }"
+        pRipple
+        size="small"
+        styleClass="p-button-sm"
+        [outlined]="true"
+        severity="info"
+        (click)="load()"
+        [disabled]="isLoading"
+      >
+        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+        <span jhiTranslate="migrationApp.dialogue.home.refreshListLabel">Actualiser la liste</span>
+      </p-button>
+
+      <p-button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        [style]="{
+          border: '2px solid ',
+          borderRadius: '10px',
+          width: '250px',
+          fontSize: '14px',
+          margin: '3px'
+        }"
+        styleClass="p-button-sm"
+        p-button-rounded
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        [outlined]="true"
+        severity="info"
+        [routerLink]="['/dialogue/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="migrationApp.dialogue.home.createLabel">Créer un nouveau Dialogue</span>
+      </p-button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  @if (dialogues?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="migrationApp.dialogue.home.notFound">Aucun Dialogue trouvé</span>
+    </div>
+  }
+
+  @if (dialogues && dialogues.length > 0) {
+    <div class="table-responsive table-entities" id="entities">
+      <p-table
+        [style]="{
+          fontSize: '14px',
+
+          border: '2px solid white ',
+          borderRadius: '30px',
+          margin: '30px'
+        }"
+        [value]="dialogues"
+        [tableStyle]="{ 'min-width': '50rem' }"
+      >
+        <ng-template pTemplate="header">
+          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="global.field.id">ID</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dialogueId">
+              <div class="d-flex">
+                <span jhiTranslate="migrationApp.dialogue.dialogueId">Dialogue Id</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="contenu">
+              <div class="d-flex">
+                <span jhiTranslate="migrationApp.dialogue.contenu">Contenu</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-dialogue>
+          <tr data-cy="entityTable">
+            <td>
+              <a [routerLink]="['/dialogue', dialogue.id, 'view']">{{ dialogue.id }}</a>
+            </td>
+            <td>{{ dialogue.dialogueId }}</td>
+            <td>{{ dialogue.contenu }}</td>
+            <td class="text-end">
+              <div class="btn-group">
+                <p-button
+                  [routerLink]="['/dialogue', dialogue.id, 'view']"
+                  icon="pi pi-eye"
+                  [rounded]="true"
+                  [text]="true"
+                  data-cy="entityDetailsButton"
+                >
+                </p-button>
+
+                <p-button
+                  [routerLink]="['/dialogue', dialogue.id, 'edit']"
+                  icon="pi pi-pencil"
+                  [rounded]="true"
+                  [text]="true"
+                  data-cy="entityEditButton"
+                >
+                </p-button>
+
+                <p-button
+                  type="submit"
+                  (click)="delete(dialogue)"
+                  icon="pi pi-trash"
+                  [rounded]="true"
+                  [text]="true"
+                  data-cy="entityDeleteButton"
+                >
+                </p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  }
+  @if (dialogues && dialogues.length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page, totalItems: totalItems, itemsPerPage: itemsPerPage }"></jhi-item-count>
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <p-paginator
+          (onPageChange)="onPageChange2($event)"
+          [first]="first"
+          [rows]="itemsPerPage"
+          [totalRecords]="totalItems"
+          [rowsPerPageOptions]="[10, 20, 30]"
+        >
+        </p-paginator>
+      </div>
+    </div>
+  }
+</p-card>

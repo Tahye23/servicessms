@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="202504232058-01-create-send-whatsapp" author="saadna">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <not>
+                <tableExists tableName="send_whatsapp"/>
+            </not>
+        </preConditions>
+        <createTable tableName="send_whatsapp">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="template_id" type="bigint"/>
+            <column name="send_date" type="timestamp with time zone"/>
+            <column name="is_sent" type="boolean"/>
+
+            <!-- Foreign key to sender_user (extended_user) -->
+            <column name="sender_user_id" type="bigint"/>
+            <column name="recipient_group_id" type="bigint"/>
+            <column name="recipient_contact_id" type="bigint"/>
+            <column name="statut_id" type="bigint"/>
+        </createTable>
+
+
+    </changeSet>
+
+</databaseChangeLog>

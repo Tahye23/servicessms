@@ -1,0 +1,64 @@
+<div class="flex justify-center py-10">
+  <div class="w-full max-w-3xl bg-white p-8 rounded-xl shadow-md space-y-6">
+    @if (groupedecontact()) {
+      <!-- Titre -->
+      <h2 class="text-2xl font-bold text-gray-800 text-center mb-4">🧩 Détails du Groupedecontact</h2>
+
+      <hr class="border-gray-300 mb-4" />
+
+      <!-- Alertes -->
+      <jhi-alert-error></jhi-alert-error>
+      <jhi-alert></jhi-alert>
+
+      <!-- Détails -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-700">
+        <div>
+          <p class="font-semibold text-gray-600 mb-1">ID</p>
+          <p>{{ groupedecontact()!.id }}</p>
+        </div>
+
+        <div>
+          <p class="font-semibold text-gray-600 mb-1">Cgrgroupe</p>
+          @if (groupedecontact()!.cgrgroupe) {
+            <a [routerLink]="['/groupe', groupedecontact()!.cgrgroupe?.id, 'view']" class="text-blue-600 hover:underline">
+              Voir Groupe ID {{ groupedecontact()!.cgrgroupe?.id }}
+            </a>
+          } @else {
+            <p class="text-gray-500">Aucun groupe associé</p>
+          }
+        </div>
+
+        <div>
+          <p class="font-semibold text-gray-600 mb-1">Contact</p>
+          @if (groupedecontact()!.contact) {
+            <a [routerLink]="['/contact', groupedecontact()!.contact?.id, 'view']" class="text-blue-600 hover:underline">
+              Voir Contact ID {{ groupedecontact()!.contact?.id }}
+            </a>
+          } @else {
+            <p class="text-gray-500">Aucun contact associé</p>
+          }
+        </div>
+      </div>
+
+      <!-- Boutons d'action -->
+      <div class="flex flex-wrap justify-center gap-4 mt-8">
+        <button
+          type="submit"
+          (click)="previousState()"
+          class="flex items-center gap-2 border border-gray-400 text-gray-700 rounded-lg px-6 py-2 hover:bg-gray-400 hover:text-white transition-colors duration-300"
+          data-cy="entityDetailsBackButton"
+        >
+          ⬅️ Retour
+        </button>
+
+        <button
+          type="button"
+          [routerLink]="['/groupedecontact', groupedecontact()!.id, 'edit']"
+          class="flex items-center gap-2 border border-blue-600 bg-blue-600 text-white rounded-lg px-6 py-2 hover:bg-blue-700 transition-colors duration-300"
+        >
+          ✏️ Éditer
+        </button>
+      </div>
+    }
+  </div>
+</div>

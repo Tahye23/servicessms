@@ -1,0 +1,76 @@
+<div class="flex justify-center">
+  <div class="w-full max-w-3xl bg-white p-8 rounded-xl shadow-md">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Détails du Service</h2>
+
+    <jhi-alert-error></jhi-alert-error>
+    <jhi-alert></jhi-alert>
+
+    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-sm text-gray-700">
+      <!-- ID -->
+      <div>
+        <dt class="font-semibold">ID</dt>
+        <dd class="mt-1 text-gray-900">{{ service()!.id }}</dd>
+      </div>
+
+      <!-- Nom -->
+      <div>
+        <dt class="font-semibold">Nom du Service</dt>
+        <dd class="mt-1 text-gray-900">{{ service()!.servNom }}</dd>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <dt class="font-semibold">Description</dt>
+        <dd class="mt-1 text-gray-900">{{ service()!.servDescription }}</dd>
+      </div>
+
+      <!-- Nombre d'usage -->
+      <div>
+        <dt class="font-semibold">Nombre d'usages</dt>
+        <dd class="mt-1 text-gray-900">{{ service()!.nbrusage }}</dd>
+      </div>
+
+      <!-- Montant -->
+      <div>
+        <dt class="font-semibold">Montant</dt>
+        <dd class="mt-1 text-gray-900">{{ service()!.montant }}</dd>
+      </div>
+
+      <!-- Statut -->
+      <div>
+        <dt class="font-semibold">Statut</dt>
+        <dd class="mt-1 text-gray-900">{{ service()!.statut ? 'Actif' : 'Inactif' }}</dd>
+      </div>
+
+      <!-- Access Type -->
+      <div class="sm:col-span-2">
+        <dt class="font-semibold">Type d'accès</dt>
+        <dd class="mt-1 text-blue-600">
+          @if (service()!.accessType) {
+            <a [routerLink]="['/referentiel', service()!.accessType?.id, 'view']">
+              {{ service()!.accessType?.id }}
+            </a>
+          }
+        </dd>
+      </div>
+    </dl>
+
+    <div class="flex justify-between mt-8">
+      <button
+        type="button"
+        (click)="previousState()"
+        class="flex items-center justify-center w-40 px-4 py-2 border border-gray-400 text-gray-700 rounded-lg hover:bg-gray-100 transition"
+      >
+        Retour
+      </button>
+
+      <button
+        type="button"
+        [routerLink]="['/service', service()!.id, 'edit']"
+        class="flex items-center justify-center w-40 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+      >
+        Éditer
+      </button>
+    </div>
+  </div>
+</div>

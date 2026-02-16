@@ -1,0 +1,451 @@
+<!-- conversations.component.html -->
+<div class="flex h-[calc(100vh-100px)] bg-gray-50">
+  <!-- Sidebar -->
+  <aside #contactsContainer class="w-80 bg-white shadow-lg flex flex-col border-r border-gray-100 h-full overflow-hidden">
+    <!-- Header -->
+    <div class="p-4 border-b border-gray-100 flex-shrink-0">
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="text-xl font-semibold text-gray-800">Conversations</h2>
+          <!-- <p class="text-sm text-gray-500">{{ contacts.length }} contacts</p> -->
+        </div>
+        <button
+          (click)="openModal()"
+          class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+        >
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="p-3 border-b border-gray-100 flex-shrink-0">
+      <div class="relative">
+        <input
+          type="text"
+          placeholder="Rechercher un contact..."
+          class="w-full pl-10 pr-4 py-2 rounded-xl bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500"
+          (input)="searchChats($event)"
+        />
+        <svg class="h-5 w-5 absolute top-2.5 left-3 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+          <path
+            fill-rule="evenodd"
+            d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0
+                   01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </div>
+    </div>
+
+    <!-- List -->
+    <cdk-virtual-scroll-viewport itemSize="120" class="flex-1 overflow-y-auto" (scrolledIndexChange)="onChatsScrollIndexChange($event)">
+      <ul class="divide-y divide-gray-100">
+        <li *cdkVirtualFor="let c of filteredGroupedChats" class="h-[120px]">
+          <!-- Contact Header -->
+          <div class="flex items-center p-3 border-b border-gray-50">
+            <div
+              class="w-12 h-12 rounded-full bg-gradient-to-r from-green-400 to-teal-500 flex items-center justify-center text-white font-medium text-lg"
+            >
+              {{ c.contact.connom!.charAt(0).toUpperCase() }}
+            </div>
+            <div class="ml-4 flex-1 overflow-hidden">
+              <div class="font-medium text-gray-900 truncate">{{ c.contact.connom }}</div>
+              <div class="text-sm text-gray-500 truncate">{{ c.contact.contelephone }}</div>
+            </div>
+          </div>
+
+          <!-- Channel Options -->
+          <div class="px-3 pb-2">
+            <div class="flex space-x-2">
+              <!-- WhatsApp Option -->
+              <button
+                *ngIf="hasWhatsAppChat(c.contact)"
+                (click)="selectContactChannel(c.contact, 'WHATSAPP')"
+                class="flex-1 flex items-center justify-center py-2 px-3 rounded-lg text-sm transition-colors"
+                [class.bg-green-100]="selectedContact?.id === c.contact.id && selectedChannel === 'WHATSAPP'"
+                [class.text-green-700]="selectedContact?.id === c.contact.id && selectedChannel === 'WHATSAPP'"
+                [class.bg-gray-100]="!(selectedContact?.id === c.contact.id && selectedChannel === 'WHATSAPP')"
+                [class.text-gray-600]="!(selectedContact?.id === c.contact.id && selectedChannel === 'WHATSAPP')"
+                [class.hover:bg-green-50]="!(selectedContact?.id === c.contact.id && selectedChannel === 'WHATSAPP')"
+              >
+                <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"
+                  />
+                </svg>
+                WhatsApp
+              </button>
+
+              <!-- SMS Option -->
+              <button
+                *ngIf="hasSMSChat(c.contact)"
+                (click)="selectContactChannel(c.contact, 'SMS')"
+                class="flex-1 flex items-center justify-center py-2 px-3 rounded-lg text-sm transition-colors"
+                [class.bg-blue-100]="selectedContact?.id === c.contact.id && selectedChannel === 'SMS'"
+                [class.text-blue-700]="selectedContact?.id === c.contact.id && selectedChannel === 'SMS'"
+                [class.bg-gray-100]="!(selectedContact?.id === c.contact.id && selectedChannel === 'SMS')"
+                [class.text-gray-600]="!(selectedContact?.id === c.contact.id && selectedChannel === 'SMS')"
+                [class.hover:bg-blue-50]="!(selectedContact?.id === c.contact.id && selectedChannel === 'SMS')"
+              >
+                <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"
+                  />
+                </svg>
+                SMS
+              </button>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </cdk-virtual-scroll-viewport>
+
+    <!-- Loader infinite scroll -->
+    <!-- <div *ngIf="groupedChatsArray.length" class="flex justify-center py-3 flex-shrink-0">
+      <div class="w-6 h-6 border-2 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+    </div> -->
+
+    <!-- Footer info -->
+    <div class="p-3 border-t border-gray-100 bg-white flex-shrink-0">
+      <!-- <div class="text-sm text-gray-600 text-center">{{ contacts.length }} / {{ totalContacts }} contacts chargés</div> -->
+    </div>
+  </aside>
+
+  <!-- Chat area -->
+  <div class="flex-1 flex flex-col h-full overflow-hidden">
+    <!-- Header -->
+    <div *ngIf="selectedContact" class="h-16 border-b border-gray-100 flex items-center px-6 bg-white shadow-sm flex-shrink-0">
+      <div
+        class="w-10 h-10 rounded-full bg-gradient-to-r from-green-400 to-teal-500 flex items-center justify-center text-white font-medium"
+      >
+        {{ selectedContact.connom!.charAt(0).toUpperCase() }}
+      </div>
+      <div class="ml-3">
+        <div class="font-medium">{{ selectedContact.connom }}</div>
+        <div class="text-xs text-gray-500 flex items-center">
+          <span>{{ selectedContact.contelephone }}</span>
+          <span
+            *ngIf="selectedChannel"
+            class="ml-2 px-2 py-1 rounded-full text-xs"
+            [class.bg-green-100]="selectedChannel === 'WHATSAPP'"
+            [class.text-green-700]="selectedChannel === 'WHATSAPP'"
+            [class.bg-blue-100]="selectedChannel === 'SMS'"
+            [class.text-blue-700]="selectedChannel === 'SMS'"
+          >
+            {{ selectedChannel }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!selectedContact" class="flex-1 flex flex-col items-center justify-center text-gray-500 bg-gray-50">
+      <svg class="h-16 w-16 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1"
+          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03
+                 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512
+                 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+        />
+      </svg>
+      <h3 class="text-lg font-medium mb-1">Aucune conversation sélectionnée</h3>
+      <p class="text-sm">Sélectionnez un contact et un canal pour voir les messages</p>
+    </div>
+
+    <!-- Messages -->
+    <div
+      #messagesContainer
+      *ngIf="selectedContact && selectedChannel"
+      class="flex-1 overflow-y-auto p-4 bg-gray-100 relative"
+      [class.scrolling]="isScrolling"
+    >
+      <div *ngIf="loadingMoreMessages" class="sticky top-0 flex justify-center py-2 mb-2 z-10">
+        <div class="w-6 h-6 border-2 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+
+      <div *ngIf="noMoreMessages && messages.length" class="text-center text-xs text-gray-400 mb-4 py-1">Début de la conversation</div>
+
+      <cdk-virtual-scroll-viewport #messagesViewport itemSize="80" minBufferPx="400" maxBufferPx="800" class="h-full">
+        <div *cdkVirtualFor="let m of messages; trackBy: trackByMessageId; let i = index" class="message-wrapper" [attr.data-index]="i">
+          <!-- Date separator -->
+          <div *ngIf="showDateSeparator(m, i)" class="flex justify-center my-3">
+            <div class="bg-white text-xs text-gray-500 px-3 py-1 rounded-full shadow-sm">
+              {{ getMessageDate(m) | date: 'mediumDate' }}
+            </div>
+          </div>
+
+          <!-- Message bubble -->
+          <div class="flex mb-2" [class.justify-end]="m.receiver !== selectedContact.contelephone">
+            <div
+              [class.bg-green-500]="m.direction === 'OUTBOUND'"
+              [class.text-white]="m.direction === 'OUTBOUND'"
+              [class.bg-white]="m.direction === 'INBOUND'"
+              [class.text-gray-800]="m.direction === 'INBOUND'"
+              [class.message-out]="m.direction === 'OUTBOUND'"
+              [class.message-in]="m.direction === 'INBOUND'"
+              class="max-w-[70%] px-4 py-2.5 rounded-lg shadow-sm relative message animate-fade-in"
+            >
+              <!-- Message content -->
+              <app-template-renderer [templateId]="m.template_id" [variables]="m.vars"></app-template-renderer>
+
+              <!-- Message time -->
+              <div
+                class="text-right text-xs mt-1"
+                [class.text-green-100]="m.receiver !== selectedContact.contelephone"
+                [class.text-gray-400]="m.receiver === selectedContact.contelephone"
+              >
+                {{ m.sendDate | date: 'shortTime' }}
+              </div>
+
+              <!-- Read status for outgoing messages -->
+              <div *ngIf="m.receiver !== selectedContact.contelephone" class="absolute bottom-1 right-2 text-xs">
+                <svg *ngIf="m.status === 'READ'" class="h-3 w-3 text-green-100" viewBox="0 0 20 20" fill="currentColor">
+                  <path
+                    fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </cdk-virtual-scroll-viewport>
+
+      <!-- Scroll to bottom button -->
+      <button
+        *ngIf="showScrollButton"
+        (click)="scrollToBottom()"
+        class="absolute bottom-4 right-4 bg-gray-700 text-white rounded-full p-2 shadow-lg opacity-80 hover:opacity-100 transition-opacity"
+      >
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Input -->
+    <div *ngIf="selectedContact && selectedChannel" class="border-t border-gray-100 bg-white p-3 flex-shrink-0">
+      <form (submit)="$event.preventDefault(); send()" class="flex items-center space-x-2">
+        <!-- Emoji button -->
+        <button type="button" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </button>
+
+        <!-- Templates button -->
+        <button
+          type="button"
+          (click)="toggleTemplates()"
+          class="text-blue-500 hover:text-blue-700 focus:outline-none relative"
+          title="Afficher les templates"
+        >
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+        </button>
+
+        <!-- Input field -->
+        <input
+          type="text"
+          [(ngModel)]="newMessage"
+          name="newMessage"
+          placeholder="Écrivez un message..."
+          [disabled]="sending"
+          class="flex-1 py-3 px-4 bg-gray-100 rounded-full focus:ring-2 focus:ring-green-500 focus:outline-none"
+          (keydown.enter)="$event.preventDefault(); send()"
+        />
+
+        <!-- Send button -->
+        <button
+          type="submit"
+          [disabled]="sending || !newMessage.trim()"
+          class="bg-green-500 text-white rounded-full p-2.5 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 transition-colors"
+        >
+          <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0
+                     001.169 1.409l5-1.429A1 1 0 009 15.571V11a1
+                     1 0 112 0v4.571a1 1 0 00.725.962l5
+                     1.428a1 1 0 001.17-1.408l-7-14z"
+            />
+          </svg>
+        </button>
+      </form>
+
+      <!-- Templates Modal/Dropdown -->
+
+      <!-- Mat Select Dropdown pour les Templates -->
+      <div>
+        <mat-form-field *ngIf="showTemplates" appearance="fill" class="w-full mt-4">
+          <mat-label>Sélectionner un template</mat-label>
+          <mat-select [(value)]="selectedTemplate" (selectionChange)="selectTemplate($event.value)">
+            <mat-option *ngFor="let template of templates" [value]="template">
+              <div class="flex flex-col">
+                <span class="font-semibold">{{ template.name || 'Sans nom' }}</span>
+                <small class="text-gray-600">{{ template.description || 'Sans description' }}</small>
+                <div class="mt-1 flex items-center space-x-2">
+                  <span *ngIf="template.isWhatsapp" class="text-xs text-green-700 bg-green-100 px-1 rounded">WhatsApp</span>
+                  <span
+                    *ngIf="template.approved === 'true' || template.approved === true"
+                    class="text-xs text-blue-700 bg-blue-100 px-1 rounded"
+                    >Approuvé</span
+                  >
+                </div>
+              </div>
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="isModalOpen" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" (click)="closeModal()">
+  <div class="bg-white rounded-lg p-6 w-96 max-w-md mx-4" (click)="$event.stopPropagation()">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-lg font-semibold text-gray-800">Créer un nouveau chat</h3>
+      <button (click)="closeModal()" class="text-gray-500 hover:text-gray-700">
+        <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+          <path
+            d="M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <form #chatForm="ngForm" (ngSubmit)="onSubmit(chatForm)">
+      <!-- Contact -->
+      <div>
+        <!-- Contact sélectionné -->
+        <div *ngIf="selectedContact" class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl p-6 mb-6 border border-blue-200">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
+                <span class="text-white font-bold text-lg">{{ selectedContact.conprenom?.charAt(0) }}</span>
+              </div>
+              <div>
+                <div class="font-bold text-blue-900">{{ selectedContact.conprenom }} {{ selectedContact.connom }}</div>
+                <div class="text-blue-700">{{ selectedContact.contelephone }}</div>
+              </div>
+            </div>
+            <button type="button" (click)="clearSelectedContact()" class="p-2 text-blue-600 hover:bg-blue-200 rounded-xl transition-colors">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Recherche contact -->
+        <div *ngIf="!selectedContact" class="contact-search-container relative">
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            [ngModelOptions]="{ standalone: true }"
+            (focus)="openDropdown()"
+            (ngModelChange)="onSearchChange($event)"
+            placeholder="Rechercher un contact..."
+            class="w-full pl-12 pr-4 py-4 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-lg"
+          />
+
+          <!-- Dropdown contacts -->
+          <div
+            *ngIf="dropdownOpen && !selectedContact"
+            class="absolute z-30 w-full bg-white rounded-2xl shadow-xl border border-gray-200 mt-2 max-h-80 overflow-hidden"
+          >
+            <div class="max-h-80 overflow-y-auto" (scroll)="onScroll($event)">
+              <div
+                *ngFor="let contact of allContacts"
+                (click)="selectContact(contact)"
+                class="p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors"
+              >
+                <div class="flex items-center space-x-3">
+                  <div class="w-10 h-10 bg-gray-200 rounded-xl flex items-center justify-center">
+                    <span class="text-gray-600 font-medium">{{ contact.conprenom?.charAt(0) }}</span>
+                  </div>
+                  <div>
+                    <div class="font-medium text-gray-900">{{ contact.conprenom }} {{ contact.connom }}</div>
+                    <div class="text-sm text-gray-500">{{ contact.contelephone }}</div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="isLoading" class="p-6 text-center">
+                <div class="inline-flex items-center text-gray-500">
+                  <svg class="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Chargement...
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Canal -->
+      <div class="mb-4" *ngIf="selectedContact">
+        <label for="channel" class="block text-sm font-medium text-gray-700 mb-2"> Canal </label>
+        <div class="relative">
+          <select
+            id="channel"
+            name="channel"
+            [(ngModel)]="formData.channel"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+          >
+            <option value="">Sélectionner un canal</option>
+            <option *ngFor="let channel of availableChannels" [value]="channel">
+              {{ channel }}
+            </option>
+          </select>
+          <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+            <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+        <div *ngIf="chatForm.submitted && !formData.channel" class="text-red-500 text-sm mt-1">La sélection d'un canal est requise</div>
+      </div>
+
+      <!-- Boutons -->
+      <div class="flex gap-3">
+        <button
+          type="button"
+          (click)="closeModal()"
+          class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+        >
+          Annuler
+        </button>
+        <button
+          type="submit"
+          [disabled]="chatForm.invalid || isLoading"
+          class="flex-1 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {{ isLoading ? 'Création...' : 'Créer' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,42 @@
+{
+  "annotations": {
+    "changelogDate": "20240722111345"
+  },
+  "fields": [
+    {
+      "fieldName": "conid",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "connom",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "conprenom",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "contelephone",
+      "fieldType": "String",
+      "fieldValidateRules": []
+    },
+    {
+      "fieldName": "statuttraitement",
+      "fieldType": "Integer"
+    }
+  ],
+  "name": "Contact",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "groupe",
+      "relationshipName": "Groupe",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "no"
+}

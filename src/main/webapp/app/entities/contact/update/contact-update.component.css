@@ -1,0 +1,26 @@
+/* cible la liste déroulante du composant intl-tel-input */
+::ng-deep .iti__country-list {
+  position: absolute !important; /* bien décroché du flux */
+  top: 100% !important; /* juste en-dessous de l’input */
+  left: 0 !important;
+  width: 100% !important; /* occupe toute la largeur parent */
+  max-height: 12rem !important; /* hauteur fixe pour le scroll */
+  overflow-y: auto !important; /* scroll interne */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 9999 !important;
+  background-color: #ffffff; /* par‐dessus tout */
+}
+/* cible l’input interne du composant */
+::ng-deep ngx-intl-tel-input input:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* si vous voulez un style de scrollbar plus fin */
+::ng-deep .iti__country-list::-webkit-scrollbar {
+  width: 6px;
+}
+::ng-deep .iti__country-list::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}

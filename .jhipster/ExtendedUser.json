@@ -1,0 +1,32 @@
+{
+  "annotations": {
+    "changelogDate": "20240723152853"
+  },
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "Integer",
+      "options": {
+        "id": true
+      }
+    },
+    {
+      "fieldName": "address",
+      "fieldType": "String"
+    }
+  ],
+  "name": "ExtendedUser",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityField": "login",
+      "otherEntityName": "user",
+      "relationshipName": "extuser",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "no"
+}

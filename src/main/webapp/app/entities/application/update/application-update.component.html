@@ -1,0 +1,851 @@
+<!-- Container principal avec arrière-plan moderne -->
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50 py-8 px-4">
+  <div class="max-w-4xl mx-auto">
+    <!-- Breadcrumb -->
+    <nav class="flex mb-8" aria-label="Breadcrumb">
+      <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+          <a href="#" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-purple-600 transition-colors">
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"
+              ></path>
+            </svg>
+            Accueil
+          </a>
+        </li>
+        <li>
+          <div class="flex items-center">
+            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                clip-rule="evenodd"
+              ></path>
+            </svg>
+            <a href="#" class="ml-1 text-sm font-medium text-gray-700 hover:text-purple-600 md:ml-2 transition-colors">Applications</a>
+          </div>
+        </li>
+        <li>
+          <div class="flex items-center">
+            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                clip-rule="evenodd"
+              ></path>
+            </svg>
+            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">
+              {{ editForm.controls.id.value ? 'Modifier' : 'Créer' }}
+            </span>
+          </div>
+        </li>
+      </ol>
+    </nav>
+
+    <!-- Header avec titre -->
+    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6 md:p-8 mb-8 animate-fade-in">
+      <div class="flex items-center gap-4">
+        <div class="p-3 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl shadow-lg">
+          <svg class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              *ngIf="!editForm.controls.id.value"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+            />
+            <path
+              *ngIf="editForm.controls.id.value"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+            />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-3xl md:text-4xl font-bold text-gray-900">
+            {{ editForm.controls.id.value ? "Modifier l'application" : 'Créer une nouvelle application' }}
+          </h1>
+          <p class="text-gray-600 mt-1">
+            {{
+              editForm.controls.id.value
+                ? 'Modifiez les paramètres de votre application'
+                : 'Configurez votre nouvelle application pour accéder aux API'
+            }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulaire principal -->
+    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6 md:p-8 animate-scale-in">
+      <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm" class="space-y-8">
+        <!-- Alertes -->
+        <div class="space-y-4">
+          <jhi-alert-error></jhi-alert-error>
+
+          <!-- Messages personnalisés -->
+          <div *ngIf="successMessage" class="bg-green-50 border border-green-200 rounded-xl p-4">
+            <div class="flex items-center">
+              <svg class="h-5 w-5 text-green-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="text-green-800 font-medium">{{ successMessage }}</span>
+            </div>
+          </div>
+
+          <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 rounded-xl p-4">
+            <div class="flex items-center">
+              <svg class="h-5 w-5 text-red-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span class="text-red-800 font-medium">{{ errorMessage }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section informations de base -->
+        <div class="space-y-6">
+          <div class="border-b border-gray-200 pb-4">
+            <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <svg class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Informations de base
+            </h3>
+            <p class="text-sm text-gray-600 mt-1">Définissez les informations principales de votre application</p>
+          </div>
+
+          <!-- ID (en mode édition) -->
+          <div *ngIf="editForm.controls.id.value !== null" class="relative">
+            <label for="field_id" class="block text-sm font-medium text-gray-700 mb-2"> Identifiant de l'application </label>
+            <div class="relative">
+              <input
+                type="number"
+                id="field_id"
+                formControlName="id"
+                data-cy="id"
+                readonly
+                class="block w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-500 cursor-not-allowed"
+              />
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                </svg>
+              </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">L'identifiant est généré automatiquement</p>
+          </div>
+
+          <!-- Nom de l'application -->
+          <div class="relative">
+            <label for="field_name" class="block text-sm font-medium text-gray-700 mb-2">
+              Nom de l'application <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <input
+                type="text"
+                id="field_name"
+                formControlName="name"
+                data-cy="name"
+                placeholder="Ex: Mon App WhatsApp, Notifications SMS..."
+                class="block w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 bg-white hover:border-gray-400"
+                [class.border-red-300]="hasFieldError('name')"
+              />
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                  />
+                </svg>
+              </div>
+            </div>
+            <div *ngIf="hasFieldError('name')" class="mt-1">
+              <p class="text-sm text-red-600">Le nom de l'application est obligatoire</p>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Choisissez un nom descriptif pour identifier votre application</p>
+          </div>
+
+          <!-- Description -->
+          <div class="relative">
+            <label for="field_description" class="block text-sm font-medium text-gray-700 mb-2"> Description </label>
+            <div class="relative">
+              <textarea
+                id="field_description"
+                formControlName="description"
+                data-cy="description"
+                rows="3"
+                placeholder="Décrivez l'objectif et l'utilisation de votre application..."
+                class="block w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 bg-white hover:border-gray-400 resize-none"
+              ></textarea>
+              <div class="absolute top-3 left-0 pl-3 flex items-start pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+                </svg>
+              </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Une description claire aide à identifier l'usage de l'application</p>
+          </div>
+
+          <!-- Environnement -->
+          <div class="relative">
+            <label for="field_environment" class="block text-sm font-medium text-gray-700 mb-2"> Environnement </label>
+            <div class="relative">
+              <select
+                id="field_environment"
+                formControlName="environment"
+                data-cy="environment"
+                class="block w-full pl-12 pr-10 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 bg-white hover:border-gray-400"
+              >
+                <option value="">Sélectionner un environnement</option>
+                <option value="development">Développement</option>
+                <option value="staging">Test/Staging</option>
+                <option value="production">Production</option>
+              </select>
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"
+                  />
+                </svg>
+              </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">L'environnement détermine les limitations et permissions</p>
+          </div>
+        </div>
+
+        <!-- Section services et permissions -->
+        <div class="space-y-6">
+          <div class="border-b border-gray-200 pb-4">
+            <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <svg class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m5.012-3H20m-7 7v3a2 2 0 01-2 2H9a2 2 0 01-2-2v-3m2-6V9a2 2 0 012-2h2a2 2 0 012 2v3M7 7V5a2 2 0 012-2h6a2 2 0 012 2v2"
+                />
+              </svg>
+              Services et permissions
+            </h3>
+            <p class="text-sm text-gray-600 mt-1">Configurez les services autorisés et les limites d'utilisation</p>
+          </div>
+
+          <!-- Services autorisés -->
+          <div class="relative">
+            <label class="block text-sm font-medium text-gray-700 mb-3"> Services autorisés </label>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <label
+                class="relative flex items-center p-4 border border-gray-200 rounded-xl hover:border-purple-300 cursor-pointer transition-all duration-200"
+              >
+                <input type="checkbox" formControlName="allowSms" class="sr-only" />
+                <div class="flex items-center">
+                  <div class="w-5 h-5 border-2 border-gray-300 rounded mr-3 flex items-center justify-center">
+                    <svg class="w-3 h-3 text-purple-600 hidden" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="font-medium text-gray-900">SMS</div>
+                    <div class="text-xs text-gray-500">Envoi de SMS</div>
+                  </div>
+                </div>
+              </label>
+
+              <label
+                class="relative flex items-center p-4 border border-gray-200 rounded-xl hover:border-purple-300 cursor-pointer transition-all duration-200"
+              >
+                <input type="checkbox" formControlName="allowWhatsapp" class="sr-only" />
+                <div class="flex items-center">
+                  <div class="w-5 h-5 border-2 border-gray-300 rounded mr-3 flex items-center justify-center">
+                    <svg class="w-3 h-3 text-purple-600 hidden" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="font-medium text-gray-900">WhatsApp</div>
+                    <div class="text-xs text-gray-500">Messages WhatsApp</div>
+                  </div>
+                </div>
+              </label>
+
+              <label
+                class="relative flex items-center p-4 border border-gray-200 rounded-xl hover:border-purple-300 cursor-pointer transition-all duration-200"
+              >
+                <input type="checkbox" formControlName="allowEmail" class="sr-only" />
+                <div class="flex items-center">
+                  <div class="w-5 h-5 border-2 border-gray-300 rounded mr-3 flex items-center justify-center">
+                    <svg class="w-3 h-3 text-purple-600 hidden" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="font-medium text-gray-900">Email</div>
+                    <div class="text-xs text-gray-500">Envoi d'emails</div>
+                  </div>
+                </div>
+              </label>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">Sélectionnez les services que votre application pourra utiliser</p>
+          </div>
+          <!-- ✅ SECTION À AJOUTER DANS LE HTML APRÈS LA SECTION WEBHOOK -->
+          <!-- À insérer après la section "Configuration Webhook" -->
+
+          <!-- Section Token d'API (uniquement en création) -->
+          <div *ngIf="!editForm.controls.id.value" class="space-y-6">
+            <div class="border-b border-gray-200 pb-4">
+              <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <svg class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+                  />
+                </svg>
+                Configuration du Token d'API
+              </h3>
+              <p class="text-sm text-gray-600 mt-1">Définissez la durée de validité du token qui sera généré automatiquement</p>
+            </div>
+
+            <!-- Case à cocher: Jamais expirer -->
+            <div class="relative">
+              <label
+                class="flex items-center p-4 border border-gray-200 rounded-xl hover:border-purple-300 cursor-pointer transition-all duration-200"
+              >
+                <input type="checkbox" formControlName="tokenNeverExpires" class="sr-only" />
+                <div class="flex items-center">
+                  <div class="w-5 h-5 border-2 border-gray-300 rounded mr-3 flex items-center justify-center">
+                    <svg class="w-3 h-3 text-purple-600 hidden" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="font-medium text-gray-900">Token sans expiration</div>
+                    <div class="text-xs text-gray-500">Le token n'expirera jamais (non recommandé pour la production)</div>
+                  </div>
+                </div>
+              </label>
+            </div>
+
+            <!-- Champ Date d'expiration -->
+            <div class="relative" *ngIf="!editForm.get('tokenNeverExpires')?.value">
+              <label for="field_tokenDateExpiration" class="block text-sm font-medium text-gray-700 mb-2">
+                Date d'expiration du token <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <input
+                  type="date"
+                  id="field_tokenDateExpiration"
+                  formControlName="tokenDateExpiration"
+                  [min]="getMinDate()"
+                  class="block w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 bg-white hover:border-gray-400"
+                  [class.border-red-300]="hasFieldError('tokenDateExpiration')"
+                />
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+              </div>
+
+              <div *ngIf="hasFieldError('tokenDateExpiration')" class="mt-1">
+                <p *ngFor="let error of getFieldErrors('tokenDateExpiration')" class="text-sm text-red-600">
+                  {{ error }}
+                </p>
+              </div>
+
+              <div class="flex items-center gap-2 mt-2">
+                <button
+                  type="button"
+                  (click)="editForm.get('tokenDateExpiration')?.setValue(getSuggestedExpirationDate())"
+                  class="text-xs text-purple-600 hover:text-purple-800 underline"
+                >
+                  Suggérer 6 mois
+                </button>
+                <span class="text-xs text-gray-500">•</span>
+                <span class="text-xs text-gray-500">Le token sera automatiquement généré à la création</span>
+              </div>
+            </div>
+
+            <!-- Message d'information -->
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+              <div class="flex items-start">
+                <svg class="h-5 w-5 text-blue-400 mr-3 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <div class="text-sm text-blue-800">
+                  <p class="font-medium mb-1">À propos du token d'API</p>
+                  <ul class="list-disc list-inside space-y-1 text-xs">
+                    <li>Un token unique sera généré automatiquement après la création</li>
+                    <li>Vous pourrez consulter et régénérer ce token depuis les détails de l'application</li>
+                    <li>
+                      {{
+                        editForm.get('tokenNeverExpires')?.value
+                          ? 'Token sans expiration : pratique mais moins sécurisé'
+                          : 'Token avec expiration : recommandé pour la sécurité'
+                      }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Note: Style CSS pour la checkbox (à ajouter dans la section <style> existante) -->
+          <style>
+            /* Checkbox styles pour tokenNeverExpires */
+            input[type='checkbox']:checked + div .w-5 {
+              border-color: #7c3aed;
+              background-color: #7c3aed;
+            }
+
+            input[type='checkbox']:checked + div .w-5 svg {
+              display: block;
+            }
+          </style>
+
+          <!-- Limites d'utilisation -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="relative">
+              <label for="field_dailyLimit" class="block text-sm font-medium text-gray-700 mb-2"> Limite journalière </label>
+              <div class="relative">
+                <input
+                  type="number"
+                  id="field_dailyLimit"
+                  formControlName="dailyLimit"
+                  data-cy="dailyLimit"
+                  placeholder="1000"
+                  min="0"
+                  class="block w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 bg-white hover:border-gray-400"
+                />
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">Nombre maximum d'appels API par jour</p>
+            </div>
+
+            <div class="relative">
+              <label for="field_monthlyLimit" class="block text-sm font-medium text-gray-700 mb-2"> Limite mensuelle </label>
+              <div class="relative">
+                <input
+                  type="number"
+                  id="field_monthlyLimit"
+                  formControlName="monthlyLimit"
+                  data-cy="monthlyLimit"
+                  placeholder="30000"
+                  min="0"
+                  class="block w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 bg-white hover:border-gray-400"
+                />
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8 7V3a4 4 0 118 0v4m-4 12v-6m0 0V7m0 6h6m-6 0H6"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">Nombre maximum d'appels API par mois</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section webhook -->
+        <div class="space-y-6">
+          <div class="border-b border-gray-200 pb-4">
+            <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <svg class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                />
+              </svg>
+              Configuration Webhook
+            </h3>
+            <p class="text-sm text-gray-600 mt-1">Configurez les webhooks pour recevoir les notifications en temps réel</p>
+          </div>
+
+          <!-- URL du webhook -->
+          <div class="relative">
+            <label for="field_webhookUrl" class="block text-sm font-medium text-gray-700 mb-2"> URL du Webhook </label>
+            <div class="relative">
+              <input
+                type="url"
+                id="field_webhookUrl"
+                formControlName="webhookUrl"
+                data-cy="webhookUrl"
+                placeholder="https://votre-app.com/webhook"
+                class="block w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 bg-white hover:border-gray-400"
+              />
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                  />
+                </svg>
+              </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">URL où les notifications seront envoyées</p>
+          </div>
+
+          <!-- Secret du webhook -->
+          <div class="relative">
+            <label for="field_webhookSecret" class="block text-sm font-medium text-gray-700 mb-2"> Secret Webhook (optionnel) </label>
+            <div class="relative">
+              <input
+                type="password"
+                id="field_webhookSecret"
+                formControlName="webhookSecret"
+                data-cy="webhookSecret"
+                placeholder="Secret pour valider les webhooks"
+                class="block w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 bg-white hover:border-gray-400"
+              />
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Secret utilisé pour valider l'authenticité des webhooks</p>
+          </div>
+
+          <!-- Test webhook button -->
+          <div class="flex items-center gap-4">
+            <button
+              type="button"
+              (click)="testWebhook()"
+              [disabled]="!editForm.get('webhookUrl')?.value || isTestingWebhook"
+              class="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <svg class="h-4 w-4" [class.animate-spin]="isTestingWebhook" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h1m4 0h1m-6-8h1m4 0h1M9 18h6"
+                />
+              </svg>
+              {{ isTestingWebhook ? 'Test en cours...' : 'Tester le webhook' }}
+            </button>
+
+            <div *ngIf="webhookTestResult" class="flex items-center gap-2">
+              <svg *ngIf="webhookTestResult.success" class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <svg *ngIf="!webhookTestResult.success" class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              <span class="text-sm" [class.text-green-600]="webhookTestResult.success" [class.text-red-600]="!webhookTestResult.success">
+                {{ webhookTestResult.message }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section relations existantes -->
+        <div class="space-y-6">
+          <div class="border-b border-gray-200 pb-4">
+            <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <svg class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                />
+              </svg>
+              Associations
+            </h3>
+            <p class="text-sm text-gray-600 mt-1">Liez votre application aux APIs et plans d'abonnement</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- API -->
+            <div class="relative">
+              <label for="field_api" class="block text-sm font-medium text-gray-700 mb-2"> API associée </label>
+              <div class="relative">
+                <select
+                  id="field_api"
+                  formControlName="api"
+                  data-cy="api"
+                  [compareWith]="compareApi"
+                  class="block w-full pl-12 pr-10 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 bg-white hover:border-gray-400"
+                >
+                  <option [ngValue]="null">Sélectionnez une API</option>
+                  <option *ngFor="let apiOption of apisSharedCollection; trackBy: trackApi" [ngValue]="apiOption">
+                    {{ apiOption.apiNom || apiOption.id }}
+                  </option>
+                </select>
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Plan d'abonnement
+            <div class="relative">
+              <label for="field_planabonnement" class="block text-sm font-medium text-gray-700 mb-2">
+                Plan d'abonnement
+              </label>
+              <div class="relative">
+                <select
+                  id="field_planabonnement"
+                  formControlName="planabonnement"
+                  data-cy="planabonnement"
+                  [compareWith]="comparePlanabonnement"
+                  class="block w-full pl-12 pr-10 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 bg-white hover:border-gray-400"
+                >
+                  <option [ngValue]="null">Sélectionnez un plan</option>
+                  <option *ngFor="let planOption of planabonnementsSharedCollection; trackBy: trackPlan" [ngValue]="planOption">
+                    {{ planOption.abpName || planOption.id }}
+                  </option>
+                </select>
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                  </svg>
+                </div>
+              </div>
+            </div>-->
+          </div>
+        </div>
+
+        <!-- Aperçu de l'application -->
+        <div *ngIf="editForm.get('name')?.value" class="bg-purple-50 border border-purple-200 rounded-xl p-6">
+          <h4 class="text-sm font-medium text-purple-900 mb-4 flex items-center gap-2">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+              />
+            </svg>
+            Aperçu de l'application
+          </h4>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div>
+              <span class="font-medium text-purple-700">Nom:</span>
+              <span class="text-purple-800 ml-2">{{ editForm.get('name')?.value }}</span>
+            </div>
+
+            <div *ngIf="editForm.get('environment')?.value">
+              <span class="font-medium text-purple-700">Environnement:</span>
+              <span class="text-purple-800 ml-2">{{ editForm.get('environment')?.value }}</span>
+            </div>
+
+            <div class="md:col-span-2" *ngIf="editForm.get('description')?.value">
+              <span class="font-medium text-purple-700">Description:</span>
+              <p class="text-purple-800 mt-1">{{ editForm.get('description')?.value }}</p>
+            </div>
+
+            <div class="md:col-span-2" *ngIf="getSelectedServices().length">
+              <span class="font-medium text-purple-700">Services:</span>
+              <div class="flex flex-wrap gap-2 mt-2">
+                <span *ngFor="let service of getSelectedServices()" class="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
+                  {{ service }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
+          <button
+            type="button"
+            (click)="previousState()"
+            class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-8 py-3 bg-white border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium shadow-sm"
+          >
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            Annuler
+          </button>
+
+          <button
+            type="submit"
+            [disabled]="editForm.invalid || isSaving"
+            class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
+          >
+            <svg *ngIf="!isSaving" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <svg *ngIf="isSaving" class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            {{ isSaving ? 'Enregistrement...' : editForm.controls.id.value ? 'Mettre à jour' : "Créer l'application" }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Section d'aide -->
+    <div class="mt-8 bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6 animate-fade-in">
+      <div class="flex items-start gap-4">
+        <div class="flex-shrink-0">
+          <div class="p-2 bg-purple-100 rounded-lg">
+            <svg class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Guide de configuration</h3>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-start gap-2">
+              <svg class="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>Après création, vous recevrez un token API unique pour authentifier vos requêtes</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>Configurez votre webhook pour recevoir les notifications de statut en temps réel</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>Les limites journalières et mensuelles vous aident à contrôler l'utilisation de l'API</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>Vous pouvez modifier ces paramètres à tout moment depuis le tableau de bord</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Styles CSS pour les animations -->
+<style>
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.4s ease-out;
+  }
+
+  /* Checkbox styles */
+  input[type='checkbox']:checked + div .w-5 {
+    border-color: #7c3aed;
+    background-color: #7c3aed;
+  }
+
+  input[type='checkbox']:checked + div .w-5 svg {
+    display: block;
+  }
+
+  /* Focus states améliorés */
+  input:focus,
+  select:focus,
+  textarea:focus {
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+  }
+
+  /* Glassmorphism effect */
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+  }
+</style>

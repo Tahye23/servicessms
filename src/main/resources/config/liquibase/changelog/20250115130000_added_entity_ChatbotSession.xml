@@ -1,0 +1,30 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+      http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="2024-07-17-02-create-chatbot-session" author="yourname">
+        <createTable tableName="chatbot_session">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="phone_number" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_login" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="current_node_id" type="VARCHAR(255)"/>
+            <column name="variables" type="TEXT"/>
+            <column name="last_interaction" type="TIMESTAMP"/>
+            <column name="is_active" type="BOOLEAN" defaultValueBoolean="true"/>
+            <column name="session_start" type="TIMESTAMP"/>
+            <column name="last_message_type" type="VARCHAR(255)"/>
+            <column name="error_count" type="INTEGER" defaultValueNumeric="0"/>
+        </createTable>
+
+        <createSequence sequenceName="sequenceGenerator" startValue="1"/>
+    </changeSet>
+</databaseChangeLog>

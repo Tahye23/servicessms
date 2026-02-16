@@ -1,0 +1,863 @@
+<div class="min-h-screen p-6">
+  <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+    <!-- En-tête -->
+    <div class="p-4 md:p-6 rounded-xl bg-white/70 supports-[backdrop-filter]:backdrop-blur-sm">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-12 md:items-center">
+        <!-- Titre + meta -->
+        <div class="md:col-span-4 flex items-start sm:items-center gap-3">
+          <div class="shrink-0 bg-gradient-to-br from-blue-500/15 to-indigo-500/15 p-2.5 rounded-xl ring-1 ring-blue-200/40">
+            <svg class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.8"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+          </div>
+
+          <div class="min-w-0">
+            <h1 class="text-xl md:text-2xl font-semibold tracking-tight text-slate-900">Contacts</h1>
+            <div class="mt-1 flex flex-wrap items-center gap-2">
+              <span
+                class="inline-flex items-center gap-1 rounded-full bg-blue-50 text-blue-700 px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ring-blue-200"
+              >
+                <span class="inline-block size-1.5 rounded-full bg-blue-500"></span> Actifs
+              </span>
+              <span class="text-xs text-gray-500 font-medium">
+                {{ totalItems | number }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recherche -->
+        <div class="md:col-span-5">
+          <div class="flex items-center gap-2">
+            <div class="relative group flex-1">
+              <label for="contact-search" class="sr-only">Rechercher</label>
+              <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <!-- icône loupe -->
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </span>
+
+              <input
+                id="contact-search"
+                [(ngModel)]="searchTermDraft"
+                (keyup.enter)="onSearchClick()"
+                type="text"
+                autocomplete="off"
+                placeholder="Rechercher un contact, un numéro, une info…"
+                class="w-full pl-10 pr-14 py-2.5 rounded-lg text-sm bg-white border border-gray-300 shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500/80 focus:border-blue-500 transition-all group-hover:ring-1 group-hover:ring-blue-200/70"
+              />
+
+              <!-- Clear -->
+              <button
+                *ngIf="searchTermDraft"
+                (click)="searchTermDraft = ''"
+                type="button"
+                class="absolute right-9 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition"
+                aria-label="Effacer la recherche"
+              >
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              <!-- Loader / hint -->
+              <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                <svg *ngIf="isLoading" class="h-4 w-4 animate-spin text-blue-500" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                <span
+                  class="hidden md:inline-flex px-1.5 py-0.5 text-xs font-medium text-gray-500 bg-gray-100 rounded border border-gray-200"
+                >
+                  Ctrl&nbsp;K
+                </span>
+              </div>
+            </div>
+
+            <!-- Bouton Rechercher -->
+            <button
+              type="button"
+              (click)="onSearchClick()"
+              [disabled]="isLoading"
+              [attr.aria-busy]="isLoading ? 'true' : null"
+              class="group inline-flex items-center gap-2 rounded-lg border border-slate-300/80 bg-transparent px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50/70 hover:border-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            >
+              <!-- icône loupe -->
+              <svg
+                class="h-4 w-4 -ml-0.5 opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-transform"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z"
+                />
+              </svg>
+
+              <span class="sm:inline">Rechercher</span>
+
+              <!-- spinner quand isLoading -->
+              <svg *ngIf="isLoading" class="ml-1.5 h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v4A4 4 0 004 12z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Actions: bouton "…" + menu -->
+        <!-- Colonne Actions (à droite) -->
+        <div class="md:col-span-3 md:justify-self-end">
+          <div class="flex items-center justify-end gap-2">
+            <!-- Bouton Filtres -->
+            <button
+              type="button"
+              (click)="toggleAdvancedFilters()"
+              [attr.aria-pressed]="showAdvancedFilters"
+              class="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition border-gray-200 bg-white text-slate-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500/70"
+              [ngClass]="{
+                'bg-blue-50 border-blue-200 text-blue-700': hasActiveFilters()
+              }"
+            >
+              <!-- icône entonnoir -->
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 4h18M6 10h12M10 16h4" />
+              </svg>
+              <span class="hidden md:inline">Filtres</span>
+              <span *ngIf="hasActiveFilters()" class="ml-1 inline-block h-1.5 w-1.5 rounded-full bg-blue-600"></span>
+            </button>
+
+            <!-- Menu "…" -->
+            <div class="relative" #actionsMenu>
+              <button
+                type="button"
+                (click)="toggleActions($event)"
+                [attr.aria-expanded]="actionsOpen"
+                aria-haspopup="menu"
+                class="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white p-2.5 text-slate-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500/70 transition"
+              >
+                <span class="sr-only">Ouvrir le menu d’actions</span>
+                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zm6 0a2 2 0 11-4 0 2 2 0 014 0zm6 0a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </button>
+
+              <!-- Dropdown -->
+              <div
+                *ngIf="actionsOpen"
+                role="menu"
+                class="absolute right-0 mt-2 w-56 z-30 rounded-xl bg-white shadow-lg ring-1 ring-black/5 overflow-hidden"
+                (click)="$event.stopPropagation()"
+              >
+                <div class="py-1">
+                  <button
+                    role="menuitem"
+                    (click)="load(); closeActions()"
+                    [disabled]="isLoading"
+                    class="w-full px-3.5 py-2.5 text-left text-sm flex items-center gap-2 hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none">
+                      <path
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                      />
+                    </svg>
+                    <span>Actualiser</span>
+                    <svg *ngIf="isLoading" class="ml-auto h-4 w-4 animate-spin text-blue-500" viewBox="0 0 24 24" fill="none">
+                      <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                      <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v4A4 4 0 004 12z" />
+                    </svg>
+                  </button>
+
+                  <button
+                    role="menuitem"
+                    (click)="openModal(); closeActions()"
+                    class="w-full px-3.5 py-2.5 text-left text-sm flex items-center gap-2 hover:bg-gray-50"
+                  >
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24">
+                      <path
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                      />
+                    </svg>
+                    <span>Champs personnalisés</span>
+                  </button>
+
+                  <div class="my-1 h-px bg-gray-100"></div>
+
+                  <a
+                    role="menuitem"
+                    [routerLink]="['/contact/new']"
+                    (click)="closeActions()"
+                    class="block px-3.5 py-2.5 text-sm hover:bg-gray-50"
+                  >
+                    Nouveau contact
+                  </a>
+
+                  <!-- Raccourci pour (dé)plier filtres -->
+                  <button role="menuitem" (click)="closeActions()" class="w-full px-3.5 py-2.5 text-left text-sm hover:bg-gray-50">
+                    Afficher/masquer les filtres
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Filtres avancés -->
+    <div *ngIf="showAdvancedFilters" class="mt-4 mb-6 p-6 rounded-xl">
+      <div class="flex items-center justify-between mt-4 pt-4">
+        <div class="flex items-center gap-3">
+          <button (click)="clearAllFilters()" class="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 underline">Effacer</button>
+          <span class="text-sm text-blue-600 bg-blue-100 px-3 py-1 rounded-full"> {{ totalItems | number }} résultat(s) </span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            (click)="onSearchClick()"
+            [disabled]="isLoading"
+            [attr.aria-busy]="isLoading ? 'true' : null"
+            class="group inline-flex items-center gap-2 rounded-lg border border-slate-300/80 bg-transparent px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50/70 hover:border-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          >
+            <svg
+              class="h-4 w-4 -ml-0.5 opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-transform"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z"
+              />
+            </svg>
+            <span>Rechercher</span>
+            <svg *ngIf="isLoading" class="ml-1.5 h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v4A4 4 0 004 12z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <!--  Texte : nom / prénom / téléphone -->
+      <div class="mb-6">
+        <h4 class="text-md font-medium text-gray-700 mb-3 border-b border-gray-200 pb-2">🔍 Recherche textuelle</h4>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+          <!-- Nom -->
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Nom</label>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+              <select
+                [(ngModel)]="advancedFiltersDraft.nomFilterType"
+                class="w-full sm:w-40 md:w-44 px-2 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              >
+                <option [ngValue]="FilterType.CONTAINS">Contient</option>
+                <option [ngValue]="FilterType.STARTS_WITH">Commence par</option>
+                <option [ngValue]="FilterType.ENDS_WITH">Finit par</option>
+                <option [ngValue]="FilterType.EXACT">Exact</option>
+              </select>
+              <input
+                type="text"
+                [(ngModel)]="advancedFiltersDraft.nom"
+                placeholder="Nom..."
+                class="w-full sm:flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+              />
+            </div>
+          </div>
+
+          <!-- Prénom -->
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Prénom</label>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+              <select
+                [(ngModel)]="advancedFiltersDraft.prenomFilterType"
+                class="w-full sm:w-40 md:w-44 px-2 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              >
+                <option [ngValue]="FilterType.CONTAINS">Contient</option>
+                <option [ngValue]="FilterType.STARTS_WITH">Commence par</option>
+                <option [ngValue]="FilterType.ENDS_WITH">Finit par</option>
+                <option [ngValue]="FilterType.EXACT">Exact</option>
+              </select>
+              <input
+                type="text"
+                [(ngModel)]="advancedFiltersDraft.prenom"
+                placeholder="Prénom..."
+                class="w-full sm:flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+              />
+            </div>
+          </div>
+
+          <!-- Téléphone -->
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Téléphone</label>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+              <select
+                [(ngModel)]="advancedFiltersDraft.telephoneFilterType"
+                class="w-full sm:w-40 md:w-44 px-2 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              >
+                <option [ngValue]="FilterType.CONTAINS">Contient</option>
+                <option [ngValue]="FilterType.STARTS_WITH">Commence par</option>
+                <option [ngValue]="FilterType.ENDS_WITH">Finit par</option>
+                <option [ngValue]="FilterType.EXACT">Exact</option>
+              </select>
+              <input
+                type="text"
+                [(ngModel)]="advancedFiltersDraft.telephone"
+                placeholder="Ex: +222, 44..."
+                class="w-full sm:flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!--  Statuts / WhatsApp -->
+      <div class="mb-6">
+        <h4 class="text-md font-medium text-gray-700 mb-3 border-b border-gray-200 pb-2">📊 Statuts</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Statut de traitement</label>
+            <select
+              [(ngModel)]="advancedFiltersDraft.statut"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+            >
+              <option value="">Tous les statuts</option>
+              <option value="1">Valide (1)</option>
+              <option value="3">Doublon (3)</option>
+            </select>
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">WhatsApp</label>
+            <select
+              [(ngModel)]="advancedFiltersDraft.hasWhatsapp"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+            >
+              <option value="">Tous</option>
+              <option value="true">✅ Avec WhatsApp</option>
+              <option value="false">❌ Sans WhatsApp</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!--  SMS -->
+      <div class="mb-6">
+        <h4 class="text-md font-medium text-gray-700 mb-3 border-b border-gray-200 pb-2">💬 SMS</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="space-y-2">
+            <label class="block text-xs font-medium text-gray-600">SMS envoyés (minimum)</label>
+            <input
+              type="number"
+              min="0"
+              [(ngModel)]="advancedFiltersDraft.minSmsSent"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+            />
+          </div>
+          <div class="space-y-2">
+            <label class="block text-xs font-medium text-gray-600">SMS envoyés (maximum)</label>
+            <input
+              type="number"
+              min="0"
+              [(ngModel)]="advancedFiltersDraft.maxSmsSent"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!--  A reçu des messages -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">📤 A reçu des messages</label>
+        <select
+          [(ngModel)]="advancedFiltersDraft.hasReceivedMessages"
+          class="w-full md:w-64 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+        >
+          <option value="">Tous</option>
+          <option value="true">✅ A reçu des messages</option>
+          <option value="false">❌ N'a pas reçu de messages</option>
+        </select>
+      </div>
+
+      <!--  Campagne -->
+      <div class="mb-6">
+        <h4 class="text-md font-medium text-gray-700 mb-3 border-b border-gray-200 pb-2">🔗 Campagne / SMS</h4>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">ID campagne</label>
+            <input
+              type="number"
+              [(ngModel)]="advancedFiltersDraft.campaignId"
+              placeholder="send_sms.id"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">sms.status</label>
+            <select
+              [(ngModel)]="advancedFiltersDraft.smsStatus"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+            >
+              <option value="">Tous</option>
+              <option *ngFor="let s of smsStatusOptions" [value]="s">{{ s }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">delivery_status</label>
+            <select
+              [(ngModel)]="advancedFiltersDraft.deliveryStatus"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+            >
+              <option value="">Tous</option>
+              <option *ngFor="let d of deliveryStatusOptions" [value]="d">{{ d }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700">last_error</label>
+            <select
+              [(ngModel)]="lastErrorSelection"
+              (ngModelChange)="onLastErrorChange($event)"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+            >
+              <option *ngFor="let e of lastErrorOptions" [value]="e.value">{{ e.label }}</option>
+            </select>
+            <input
+              *ngIf="lastErrorSelection === '__custom__'"
+              type="text"
+              [(ngModel)]="lastErrorCustom"
+              (ngModelChange)="onLastErrorCustomInput()"
+              placeholder="Saisir une erreur…"
+              class="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex overflow-x-auto px-6 pt-4">
+      <button
+        (click)="selectTab('contacts')"
+        class="px-4 py-2 mr-2 font-medium text-sm rounded-t-lg border-b-2 transition-all"
+        [ngClass]="
+          selectedTab === 'contacts'
+            ? 'border-blue-600 text-blue-600'
+            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+        "
+      >
+        <div class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+            />
+          </svg>
+          Tous les Contacts
+        </div>
+      </button>
+      <!-- Onglet Historique des imports -->
+      <button
+        (click)="selectTab('import-history')"
+        class="px-4 py-2 mr-2 font-medium text-sm rounded-t-lg border-b-2 transition-all"
+        [ngClass]="
+          selectedTab === 'import-history'
+            ? 'border-blue-600 text-blue-600'
+            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+        "
+      >
+        <div class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Historique des imports
+        </div>
+      </button>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="p-6">
+      <!-- Onglet contacts -->
+      <div *ngIf="selectedTab === 'contacts'">
+        <!-- Message vide -->
+        <div *ngIf="contacts && contacts.length === 0" class="flex flex-col items-center justify-center py-12">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-16 w-16 text-gray-300 mb-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+          </svg>
+          <h3 class="text-lg font-medium text-gray-800">Aucun contact trouvé</h3>
+          <p class="text-gray-500 mt-1">Commencez par ajouter des contacts ou importer un fichier CSV</p>
+          <button
+            [routerLink]="['/contact/new']"
+            class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all flex items-center"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Ajouter un contact
+          </button>
+        </div>
+
+        <!-- Table -->
+        <div *ngIf="contacts && contacts.length > 0" class="overflow-hidden border border-gray-100 rounded-lg">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead>
+              <tr class="bg-gray-50">
+                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prénom</th>
+                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Téléphone</th>
+                <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-100">
+              <tr *ngFor="let contact of contacts; trackBy: trackByContactId" class="hover:bg-gray-50 transition-colors">
+                <td class="px-4 py-3 text-sm font-medium text-blue-600">{{ contact.id }}</td>
+                <td class="px-4 py-3 text-sm text-gray-900">{{ contact.connom }}</td>
+                <td class="px-4 py-3 text-sm text-gray-900">{{ contact.conprenom }}</td>
+                <td class="px-4 py-3 text-sm text-gray-900">{{ contact.contelephone }}</td>
+                <td class="px-4 py-3 text-right whitespace-nowrap">
+                  <div class="flex items-center justify-end space-x-1.5">
+                    <button
+                      (click)="view(contact)"
+                      [disabled]="isLoading"
+                      class="group p-1.5 rounded-full text-gray-500 hover:text-blue-600 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                      title="Voir les détails"
+                    >
+                      <svg class="h-4 w-4 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                        />
+                      </svg>
+                    </button>
+
+                    <button
+                      (click)="edit(contact)"
+                      [disabled]="isLoading"
+                      class="group p-1.5 rounded-full text-gray-500 hover:text-green-600 hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                      title="Modifier"
+                    >
+                      <svg class="h-4 w-4 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        />
+                      </svg>
+                    </button>
+
+                    <button
+                      (click)="delete(contact)"
+                      [disabled]="isLoading"
+                      class="group p-1.5 rounded-full text-gray-500 hover:text-red-600 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                      title="Supprimer"
+                    >
+                      <svg class="h-4 w-4 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Pagination avec style moderne -->
+          <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6" *ngIf="contacts && totalItems > itemsPerPage">
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
+              <!-- Compteur de résultats personnalisé sans jhi-item-count -->
+              <div class="text-sm text-gray-700">
+                Affichage
+                <span class="font-medium">{{ (page - 1) * itemsPerPage + 1 }}</span>
+                -
+                <span class="font-medium">{{ Math.min(page * itemsPerPage, totalItems) }}</span>
+                sur
+                <span class="font-medium">{{ totalItems }}</span>
+                résultats
+              </div>
+              <div>
+                <label for="itemsPerPageSelect">Afficher</label>
+                <select
+                  id="itemsPerPageSelect"
+                  [(ngModel)]="itemsPerPage"
+                  (change)="changeItemsPerPage()"
+                  class="bg-indigo-50 border-none rounded-full px-3 py-1 font-medium text-indigo-700 focus:ring-2 focus:ring-indigo-300 focus:outline-none appearance-none cursor-pointer"
+                >
+                  <option *ngFor="let option of itemsPerPageOptions" [value]="option">{{ option }}</option>
+                </select>
+                <span>par page</span>
+              </div>
+
+              <!-- Pagination Custom Tailwind -->
+              <div class="flex items-center space-x-1">
+                <!-- Bouton Précédent -->
+                <button
+                  (click)="prevPage()"
+                  [disabled]="page === 1"
+                  class="px-3 py-1 rounded-md border text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  ⬅️ Précédent
+                </button>
+
+                <!-- Pages dynamiques -->
+                <div class="flex items-center space-x-1">
+                  <button
+                    *ngFor="let pageNumber of getDisplayedPages(); trackBy: trackByPageNumber"
+                    (click)="isNumber(pageNumber) ? goToPage(pageNumber) : null"
+                    [disabled]="isLoading || !isNumber(pageNumber)"
+                    [ngClass]="{
+                      'bg-blue-600 text-white': page === pageNumber,
+                      'bg-white text-gray-700 hover:bg-gray-100': page !== pageNumber && isNumber(pageNumber),
+                      'bg-white text-gray-400 cursor-default': !isNumber(pageNumber),
+                      'opacity-50 cursor-not-allowed': isLoading
+                    }"
+                    class="px-3 py-1 rounded-md border text-sm transition-all duration-200"
+                  >
+                    {{ pageNumber }}
+                  </button>
+                </div>
+
+                <!-- Bouton Suivant -->
+                <button
+                  (click)="nextPage()"
+                  [disabled]="page === totalPages"
+                  class="px-3 py-1 rounded-md border text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Suivant ➡️
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Contenu de l'onglet Historique des imports -->
+      <div *ngIf="selectedTab === 'import-history'" class="bg-white rounded-lg">
+        <jhi-import-result></jhi-import-result>
+      </div>
+      <app-toast #toast></app-toast>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div *ngIf="showModal" class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-md z-50">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md border border-gray-100 max-h-[90vh] flex flex-col">
+    <!-- Header -->
+    <div class="flex justify-between items-center p-6 border-b">
+      <h2 class="text-2xl font-bold text-gray-800">Gestion des Champs Personnalisés</h2>
+      <button (click)="closeModal()" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <div class="overflow-y-auto px-8 py-6 space-y-6 flex-1">
+      <!-- Form for adding a field -->
+      <form [formGroup]="fieldForm" (ngSubmit)="addField()" class="mb-6 space-y-3">
+        <div class="space-y-1">
+          <label for="apiName" class="text-sm font-medium text-gray-700">Nom API</label>
+          <input
+            type="text"
+            id="apiName"
+            formControlName="apiName"
+            placeholder="ex: altPhone"
+            class="w-full px-4 py-3 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+            [ngClass]="{ 'border-red-500': hasError('apiName', 'required') || hasError('apiName', 'pattern') }"
+          />
+          <p *ngIf="hasError('apiName', 'required') || hasError('apiName', 'pattern')" class="text-sm text-red-600">
+            {{ getFieldErrorMessage('apiName') }}
+          </p>
+          <p class="text-xs text-gray-500">Utilisé pour les requêtes API (ex: altPhone)</p>
+        </div>
+
+        <div class="space-y-1">
+          <label for="label" class="text-sm font-medium text-gray-700">Label</label>
+          <input
+            type="text"
+            id="label"
+            formControlName="label"
+            placeholder="ex: Téléphone alternatif"
+            class="w-full px-4 py-3 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+            [ngClass]="{ 'border-red-500': hasError('label', 'required') }"
+          />
+          <p *ngIf="hasError('label', 'required')" class="text-sm text-red-600">
+            {{ getFieldErrorMessage('label') }}
+          </p>
+          <p class="text-xs text-gray-500">Affiché à l'utilisateur</p>
+        </div>
+
+        <div class="space-y-1">
+          <label for="maxLength" class="text-sm font-medium text-gray-700">Taille maximale</label>
+          <input
+            type="number"
+            id="maxLength"
+            formControlName="maxLength"
+            placeholder="100"
+            min="1"
+            max="500"
+            class="w-full px-4 py-3 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+            [ngClass]="{ 'border-red-500': hasError('maxLength', 'required') || hasError('maxLength', 'min') }"
+          />
+          <p *ngIf="hasError('maxLength', 'required') || hasError('maxLength', 'min')" class="text-sm text-red-600">
+            {{ getFieldErrorMessage('maxLength') }}
+          </p>
+          <p class="text-xs text-gray-500">Nombre maximal de caractères autorisés</p>
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="fieldForm.invalid"
+          class="w-full flex items-center justify-center px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-indigo-300 disabled:cursor-not-allowed"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          Ajouter ce champ
+        </button>
+      </form>
+
+      <!-- Divider -->
+      <div class="relative mb-6">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-gray-200"></div>
+        </div>
+        <div class="relative flex justify-center text-sm">
+          <span class="px-2 bg-white text-gray-500">Champs existants ({{ countCustomFields() }})</span>
+        </div>
+      </div>
+
+      <!-- Loading indicator -->
+      <div *ngIf="isLoadingCustomFields" class="flex justify-center items-center py-8">
+        <svg class="animate-spin h-8 w-8 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path
+            class="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          ></path>
+        </svg>
+      </div>
+
+      <!-- Existing fields list -->
+      <div *ngIf="!isLoadingCustomFields" class="max-h-64 overflow-y-auto mb-6 space-y-2">
+        <div
+          *ngFor="let key of customFieldKeys()"
+          class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-100 hover:border-indigo-200 transition-colors"
+        >
+          <div class="flex-1">
+            <div class="font-medium text-gray-800">{{ key }}</div>
+            <div class="text-sm text-gray-600">{{ customFields[key].label }}</div>
+            <div class="text-xs text-gray-500">Max {{ customFields[key].maxLength }} caractères</div>
+          </div>
+          <button
+            (click)="removeField(key)"
+            class="ml-2 p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors focus:outline-none"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              />
+            </svg>
+          </button>
+        </div>
+        <!-- Empty state -->
+        <div *ngIf="!customFieldKeys().length" class="flex flex-col items-center justify-center py-8 text-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-12 w-12 text-gray-300 mb-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+            />
+          </svg>
+          <p class="text-gray-500 text-sm">Aucun champ personnalisé</p>
+          <p class="text-gray-400 text-xs">Ajoutez des champs pour enrichir vos contacts</p>
+        </div>
+      </div>
+    </div>
+    <!-- Actions -->
+    <div class="border-t px-8 py-4 grid grid-cols-2 gap-4">
+      <button (click)="closeModal()" class="px-4 py-3 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none transition-colors">
+        Annuler
+      </button>
+      <button
+        (click)="saveCustomFields()"
+        [disabled]="isSubmitting || countCustomFields() === 0"
+        class="px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-indigo-300 disabled:cursor-not-allowed focus:outline-none transition-colors flex items-center justify-center"
+      >
+        <svg
+          *ngIf="isSubmitting"
+          class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path
+            class="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          ></path>
+        </svg>
+        Enregistrer
+      </button>
+    </div>
+  </div>
+</div>

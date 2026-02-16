@@ -1,0 +1,74 @@
+<div class="flex justify-center">
+  <div class="w-full max-w-4xl bg-white rounded-xl shadow-md p-8">
+    @if (choix()) {
+      <div>
+        <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center space-x-2" data-cy="choixDetailsHeading">
+          <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <span jhiTranslate="migrationApp.choix.detail.title">Choix</span>
+        </h2>
+
+        <hr class="my-4 border-gray-300" />
+
+        <jhi-alert-error></jhi-alert-error>
+        <jhi-alert></jhi-alert>
+
+        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-sm text-gray-700">
+          <div>
+            <dt class="font-medium text-gray-500" jhiTranslate="global.field.id">ID</dt>
+            <dd class="mt-1 text-gray-900">{{ choix()!.id }}</dd>
+          </div>
+
+          <div>
+            <dt class="font-medium text-gray-500" jhiTranslate="migrationApp.choix.chovaleur">Chovaleur</dt>
+            <dd class="mt-1 text-gray-900">{{ choix()!.chovaleur }}</dd>
+          </div>
+
+          <div>
+            <dt class="font-medium text-gray-500" jhiTranslate="migrationApp.choix.choquestion">Choquestion</dt>
+            <dd class="mt-1 text-gray-900">
+              @if (choix()!.choquestion) {
+                <a [routerLink]="['/question', choix()!.choquestion?.id, 'view']" class="text-blue-600 hover:underline">
+                  {{ choix()!.choquestion?.id }}
+                </a>
+              }
+            </dd>
+          </div>
+
+          <div>
+            <dt class="font-medium text-gray-500" jhiTranslate="migrationApp.choix.choquestionSuivante">Choquestion Suivante</dt>
+            <dd class="mt-1 text-gray-900">
+              @if (choix()!.choquestionSuivante) {
+                <a [routerLink]="['/question', choix()!.choquestionSuivante?.id, 'view']" class="text-blue-600 hover:underline">
+                  {{ choix()!.choquestionSuivante?.id }}
+                </a>
+              }
+            </dd>
+          </div>
+        </dl>
+
+        <div class="flex space-x-3 mt-6">
+          <button
+            type="button"
+            (click)="previousState()"
+            data-cy="entityDetailsBackButton"
+            class="flex items-center px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50"
+          >
+            <fa-icon icon="arrow-left" class="mr-2"></fa-icon>
+            <span jhiTranslate="entity.action.back">Retour</span>
+          </button>
+
+          <button
+            type="button"
+            [routerLink]="['/choix', choix()!.id, 'edit']"
+            class="flex items-center px-4 py-2 border border-blue-600 rounded-md text-white bg-blue-600 hover:bg-blue-700"
+          >
+            <fa-icon icon="pencil-alt" class="mr-2"></fa-icon>
+            <span jhiTranslate="entity.action.edit">Editer</span>
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

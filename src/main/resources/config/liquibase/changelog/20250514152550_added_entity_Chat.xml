@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity Contact.
+    -->
+    <changeSet id="20250515-1-create-chat" author="saadna">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <not>
+                <tableExists tableName="chat"/>
+            </not>
+        </preConditions>
+        <createTable tableName="chat">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="contact_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_chat_contact" references="contact(id)"/>
+            </column>
+            <column name="channel" type="VARCHAR(10)">
+            </column>
+            <column name="last_updated" type="TIMESTAMP">
+            </column>
+        </createTable>
+    </changeSet>
+
+
+
+
+</databaseChangeLog>

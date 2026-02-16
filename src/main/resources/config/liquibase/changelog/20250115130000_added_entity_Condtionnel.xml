@@ -1,0 +1,44 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+      http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="2024-07-17-03-create-conditional-connection" author="yourname">
+        <createTable tableName="conditional_connection">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="connection_id" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="condition_value" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="next_node_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="label" type="VARCHAR(100)"/>
+            <column name="operator" type="VARCHAR(255)"/>
+            <column name="connection_order" type="INTEGER"/>
+            <column name="node_id" type="BIGINT"/>
+
+            <!-- Héritage d'AbstractAuditingEntity -->
+            <column name="created_by" type="VARCHAR(50)"/>
+            <column name="created_date" type="TIMESTAMP"/>
+            <column name="last_modified_by" type="VARCHAR(50)"/>
+            <column name="last_modified_date" type="TIMESTAMP"/>
+        </createTable>
+
+        <!-- Foreign Key pour node_id vers flow_node.id -->
+        <addForeignKeyConstraint
+            baseTableName="conditional_connection"
+            baseColumnNames="node_id"
+            referencedTableName="flow_node"
+            referencedColumnNames="id"
+            constraintName="fk_conditional_connection_node"/>
+
+        <createSequence sequenceName="sequenceGenerator" startValue="1"/>
+    </changeSet>
+</databaseChangeLog>

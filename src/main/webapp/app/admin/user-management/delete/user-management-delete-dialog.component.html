@@ -1,0 +1,214 @@
+<!-- Overlay du modal -->
+<div *ngIf="user" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" (click)="cancel()">
+  <!-- Contenu du modal -->
+  <div
+    class="relative w-full max-w-md transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all duration-300 ease-out"
+    (click)="$event.stopPropagation()"
+  >
+    <form name="deleteForm" (ngSubmit)="confirmDelete(user.login!)">
+      <!-- Header du modal -->
+      <div class="relative p-6 pb-4">
+        <!-- Icône d'alerte -->
+        <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+          <svg class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.96-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+            />
+          </svg>
+        </div>
+
+        <!-- Titre -->
+        <h3 class="text-center text-xl font-bold text-gray-900 mb-2">Supprimer l'utilisateur</h3>
+
+        <!-- Bouton de fermeture -->
+        <button
+          type="button"
+          class="absolute top-4 right-4 rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors duration-200"
+          (click)="cancel()"
+        >
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Corps du modal -->
+      <div class="px-6 pb-6">
+        <!-- Alerte d'erreur -->
+        <jhi-alert-error class="mb-4"></jhi-alert-error>
+
+        <!-- Message de confirmation -->
+        <div class="text-center mb-6">
+          <p class="text-gray-600 mb-3">Êtes-vous certain de vouloir supprimer définitivement l'utilisateur ?</p>
+
+          <!-- Badge avec le nom de l'utilisateur -->
+          <div class="inline-flex items-center px-4 py-2 rounded-full bg-red-50 border border-red-200">
+            <svg class="h-4 w-4 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
+            </svg>
+            <span class="font-semibold text-red-700">{{ user.login }}</span>
+          </div>
+
+          <!-- Avertissement -->
+          <p class="text-sm text-red-600 mt-3 font-medium">⚠️ Cette action est irréversible</p>
+        </div>
+
+        <!-- Boutons d'action -->
+        <div class="flex flex-col sm:flex-row gap-3">
+          <!-- Bouton annuler -->
+          <button
+            type="button"
+            class="flex-1 inline-flex items-center justify-center px-4 py-3 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-200"
+            (click)="cancel()"
+          >
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            Annuler
+          </button>
+
+          <!-- Bouton supprimer -->
+          <button
+            type="submit"
+            class="flex-1 inline-flex items-center justify-center px-4 py-3 border border-transparent rounded-xl text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-200 transition-all duration-200 hover:shadow-lg"
+          >
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              />
+            </svg>
+            Supprimer définitivement
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Version alternative avec animation d'entrée -->
+<div *ngIf="user" class="fixed inset-0 z-50 flex items-center justify-center p-4" [@modalAnimation]>
+  <!-- Background overlay avec blur -->
+  <div class="absolute inset-0 bg-gradient-to-br from-black/40 via-black/50 to-black/60 backdrop-blur-sm" (click)="cancel()"></div>
+
+  <!-- Modal content avec animation -->
+  <div
+    class="relative w-full max-w-md transform scale-100 opacity-100 transition-all duration-300 ease-out"
+    (click)="$event.stopPropagation()"
+    [@slideIn]
+  >
+    <div class="overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-black/5">
+      <form name="deleteForm" (ngSubmit)="confirmDelete(user.login!)">
+        <!-- Header avec gradient -->
+        <div class="relative bg-gradient-to-r from-red-500 to-red-600 px-6 py-6 text-white">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <div class="ml-4">
+              <h3 class="text-lg font-semibold">Confirmation de suppression</h3>
+              <p class="text-red-100 text-sm">Action irréversible</p>
+            </div>
+          </div>
+
+          <!-- Bouton fermer dans le header -->
+          <button
+            type="button"
+            class="absolute top-6 right-6 rounded-full p-1 text-white/80 hover:bg-white/20 hover:text-white transition-colors duration-200"
+            (click)="cancel()"
+          >
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Corps -->
+        <div class="p-6">
+          <jhi-alert-error class="mb-4"></jhi-alert-error>
+
+          <div class="text-center">
+            <p class="text-gray-600 mb-4">Vous êtes sur le point de supprimer définitivement l'utilisateur :</p>
+
+            <div
+              class="inline-flex items-center px-6 py-3 rounded-2xl bg-gradient-to-r from-red-50 to-red-100 border-2 border-red-200 mb-4"
+            >
+              <svg class="h-5 w-5 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
+              </svg>
+              <span class="font-bold text-red-700 text-lg">{{ user.login }}</span>
+            </div>
+
+            <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 mb-6">
+              <div class="flex items-center justify-center mb-2">
+                <svg class="h-5 w-5 text-amber-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.96-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                  />
+                </svg>
+                <span class="font-semibold text-amber-800">Attention</span>
+              </div>
+              <p class="text-sm text-amber-700">Toutes les données associées à cet utilisateur seront perdues définitivement.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer avec boutons -->
+        <div class="bg-gray-50 px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+          <button
+            type="button"
+            class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-200"
+            (click)="cancel()"
+          >
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            Annuler
+          </button>
+
+          <button
+            type="submit"
+            class="inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-xl text-sm font-medium text-white bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-4 focus:ring-red-200 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+          >
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              />
+            </svg>
+            Supprimer définitivement
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

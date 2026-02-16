@@ -1,0 +1,28 @@
+{
+  "migrationApp": {
+    "referentiel": {
+      "home": {
+        "title": "Referentiels",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Referentiel",
+        "createOrEditLabel": "Créer ou éditer un Referentiel",
+        "notFound": "Aucun Referentiel trouvé"
+      },
+      "created": "Un nouveau Referentiel a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Referentiel avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Referentiel avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Referentiel {{ id }} ?"
+      },
+      "detail": {
+        "title": "Referentiel"
+      },
+      "id": "ID",
+      "refCode": "Ref Code",
+      "refRadical": "Ref Radical",
+      "refFrTitle": "Ref Fr Title",
+      "refArTitle": "Ref Ar Title",
+      "refEnTitle": "Ref En Title"
+    }
+  }
+}

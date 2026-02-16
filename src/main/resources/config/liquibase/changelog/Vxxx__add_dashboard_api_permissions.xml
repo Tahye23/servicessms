@@ -1,0 +1,38 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="add-can-view-dashboard-can-manage-api" author="saadna">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <not>
+                <columnExists tableName="abonnement" columnName="can_view_dashboard"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="abonnement">
+            <column name="can_view_dashboard" type="BOOLEAN" defaultValueBoolean="true" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="can_manage_api" type="BOOLEAN" defaultValueBoolean="false" >
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="add-can-view-dashboard-can-manage-api2" author="saadna">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <not>
+                <columnExists tableName="plan_abonnement" columnName="can_view_dashboard"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="plan_abonnement">
+            <column name="can_view_dashboard" type="BOOLEAN" defaultValueBoolean="true" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="can_manage_api" type="BOOLEAN" defaultValueBoolean="false" >
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

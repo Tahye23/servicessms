@@ -1,0 +1,60 @@
+.cdk-virtual-scroll-viewport {
+  width: 100%;
+  height: 100%;
+  contain: strict;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.message-out {
+  margin-left: auto;
+  margin-right: 0;
+  border-bottom-right-radius: 4px;
+}
+
+.message-in {
+  margin-left: 0;
+  margin-right: auto;
+  border-bottom-left-radius: 4px;
+}
+
+.message-in::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -0.5rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  background: white;
+  clip-path: polygon(0 0, 100% 100%, 100% 0);
+}
+
+.message-out::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: -0.5rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  background: rgb(34 197 94); /* green-500 */
+  clip-path: polygon(0 100%, 0 0, 100% 0);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.scrolling .animate-fade-in {
+  animation: none;
+}

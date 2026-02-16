@@ -1,0 +1,10 @@
+{
+  "migrationApp": {
+    "EDD": {
+      "null": "",
+      "FERME": "FERME",
+      "EXPIRE": "EXPIRE",
+      "ENCOURS": "ENCOURS"
+    }
+  }
+}

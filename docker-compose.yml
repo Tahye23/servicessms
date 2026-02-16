@@ -1,0 +1,31 @@
+version: '3'
+services:
+  app:
+    image: 339713193116.dkr.ecr.eu-west-1.amazonaws.com/servicesms:migration-v1.7.54
+    environment:
+      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - SPRING_PROFILES_ACTIVE=prod,api-docs
+      - MANAGEMENT_PROMETHEUS_METRICS_EXPORT_ENABLED=true
+      - SPRING_DATASOURCE_USERNAME=backend
+      - SPRING_DATASOURCE_PASSWORD=backend
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/migrationsms
+      - SPRING_LIQUIBASE_URL=jdbc:postgresql://host.docker.internal:5432/migrationsms
+      - SPRING_MAIL_HOST=smtp.hostinger.com
+      - SPRING_MAIL_PORT=465
+      - SPRING_MAIL_USERNAME=contact@pay.richatt.com
+      - SPRING_MAIL_PASSWORD=Rich@ttPay2023!
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH=true
+      - SPRING_MAIL_PROPERTIES_MAIL_SMTP_SSL_ENABLE=true
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    ports:
+      - 8101:8101
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:8101/management/health
+      interval: 5s
+      timeout: 5s
+      retries: 40

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+      http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="20240624-01-create-extended-user" author="your_name">
+        <createTable tableName="extended_user">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="phone_number" type="VARCHAR(50)"/>
+            <column name="address" type="VARCHAR(255)"/>
+            <column name="city" type="VARCHAR(100)"/>
+            <column name="country" type="VARCHAR(100)"/>
+            <column name="postal_code" type="VARCHAR(20)"/>
+            <column name="company_name" type="VARCHAR(255)"/>
+            <column name="website" type="VARCHAR(255)"/>
+            <column name="created_date" type="TIMESTAMP"/>
+            <column name="updated_date" type="TIMESTAMP"/>
+            <column name="sms_quota" type="INT" defaultValueNumeric="0"/>
+            <column name="whatsapp_quota" type="INT" defaultValueNumeric="0"/>
+            <column name="sms_used_this_month" type="INT" defaultValueNumeric="0"/>
+            <column name="whatsapp_used_this_month" type="INT" defaultValueNumeric="0"/>
+            <column name="last_quota_reset" type="DATE"/>
+            <column name="timezone" type="VARCHAR(50)" defaultValue="UTC"/>
+            <column name="language" type="VARCHAR(10)" defaultValue="fr"/>
+            <column name="notifications_email" type="BOOLEAN" defaultValueBoolean="true"/>
+            <column name="notifications_sms" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="marketing_emails" type="BOOLEAN" defaultValueBoolean="true"/>
+            <column name="api_key" type="VARCHAR(255)"/>
+            <column name="api_key_created_date" type="TIMESTAMP"/>
+            <column name="api_key_last_used" type="TIMESTAMP"/>
+            <column name="billing_address" type="VARCHAR(255)"/>
+            <column name="billing_city" type="VARCHAR(100)"/>
+            <column name="billing_country" type="VARCHAR(100)"/>
+            <column name="billing_postal_code" type="VARCHAR(20)"/>
+            <column name="tax_id" type="VARCHAR(100)"/>
+            <column name="payment_method_id" type="VARCHAR(100)"/>
+            <column name="last_login" type="TIMESTAMP"/>
+            <column name="login_count" type="BIGINT" defaultValueNumeric="0"/>
+            <column name="total_messages_sent" type="BIGINT" defaultValueNumeric="0"/>
+            <column name="account_created" type="TIMESTAMP"/>
+            <column name="subscription_start_date" type="DATE"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="extended_user"
+            baseColumnNames="user_id"
+            referencedTableName="jhi_user"
+            referencedColumnNames="id"
+            constraintName="fk_extended_user_user_id"/>
+
+    </changeSet>
+</databaseChangeLog>

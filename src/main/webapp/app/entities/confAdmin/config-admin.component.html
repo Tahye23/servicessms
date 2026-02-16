@@ -1,0 +1,476 @@
+<div *ngIf="!accessGranted">
+  <label class="block mb-2">Code Secret</label>
+  <input type="password" [(ngModel)]="codeSecret" class="w-full p-2 border rounded mb-4" placeholder="Entrer le code secret" />
+  <button (click)="verifySecretCode()" class="bg-blue-500 text-white w-full py-2 rounded hover:bg-blue-600">Valider</button>
+</div>
+
+<div *ngIf="accessGranted" class="flex flex-col gap-4 mt-6">
+  <div *ngIf="isAdmin()" class="bg-white border border-gray-200 rounded-lg shadow-sm">
+    <div class="p-4 border-b border-gray-200 bg-gray-50 rounded-t-lg">
+      <h3 class="text-lg font-semibold text-gray-800">Configuration de la Persistence</h3>
+    </div>
+    <div class="p-4">
+      <form [formGroup]="persistenceForm">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Mode de Persistence*</label>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div
+              *ngFor="let option of persistenceOptions"
+              class="border rounded-lg p-4 cursor-pointer transition-all"
+              [ngClass]="{
+                'border-blue-500 bg-blue-50': persistenceForm.get('persistenceType')!.value === option.value,
+                'border-gray-200 hover:border-gray-300': persistenceForm.get('persistenceType')!.value !== option.value
+              }"
+              (click)="persistenceForm.get('persistenceType')!.setValue(option.value)"
+            >
+              <div class="flex items-center">
+                <div class="w-6 h-6 flex-shrink-0 mr-2">
+                  <svg
+                    *ngIf="option.value === 'jpa'"
+                    class="w-6 h-6 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"
+                    ></path>
+                  </svg>
+                  <svg
+                    *ngIf="option.value === 'jdbc'"
+                    class="w-6 h-6 text-green-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"
+                    ></path>
+                  </svg>
+                </div>
+                <div>
+                  <div class="font-medium">{{ option.label }}</div>
+                  <div class="text-xs text-gray-500">{{ option.description }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div [ngSwitch]="persistenceForm.get('persistenceType')!.value">
+          <!-- Options JPA -->
+          <div *ngSwitchCase="'jpa'" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Taille du pool de connexions</label>
+                <input
+                  type="number"
+                  formControlName="connectionPoolSize"
+                  class="w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  min="5"
+                  max="100"
+                />
+              </div>
+              <div class="form-group">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Mode cache JPA</label>
+                <select formControlName="jpaCache" class="w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500">
+                  <option value="none">Aucun cache</option>
+                  <option value="read-only">Lecture seule</option>
+                  <option value="read-write">Lecture-écriture</option>
+                  <option value="transactional">Transactionnel</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Stratégie de batch insert</label>
+              <select formControlName="batchStrategy" class="w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500">
+                <option value="single">Insertion unitaire</option>
+                <option value="batch-10">Batch de 10</option>
+                <option value="batch-50">Batch de 50</option>
+                <option value="batch-100">Batch de 100</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Options JDBC -->
+          <div *ngSwitchCase="'jdbc'" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Taille du batch JDBC</label>
+                <input
+                  type="number"
+                  formControlName="jdbcBatchSize"
+                  class="w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  min="10"
+                  max="1000"
+                />
+              </div>
+              <div class="form-group">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Timeout requête (secondes)</label>
+                <input
+                  type="number"
+                  formControlName="queryTimeout"
+                  class="w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  min="5"
+                  max="120"
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Mode préparation des requêtes</label>
+              <select
+                formControlName="preparedStatementMode"
+                class="w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="pooled">Pooled prepared statements</option>
+                <option value="reuse">Réutilisation des statements</option>
+                <option value="standard">Standard</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Options MongoDB -->
+          <div *ngSwitchCase="'mongo'" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Taille du pool de connexions</label>
+                <input
+                  type="number"
+                  formControlName="mongoConnectionPoolSize"
+                  class="w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  min="5"
+                  max="100"
+                />
+              </div>
+              <div class="form-group">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Timeout connexion (ms)</label>
+                <input
+                  type="number"
+                  formControlName="mongoConnectionTimeout"
+                  class="w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  min="1000"
+                  max="30000"
+                  step="1000"
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Mode bulk write</label>
+              <select formControlName="mongoBulkMode" class="w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500">
+                <option value="ordered">Ordonné</option>
+                <option value="unordered">Non ordonné (plus rapide)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Configuration des Threads -->
+  <div *ngIf="isAdmin()" class="bg-white border border-gray-200 rounded-lg shadow-sm">
+    <div class="p-4 border-b border-gray-200 bg-gray-50 rounded-t-lg">
+      <h3 class="text-lg font-semibold text-gray-800">Configuration des Threads</h3>
+    </div>
+    <div class="p-4">
+      <form [formGroup]="threadingForm">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="form-group">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre de threads d'envoi*</label>
+            <div class="flex flex-col space-y-2">
+              <input
+                type="range"
+                formControlName="sendingThreads"
+                min="1"
+                max="20"
+                step="1"
+                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              />
+              <div class="flex justify-between text-xs text-gray-500">
+                <span>1 (Économe)</span>
+                <span>{{ threadingForm.get('sendingThreads')!.value }} threads</span>
+                <span>20 (Max performance)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Threads de traitement des webhooks*</label>
+            <div class="flex flex-col space-y-2">
+              <input
+                type="range"
+                formControlName="webhookThreads"
+                min="1"
+                max="10"
+                step="1"
+                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              />
+              <div class="flex justify-between text-xs text-gray-500">
+                <span>1 (Économe)</span>
+                <span>{{ threadingForm.get('webhookThreads')!.value }} threads</span>
+                <span>10 (Max performance)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Taille de la file d'attente*</label>
+            <select formControlName="queueSize" class="w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500">
+              <option value="100">Petite (100)</option>
+              <option value="500">Moyenne (500)</option>
+              <option value="1000">Grande (1000)</option>
+              <option value="5000">Très grande (5000)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Stratégie d'exécution*</label>
+            <select
+              formControlName="executionStrategy"
+              class="w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="fixed">Pool fixe</option>
+              <option value="cached">Pool dynamique</option>
+              <option value="scheduled">Planifié</option>
+              <option value="workstealing">Work-stealing</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+            <div class="flex items-start">
+              <svg
+                class="h-6 w-6 text-yellow-600 mr-3"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+              <div>
+                <h3 class="font-semibold text-yellow-800">Recommandation</h3>
+                <p class="text-sm text-yellow-700">
+                  Un nombre élevé de threads peut améliorer la performance d'envoi mais consomme plus de ressources système. Pour les
+                  environnements à ressources limitées, utilisez des valeurs plus basses.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Monitoring et Performance -->
+  <div *ngIf="isAdmin()" class="bg-white border border-gray-200 rounded-lg shadow-sm">
+    <div class="p-4 border-b border-gray-200 bg-gray-50 rounded-t-lg">
+      <h3 class="text-lg font-semibold text-gray-800">Monitoring et Performance</h3>
+    </div>
+    <div class="p-4">
+      <form [formGroup]="monitoringForm">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="form-group">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Niveau de log</label>
+            <select formControlName="logLevel" class="w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500">
+              <option value="error">Erreur uniquement</option>
+              <option value="warn">Avertissements</option>
+              <option value="info">Information</option>
+              <option value="debug">Debug</option>
+              <option value="trace">Trace détaillée</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Rétention des journaux</label>
+            <select formControlName="logRetention" class="w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500">
+              <option value="1">1 jour</option>
+              <option value="7">7 jours</option>
+              <option value="30">30 jours</option>
+              <option value="90">90 jours</option>
+            </select>
+          </div>
+
+          <div class="form-group flex items-center">
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" formControlName="enableMetrics" class="sr-only peer" />
+              <div
+                class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"
+              ></div>
+              <span class="ml-3 text-sm font-medium text-gray-700">Activer les métriques de performance</span>
+            </label>
+          </div>
+
+          <div class="form-group flex items-center">
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" formControlName="enableHealthChecks" class="sr-only peer" />
+              <div
+                class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"
+              ></div>
+              <span class="ml-3 text-sm font-medium text-gray-700">Activer les vérifications de santé</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="mt-6" *ngIf="monitoringForm.get('enableMetrics')!.value">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Limites d'utilisation des ressources</label>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-group">
+              <label class="block text-xs text-gray-500 mb-1">Utilisation CPU maximale (%)</label>
+              <div class="flex flex-col space-y-2">
+                <input
+                  type="range"
+                  formControlName="maxCpuUsage"
+                  min="50"
+                  max="95"
+                  step="5"
+                  class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                />
+                <div class="text-center text-sm">{{ monitoringForm.get('maxCpuUsage')!.value }}%</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="block text-xs text-gray-500 mb-1">Utilisation mémoire maximale (%)</label>
+              <div class="flex flex-col space-y-2">
+                <input
+                  type="range"
+                  formControlName="maxMemoryUsage"
+                  min="50"
+                  max="95"
+                  step="5"
+                  class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                />
+                <div class="text-center text-sm">{{ monitoringForm.get('maxMemoryUsage')!.value }}%</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Actions en cas de dépassement</label>
+            <div class="space-y-2">
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  formControlName="throttleOnHighUsage"
+                  class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label class="ml-2 text-sm text-gray-700">Réduire automatiquement le nombre de threads</label>
+              </div>
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  formControlName="alertOnHighUsage"
+                  class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label class="ml-2 text-sm text-gray-700">Alerter par email</label>
+              </div>
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  formControlName="pauseOnCritical"
+                  class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label class="ml-2 text-sm text-gray-700">Mettre en pause les envois en cas d'utilisation critique</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Visualisation des Statistiques -->
+  <div *ngIf="isAdmin()" class="bg-white border border-gray-200 rounded-lg shadow-sm">
+    <div class="p-4 border-b border-gray-200 bg-gray-50 rounded-t-lg flex justify-between items-center">
+      <h3 class="text-lg font-semibold text-gray-800">Tableau de Bord Performance</h3>
+      <button type="button" class="text-blue-600 hover:text-blue-800 font-medium text-sm">Actualiser</button>
+    </div>
+    <div class="p-4">
+      <!-- Graphiques de Performance -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="border rounded-lg p-4">
+          <h4 class="text-sm font-semibold text-gray-700 mb-2">Utilisation CPU</h4>
+          <div class="h-40 w-full bg-gray-100 rounded-md flex items-end">
+            <div *ngFor="let value of cpuUsageData; let i = index" class="h-full flex-1 flex flex-col justify-end mx-px">
+              <div
+                [style.height.%]="value"
+                class="bg-blue-500"
+                [ngClass]="{
+                  'bg-green-500': value < 60,
+                  'bg-yellow-500': value >= 60 && value < 80,
+                  'bg-red-500': value >= 80
+                }"
+              ></div>
+            </div>
+          </div>
+          <div class="mt-2 flex justify-between text-xs text-gray-500">
+            <span>0%</span>
+            <span>Moyenne: {{ cpuAverageUsage }}%</span>
+            <span>100%</span>
+          </div>
+        </div>
+
+        <div class="border rounded-lg p-4">
+          <h4 class="text-sm font-semibold text-gray-700 mb-2">Utilisation Mémoire</h4>
+          <div class="h-40 w-full bg-gray-100 rounded-md flex items-end">
+            <div *ngFor="let value of memoryUsageData; let i = index" class="h-full flex-1 flex flex-col justify-end mx-px">
+              <div
+                [style.height.%]="value"
+                class="bg-blue-500"
+                [ngClass]="{
+                  'bg-green-500': value < 60,
+                  'bg-yellow-500': value >= 60 && value < 80,
+                  'bg-red-500': value >= 80
+                }"
+              ></div>
+            </div>
+          </div>
+          <div class="mt-2 flex justify-between text-xs text-gray-500">
+            <span>0%</span>
+            <span>Moyenne: {{ memoryAverageUsage }}%</span>
+            <span>100%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistiques d'Envoi -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <div class="text-sm text-gray-500">Messages envoyés (24h)</div>
+          <div class="text-2xl font-bold text-gray-800 mt-1">{{ messagesSentToday | number }}</div>
+          <div class="text-xs text-green-600 mt-1" *ngIf="messagesSentTrend > 0">+{{ messagesSentTrend }}% vs hier</div>
+          <div class="text-xs text-red-600 mt-1" *ngIf="messagesSentTrend < 0">{{ messagesSentTrend }}% vs hier</div>
+        </div>
+
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <div class="text-sm text-gray-500">Taux de livraison</div>
+          <div class="text-2xl font-bold text-gray-800 mt-1">{{ deliveryRate | percent }}</div>
+          <div class="text-xs text-gray-500 mt-1">Sur les 1000 derniers messages</div>
+        </div>
+
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <div class="text-sm text-gray-500">Taux de lecture</div>
+          <div class="text-2xl font-bold text-gray-800 mt-1">{{ readRate | percent }}</div>
+          <div class="text-xs text-gray-500 mt-1">Sur les 1000 derniers messages</div>
+          <!-- meta-config.component.html -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

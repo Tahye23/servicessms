@@ -1,0 +1,26 @@
+{
+  "migrationApp": {
+    "reponse": {
+      "home": {
+        "title": "Reponses",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Reponse",
+        "createOrEditLabel": "Créer ou éditer un Reponse",
+        "notFound": "Aucun Reponse trouvé"
+      },
+      "created": "Un nouveau Reponse a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Reponse avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Reponse avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Reponse {{ id }} ?"
+      },
+      "detail": {
+        "title": "Reponse"
+      },
+      "id": "ID",
+      "repvaleur": "Repvaleur",
+      "repquestion": "Repquestion",
+      "repcontact": "Repcontact"
+    }
+  }
+}

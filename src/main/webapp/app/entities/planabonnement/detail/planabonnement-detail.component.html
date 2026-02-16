@@ -1,0 +1,365 @@
+<div class="flex justify-center py-8 bg-gray-50 min-h-screen">
+  <div class="w-full max-w-4xl bg-white shadow-xl rounded-2xl overflow-hidden relative">
+    <div *ngIf="planabonnement() as plan">
+      <!-- Header avec gradient -->
+      <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6 relative">
+        <!-- Badge populaire -->
+        <div *ngIf="plan.abpPopular" class="absolute -top-3 right-8">
+          <span class="bg-yellow-400 text-yellow-900 px-4 py-2 rounded-full font-bold shadow-lg text-sm tracking-wide transform rotate-12">
+            🔥 POPULAIRE
+          </span>
+        </div>
+
+        <!-- Badge statut -->
+        <div class="absolute top-4 left-4">
+          <span
+            [class]="plan.active ? 'bg-green-400 text-green-900' : 'bg-red-400 text-red-900'"
+            class="px-3 py-1 rounded-full text-xs font-bold"
+          >
+            {{ plan.active ? '✓ ACTIF' : '✗ INACTIF' }}
+          </span>
+        </div>
+
+        <div class="text-center text-white">
+          <h1 class="text-4xl font-extrabold mb-2">{{ plan.abpName || 'Plan Abonnement' }}</h1>
+
+          <!-- Type de plan -->
+          <div *ngIf="plan.planType" class="mb-4">
+            <span
+              [ngClass]="{
+                'bg-green-500': plan.planType === 'FREE',
+                'bg-blue-500': plan.planType === 'SMS',
+                'bg-green-600': plan.planType === 'WHATSAPP',
+                'bg-purple-500': plan.planType === 'PREMIUM',
+                'bg-gray-800': plan.planType === 'ENTERPRISE'
+              }"
+              class="px-4 py-2 rounded-full text-white font-semibold text-sm tracking-wider"
+            >
+              {{ plan.planType }}
+            </span>
+          </div>
+
+          <p class="text-blue-100 text-lg mb-6 max-w-2xl mx-auto" *ngIf="plan.abpDescription">
+            {{ plan.abpDescription }}
+          </p>
+
+          <!-- Prix -->
+          <div class="flex items-baseline justify-center gap-2 mb-4">
+            <span class="text-5xl font-bold">{{ plan.abpPrice || 0 }}</span>
+            <span class="text-xl">{{ plan.abpCurrency || 'MRU' }}</span>
+            <span class="text-blue-200 text-lg" *ngIf="plan.abpPeriod">/ {{ formatPeriod(plan.abpPeriod) }}</span>
+          </div>
+
+          <!-- Ordre d'affichage -->
+          <div *ngIf="plan.sortOrder !== null && plan.sortOrder !== undefined" class="text-blue-200 text-sm">
+            Ordre d'affichage: {{ plan.sortOrder }}
+          </div>
+        </div>
+      </div>
+
+      <div class="p-8">
+        <!-- Section: Limites et Quotas -->
+        <div class="mb-8">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+            <svg class="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              />
+            </svg>
+            Limites et Quotas
+          </h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- SMS -->
+            <div class="bg-blue-50 rounded-xl p-6 border border-blue-200">
+              <div class="flex items-center gap-3 mb-2">
+                <svg class="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                  />
+                </svg>
+                <h3 class="font-semibold text-blue-800">SMS</h3>
+              </div>
+              <p class="text-2xl font-bold text-blue-600">{{ formatLimit(plan.smsLimit) }}</p>
+              <p class="text-blue-600 text-sm">messages par mois</p>
+            </div>
+
+            <!-- WhatsApp -->
+            <div class="bg-green-50 rounded-xl p-6 border border-green-200">
+              <div class="flex items-center gap-3 mb-2">
+                <svg class="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                  />
+                </svg>
+                <h3 class="font-semibold text-green-800">WhatsApp</h3>
+              </div>
+              <p class="text-2xl font-bold text-green-600">{{ formatLimit(plan.whatsappLimit) }}</p>
+              <p class="text-green-600 text-sm">messages par mois</p>
+            </div>
+
+            <!-- Utilisateurs -->
+            <div class="bg-purple-50 rounded-xl p-6 border border-purple-200">
+              <div class="flex items-center gap-3 mb-2">
+                <svg class="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+                  />
+                </svg>
+                <h3 class="font-semibold text-purple-800">Utilisateurs</h3>
+              </div>
+              <p class="text-2xl font-bold text-purple-600">{{ formatLimit(plan.usersLimit) }}</p>
+              <p class="text-purple-600 text-sm">comptes autorisés</p>
+            </div>
+
+            <!-- Templates -->
+            <div class="bg-yellow-50 rounded-xl p-6 border border-yellow-200">
+              <div class="flex items-center gap-3 mb-2">
+                <svg class="w-6 h-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+                <h3 class="font-semibold text-yellow-800">Templates</h3>
+              </div>
+              <p class="text-2xl font-bold text-yellow-600">{{ formatLimit(plan.templatesLimit) }}</p>
+              <p class="text-yellow-600 text-sm">modèles disponibles</p>
+            </div>
+
+            <!-- API Calls -->
+            <div class="bg-indigo-50 rounded-xl p-6 border border-indigo-200">
+              <div class="flex items-center gap-3 mb-2">
+                <svg class="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <h3 class="font-semibold text-indigo-800">API</h3>
+              </div>
+              <p class="text-2xl font-bold text-indigo-600">{{ formatLimit(plan.maxApiCallsPerDay) }}</p>
+              <p class="text-indigo-600 text-sm">appels par jour</p>
+            </div>
+
+            <!-- Stockage -->
+            <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+              <div class="flex items-center gap-3 mb-2">
+                <svg class="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"
+                  />
+                </svg>
+                <h3 class="font-semibold text-gray-800">Stockage</h3>
+              </div>
+              <p class="text-2xl font-bold text-gray-600">{{ formatStorageLimit(plan.storageLimitMb) }}</p>
+              <p class="text-gray-600 text-sm">espace disponible</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Permissions et Fonctionnalités -->
+        <div class="mb-8" *ngIf="hasPermissions(plan)">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+            <svg class="w-6 h-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+              />
+            </svg>
+            Permissions et Fonctionnalités
+          </h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div *ngIf="plan.canManageUsers" class="flex items-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <svg class="w-5 h-5 text-blue-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+                />
+              </svg>
+              <span class="font-medium text-blue-800">Gestion des utilisateurs</span>
+            </div>
+
+            <div *ngIf="plan.canManageTemplates" class="flex items-center p-4 bg-green-50 rounded-lg border border-green-200">
+              <svg class="w-5 h-5 text-green-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+              <span class="font-medium text-green-800">Gestion des templates</span>
+            </div>
+
+            <div *ngIf="plan.canViewConversations" class="flex items-center p-4 bg-purple-50 rounded-lg border border-purple-200">
+              <svg class="w-5 h-5 text-purple-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
+              </svg>
+              <span class="font-medium text-purple-800">Voir les conversations</span>
+            </div>
+
+            <div *ngIf="plan.canViewAnalytics" class="flex items-center p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+              <svg class="w-5 h-5 text-yellow-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
+              </svg>
+              <span class="font-medium text-yellow-800">Accès aux analytiques</span>
+            </div>
+
+            <div *ngIf="plan.prioritySupport" class="flex items-center p-4 bg-red-50 rounded-lg border border-red-200">
+              <svg class="w-5 h-5 text-red-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              <span class="font-medium text-red-800">Support prioritaire</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Avantages textuels -->
+        <div class="mb-8" *ngIf="plan.abpFeatures">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+            <svg class="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            Avantages Inclus
+          </h2>
+
+          <div class="bg-green-50 rounded-xl p-6 border border-green-200">
+            <ul class="space-y-3">
+              <li *ngFor="let feature of parseFeatures(plan.abpFeatures)" class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-green-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 01.083 1.32l-8 10a1 1 0 01-1.497.026l-4-5a1 1 0 111.497-1.32l3.214 4.017 7.29-9.113a1 1 0 011.413-.014z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                <span class="text-gray-700">{{ feature }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Section: Informations Techniques -->
+        <div class="mb-8">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+            <svg class="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            Informations Techniques
+          </h2>
+
+          <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div>
+                <div class="text-gray-500 text-sm font-medium mb-1">ID du Plan</div>
+                <div class="text-gray-800 font-semibold">{{ plan.id }}</div>
+              </div>
+
+              <div *ngIf="plan.abpButtonText">
+                <div class="text-gray-500 text-sm font-medium mb-1">Texte du Bouton</div>
+                <div class="text-gray-800 font-semibold">{{ plan.abpButtonText }}</div>
+              </div>
+
+              <div *ngIf="plan.buttonClass">
+                <div class="text-gray-500 text-sm font-medium mb-1">Classe CSS</div>
+                <div class="text-gray-800 font-mono text-sm">{{ plan.buttonClass }}</div>
+              </div>
+
+              <div *ngIf="plan.createdDate">
+                <div class="text-gray-500 text-sm font-medium mb-1">Date de Création</div>
+                <div class="text-gray-800 font-semibold">{{ plan.createdDate | formatMediumDate }}</div>
+              </div>
+
+              <div *ngIf="plan.updatedDate">
+                <div class="text-gray-500 text-sm font-medium mb-1">Dernière Modification</div>
+                <div class="text-gray-800 font-semibold">{{ plan.updatedDate | formatMediumDate }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex justify-between items-center pt-6 border-t border-gray-200">
+          <button
+            (click)="previousState()"
+            class="flex items-center bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg px-6 py-3 transition-colors font-medium"
+          >
+            <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Retour à la Liste
+          </button>
+
+          <div class="flex gap-3">
+            <button
+              *ngIf="plan.id"
+              (click)="duplicatePlan(plan)"
+              class="flex items-center bg-green-600 text-white hover:bg-green-700 rounded-lg px-6 py-3 transition-colors font-medium"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                />
+              </svg>
+              Dupliquer
+            </button>
+
+            <button
+              type="button"
+              [routerLink]="['/planabonnement', plan.id, 'edit']"
+              class="flex items-center bg-blue-600 text-white hover:bg-blue-700 rounded-lg px-6 py-3 transition-colors font-medium"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
+              </svg>
+              Modifier
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

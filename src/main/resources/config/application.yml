@@ -1,0 +1,250 @@
+# ===================================================================
+# Spring Boot configuration (INFRA ONLY)
+# ===================================================================
+
+---
+spring:
+  config:
+    activate:
+      on-profile: '!api-docs'
+
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:postgresql://localhost:5433/servicesrichatt
+    username: backend
+    password: backend
+    hikari:
+      poolName: Hikari
+      auto-commit: false
+      maximum-pool-size: 30
+      minimum-idle: 10
+      connection-timeout: 10000
+      idle-timeout: 300000
+      max-lifetime: 600000
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+springdoc:
+  api-docs:
+    enabled: false
+
+---
+management:
+  endpoints:
+    web:
+      base-path: /management
+      exposure:
+        include:
+          - configprops
+          - env
+          - health
+          - info
+          - jhimetrics
+          - jhiopenapigroups
+          - logfile
+          - loggers
+          - prometheus
+          - threaddump
+          - caches
+          - liquibase
+
+  endpoint:
+    health:
+      show-details: when_authorized
+      roles: 'ROLE_ADMIN'
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState,db
+
+  info:
+    git:
+      mode: full
+    env:
+      enabled: true
+
+  health:
+    mail:
+      enabled: false
+
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+        step: 60
+
+  observations:
+    key-values:
+      application: ${spring.application.name}
+
+  metrics:
+    enable:
+      http: true
+      jvm: true
+      logback: true
+      process: true
+      system: true
+    distribution:
+      percentiles-histogram:
+        all: true
+---
+spring:
+  application:
+    name: migration
+
+  profiles:
+    active: '@spring.profiles.active@'
+    group:
+      dev:
+        - dev
+        - api-docs
+
+  jmx:
+    enabled: false
+
+  data:
+    jpa:
+      repositories:
+        bootstrap-mode: deferred
+
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate.jdbc.time_zone: UTC
+      hibernate.timezone.default_storage: NORMALIZE
+      hibernate.type.preferred_instant_jdbc_type: TIMESTAMP
+      hibernate.id.new_generator_mappings: true
+      hibernate.connection.provider_disables_autocommit: true
+      hibernate.cache.use_second_level_cache: true
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: false
+      hibernate.jdbc.batch_size: 200
+      hibernate.order_inserts: true
+      hibernate.order_updates: true
+      hibernate.query.fail_on_pagination_over_collection_fetch: true
+      hibernate.query.in_clause_parameter_padding: true
+      hibernate.connection.release_mode: after_transaction
+
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+
+  messages:
+    basename: i18n/messages
+
+  main:
+    allow-bean-definition-overriding: true
+
+  mvc:
+    problemdetails:
+      enabled: true
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          authority-prefix: ''
+          authorities-claim-name: auth
+
+  task:
+    scheduling:
+      thread-name-prefix: migration-scheduling-
+      pool:
+        size: 2
+
+  thymeleaf:
+    mode: HTML
+
+  output:
+    ansi:
+      console-available: true
+---
+server:
+  servlet:
+    session:
+      cookie:
+        http-only: true
+
+springdoc:
+  show-actuator: true
+
+info:
+  display-ribbon-on-profiles: 'dev'
+
+---
+jhipster:
+  clientApp:
+    name: 'migrationApp'
+
+  mail:
+    from: contact@pay.richatt.com
+
+  api-docs:
+    default-include-pattern: /api/**
+    management-include-pattern: /management/**
+    title: Migration API
+    description: Migration API documentation
+    version: 0.0.1
+
+  security:
+    content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://images.unsplash.com; media-src 'self' data: blob:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self';"
+---
+# =============================
+# TECHNICAL SMS PARAMETERS
+# (NO OPERATOR / NO CREDENTIALS)
+# =============================
+sms:
+  fast-mode: true
+  simulation-mode: false
+
+  query:
+    enabled: true
+    batch-size: 100
+
+  bulk:
+    target-rate: 9.5
+    parallel-workers: 8
+    batch-size: 500
+    update-interval-ms: 1000
+    update-batch-size: 200
+    burst-size: 50
+    burst-pause-ms: 500
+    send-timeout: 10
+
+  dlr:
+    enabled: true
+
+dlr:
+  base-url: ${DLR_BASE_URL:https://your-server.com}
+
+---
+# =============================
+# CAMEL (ENABLED ONLY)
+# =============================
+camel:
+  component:
+    smpp:
+      enabled: true
+whatsapp:
+  verify-token: ${WHATSAPP_VERIFY_TOKEN:dummy-token}
+
+---
+logging:
+  level:
+    root: info
+    org:
+      springframework: info
+      apache:
+        camel: info
+    com:
+      example:
+        myproject:
+          service: info

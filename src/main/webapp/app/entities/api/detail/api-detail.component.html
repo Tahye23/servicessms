@@ -1,0 +1,55 @@
+<div class="flex flex-col lg:flex-row gap-6">
+  <!-- Partie principale avec les détails API -->
+  <div class="w-full lg:w-3/4 bg-white rounded-xl shadow-md p-6 space-y-6">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">Détails de l'API</h2>
+
+    <jhi-alert-error></jhi-alert-error>
+    <jhi-alert></jhi-alert>
+
+    <div *ngIf="api()" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- Colonne 1 -->
+      <div class="space-y-4">
+        <div class="flex justify-between border-b pb-2">
+          <span class="text-gray-500">ID</span>
+          <span class="font-medium text-gray-900">{{ api()!.id }}</span>
+        </div>
+        <div class="flex justify-between border-b pb-2">
+          <span class="text-gray-500">Nom de l'API</span>
+          <span class="font-medium text-gray-900">{{ api()!.apiNom }}</span>
+        </div>
+      </div>
+
+      <!-- Colonne 2 -->
+      <div class="space-y-4">
+        <div class="flex justify-between border-b pb-2">
+          <span class="text-gray-500">URL de l'API</span>
+          <span class="font-medium text-gray-900">{{ api()!.apiUrl }}</span>
+        </div>
+        <div class="flex justify-between border-b pb-2">
+          <span class="text-gray-500">Version de l'API</span>
+          <span class="font-medium text-gray-900">{{ api()!.apiVersion }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Colonne des boutons -->
+  <div class="w-full lg:w-1/4 bg-white rounded-xl shadow-md p-6 space-y-4 flex flex-col justify-center">
+    <button
+      type="button"
+      (click)="previousState()"
+      data-cy="entityDetailsBackButton"
+      class="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition"
+    >
+      Retour
+    </button>
+
+    <button
+      type="button"
+      [routerLink]="['/api', api()!.id, 'edit']"
+      class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+    >
+      Éditer
+    </button>
+  </div>
+</div>

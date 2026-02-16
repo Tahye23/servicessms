@@ -1,0 +1,50 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (entitedetest()) {
+      <div>
+        <h2 data-cy="entitedetestDetailsHeading"><span jhiTranslate="migrationApp.entitedetest.detail.title">Entitedetest</span></h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ entitedetest()!.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="migrationApp.entitedetest.identite">Identite</span></dt>
+          <dd>
+            <span>{{ entitedetest()!.identite }}</span>
+          </dd>
+          <dt><span jhiTranslate="migrationApp.entitedetest.nom">Nom</span></dt>
+          <dd>
+            <span>{{ entitedetest()!.nom }}</span>
+          </dd>
+          <dt><span jhiTranslate="migrationApp.entitedetest.nombrec">Nombrec</span></dt>
+          <dd>
+            <span>{{ entitedetest()!.nombrec }}</span>
+          </dd>
+          <dt><span jhiTranslate="migrationApp.entitedetest.chamb">Chamb</span></dt>
+          <dd>
+            <span>{{ entitedetest()!.chamb }}</span>
+          </dd>
+          <dt><span jhiTranslate="migrationApp.entitedetest.champdate">Champdate</span></dt>
+          <dd>
+            <span>{{ entitedetest()!.champdate | formatMediumDatetime }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+        </button>
+
+        <button type="button" [routerLink]="['/entitedetest', entitedetest()!.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

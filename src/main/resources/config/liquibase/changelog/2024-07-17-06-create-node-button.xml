@@ -1,0 +1,40 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+      http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="2024-07-17-06-create-node-button" author="saadna">
+        <createTable tableName="node_button">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="button_id" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="text" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="VARCHAR(100)"/>
+            <column name="next_node_id" type="VARCHAR(255)"/>
+            <column name="store_in_variable" type="VARCHAR(255)"/>
+            <column name="button_order" type="INTEGER"/>
+            <column name="node_id" type="BIGINT"/>
+            <!-- Audit fields (hérités de AbstractAuditingEntity) -->
+            <column name="created_by" type="VARCHAR(50)"/>
+            <column name="created_date" type="TIMESTAMP"/>
+            <column name="last_modified_by" type="VARCHAR(50)"/>
+            <column name="last_modified_date" type="TIMESTAMP"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="node_button"
+            baseColumnNames="node_id"
+            referencedTableName="flow_node"
+            referencedColumnNames="id"
+            constraintName="fk_node_button_node"/>
+
+        <createSequence sequenceName="sequenceGenerator" startValue="1"/>
+    </changeSet>
+</databaseChangeLog>

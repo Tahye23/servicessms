@@ -1,0 +1,815 @@
+<!-- En-tête moderne avec statistiques -->
+<div class="bg-gradient-to-r from-slate-900 via-blue-900 to-purple-900 text-white shadow-2xl">
+  <div class="max-w-7xl mx-auto px-6 py-8">
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8">
+      <div class="flex items-center space-x-4 mb-6 lg:mb-0">
+        <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-2xl flex items-center justify-center shadow-xl">
+          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+            ></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-100 to-purple-100 bg-clip-text text-transparent">
+            Gestion des Partenariats
+          </h1>
+          <p class="text-blue-100/80 mt-2 text-lg">Gérez et suivez toutes les demandes de partenariat</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <button
+          (click)="refresh()"
+          [disabled]="loading()"
+          class="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm text-white rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            ></path>
+          </svg>
+          Actualiser
+        </button>
+        <button
+          (click)="exportData({ format: 'excel', includeAll: true, selectedOnly: false })"
+          class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-xl shadow-lg hover:shadow-xl hover:from-emerald-600 hover:to-cyan-600 transition-all duration-300"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            ></path>
+          </svg>
+          Exporter
+        </button>
+      </div>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6" *ngIf="!loadingStats(); else statsLoading">
+      <div
+        class="group bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105 cursor-pointer"
+      >
+        <div class="text-3xl font-bold text-white mb-2">{{ stats()?.totalRequests || 0 }}</div>
+        <div class="text-blue-100/80 text-sm font-medium">Total</div>
+        <div class="w-full bg-white/20 rounded-full h-1.5 mt-4">
+          <div class="bg-gradient-to-r from-blue-400 to-purple-400 h-1.5 rounded-full w-full transition-all duration-500"></div>
+        </div>
+      </div>
+
+      <div
+        class="group bg-gradient-to-br from-orange-500/20 to-amber-500/20 backdrop-blur-sm rounded-2xl p-6 text-center border border-orange-300/30 cursor-pointer hover:from-orange-500/30 hover:to-amber-500/30 transition-all duration-300 hover:scale-105"
+        (click)="filterByStatus('PENDING')"
+      >
+        <div class="text-3xl font-bold text-orange-200 mb-2">{{ pendingCount() }}</div>
+        <div class="text-orange-100/80 text-sm font-medium">En attente</div>
+        <div class="w-full bg-white/20 rounded-full h-1.5 mt-4">
+          <div class="bg-gradient-to-r from-orange-400 to-amber-400 h-1.5 rounded-full w-3/4 transition-all duration-500"></div>
+        </div>
+      </div>
+
+      <div
+        class="group bg-gradient-to-br from-emerald-500/20 to-green-500/20 backdrop-blur-sm rounded-2xl p-6 text-center border border-emerald-300/30 cursor-pointer hover:from-emerald-500/30 hover:to-green-500/30 transition-all duration-300 hover:scale-105"
+        (click)="filterByStatus('APPROVED')"
+      >
+        <div class="text-3xl font-bold text-emerald-200 mb-2">{{ approvedCount() }}</div>
+        <div class="text-emerald-100/80 text-sm font-medium">Approuvées</div>
+        <div class="w-full bg-white/20 rounded-full h-1.5 mt-4">
+          <div class="bg-gradient-to-r from-emerald-400 to-green-400 h-1.5 rounded-full w-5/6 transition-all duration-500"></div>
+        </div>
+      </div>
+
+      <div
+        class="group bg-gradient-to-br from-cyan-500/20 to-blue-500/20 backdrop-blur-sm rounded-2xl p-6 text-center border border-cyan-300/30 cursor-pointer hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-300 hover:scale-105"
+        (click)="filterByToday()"
+      >
+        <div class="text-3xl font-bold text-cyan-200 mb-2">{{ todayCount() }}</div>
+        <div class="text-cyan-100/80 text-sm font-medium">Aujourd'hui</div>
+        <div class="w-full bg-white/20 rounded-full h-1.5 mt-4">
+          <div class="bg-gradient-to-r from-cyan-400 to-blue-400 h-1.5 rounded-full w-1/2 transition-all duration-500"></div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #statsLoading>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 animate-pulse border border-white/20" *ngFor="let i of [1, 2, 3, 4]">
+          <div class="h-8 bg-white/20 rounded-lg mb-3"></div>
+          <div class="h-4 bg-white/20 rounded-lg"></div>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</div>
+
+<!-- Contenu principal -->
+<div class="min-h-screen">
+  <div class="max-w-7xl mx-auto px-6 py-8">
+    <!-- Barre d'outils -->
+    <div class="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-8 mb-8">
+      <div class="flex flex-col xl:flex-row gap-8 items-start xl:items-center justify-between">
+        <!-- Recherche -->
+        <div class="flex-1 min-w-0 max-w-2xl">
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <svg class="h-6 w-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                ></path>
+              </svg>
+            </div>
+            <input
+              type="text"
+              [formControl]="searchControl"
+              placeholder="Rechercher par nom, email, entreprise..."
+              class="w-full pl-12 pr-12 py-4 border-0 bg-slate-50/80 backdrop-blur-sm rounded-2xl text-slate-700 placeholder-slate-400 focus:ring-4 focus:ring-blue-500/20 focus:bg-white transition-all duration-300 focus:outline-none"
+            />
+
+            <button
+              *ngIf="searchControl.value"
+              (click)="clearSearch()"
+              class="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all duration-200"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex flex-wrap gap-4 items-center">
+          <!-- Actions groupées -->
+          <div class="flex gap-3" *ngIf="selectedRequests.length > 0">
+            <button
+              (click)="bulkApprove()"
+              class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-500 text-white rounded-xl shadow-lg hover:shadow-xl hover:from-emerald-600 hover:to-green-600 transition-all duration-300"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Approuver ({{ selectedRequests.length }})
+            </button>
+            <button
+              (click)="bulkReject()"
+              class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl shadow-lg hover:shadow-xl hover:from-red-600 hover:to-pink-600 transition-all duration-300"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+              Rejeter ({{ selectedRequests.length }})
+            </button>
+          </div>
+
+          <!-- Contrôles -->
+          <div class="flex items-center bg-slate-100/80 backdrop-blur-sm rounded-2xl p-2 border border-slate-200/50">
+            <button
+              (click)="toggleFilters()"
+              [class.bg-white]="showFilters()"
+              [class.text-blue-600]="showFilters()"
+              class="p-3 text-slate-600 hover:text-blue-600 hover:bg-white/80 rounded-xl transition-all duration-200"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"
+                ></path>
+              </svg>
+            </button>
+
+            <button
+              (click)="toggleViewMode()"
+              [class.bg-white]="viewMode() === 'table'"
+              [class.text-blue-600]="viewMode() === 'table'"
+              class="p-3 text-slate-600 hover:text-blue-600 hover:bg-white/80 rounded-xl transition-all duration-200"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 0V5a2 2 0 012-2h2a2 2 0 002-2"
+                ></path>
+              </svg>
+            </button>
+
+            <button
+              (click)="toggleViewMode()"
+              [class.bg-white]="viewMode() === 'cards'"
+              [class.text-blue-600]="viewMode() === 'cards'"
+              class="p-3 text-slate-600 hover:text-blue-600 hover:bg-white/80 rounded-xl transition-all duration-200"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtres -->
+      <div class="mt-8 pt-8 border-t border-slate-200/50 transition-all duration-300" [class.hidden]="!showFilters()" *ngIf="showFilters()">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-700">Statut</label>
+            <select
+              [formControl]="statusFilter"
+              class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 focus:outline-none"
+            >
+              <option value="">Tous les statuts</option>
+              <option value="PENDING">En attente</option>
+              <option value="APPROVED">Approuvée</option>
+              <option value="REJECTED">Rejetée</option>
+              <option value="IN_REVIEW">En examen</option>
+            </select>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-700">Secteur</label>
+            <select
+              [formControl]="industryFilter"
+              class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 focus:outline-none"
+            >
+              <option value="">Tous les secteurs</option>
+              <option value="technology">Technologie</option>
+              <option value="ecommerce">E-commerce</option>
+              <option value="healthcare">Santé</option>
+              <option value="finance">Finance</option>
+              <option value="education">Éducation</option>
+              <option value="other">Autre</option>
+            </select>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-700">Email</label>
+            <input
+              type="email"
+              [formControl]="emailFilter"
+              placeholder="Filtrer par email"
+              class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 focus:outline-none"
+            />
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-700">Entreprise</label>
+            <input
+              type="text"
+              [formControl]="companyFilter"
+              placeholder="Nom d'entreprise"
+              class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 focus:outline-none"
+            />
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-700">Date début</label>
+            <input
+              type="date"
+              [formControl]="dateFromFilter"
+              class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 focus:outline-none"
+            />
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-700">Date fin</label>
+            <input
+              type="date"
+              [formControl]="dateToFilter"
+              class="w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 focus:outline-none"
+            />
+          </div>
+        </div>
+
+        <div class="flex gap-4 mt-8">
+          <button
+            (click)="clearFilters()"
+            class="inline-flex items-center px-6 py-3 bg-slate-100 text-slate-700 rounded-xl border border-slate-200 hover:bg-slate-200 transition-all duration-200"
+          >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              ></path>
+            </svg>
+            Effacer les filtres
+          </button>
+          <button
+            (click)="applyFilters(filterForm.value)"
+            class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl shadow-lg hover:shadow-xl hover:from-blue-600 hover:to-purple-600 transition-all duration-300"
+          >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            Appliquer
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vue Cartes -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8" *ngIf="viewMode() === 'cards' && !loading()">
+      <div
+        *ngFor="let request of filteredRequests(); let i = index; trackBy: trackByRequestId"
+        class="group bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer"
+        [style.animation-delay.ms]="i * 100"
+        (click)="viewDetails(request)"
+      >
+        <!-- En-tête avec gradient -->
+        <div class="bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 p-6 text-white relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+          <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
+
+          <div class="relative z-10">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center space-x-4">
+                <div
+                  class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-white font-bold text-xl border-2 border-white/30"
+                >
+                  {{ getInitials(request) }}
+                </div>
+                <div>
+                  <h3 class="font-bold text-xl text-white">{{ getFullName(request) }}</h3>
+                  <p class="text-blue-100 text-sm font-medium">#{{ request.id }}</p>
+                </div>
+              </div>
+
+              <label class="inline-flex items-center">
+                <input
+                  type="checkbox"
+                  [checked]="isSelected(request)"
+                  (change)="toggleSelection(request)"
+                  (click)="$event.stopPropagation()"
+                  class="w-5 h-5 text-blue-600 bg-white/20 border-white/30 rounded focus:ring-blue-500 focus:ring-2"
+                />
+              </label>
+            </div>
+
+            <!-- Statut -->
+            <div class="flex justify-between items-center">
+              <span
+                class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm border border-white/30"
+                [ngClass]="getStatusClasses(request.status)"
+              >
+                <div class="w-2 h-2 rounded-full mr-2 animate-pulse" [ngClass]="getStatusDotClass(request.status)"></div>
+                {{ getStatusLabel(request.status) }}
+              </span>
+
+              <span class="text-sm text-blue-100 bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
+                {{ formatDate(request.createdDate) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contenu -->
+        <div class="p-6 space-y-6">
+          <div class="space-y-4">
+            <div class="flex items-center space-x-3 p-3 bg-slate-50 rounded-2xl">
+              <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0h3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                  ></path>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="font-semibold text-slate-900 truncate">{{ request.companyName }}</div>
+                <div class="text-sm text-slate-500">{{ getIndustryLabel(request.industry) }}</div>
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-3 p-3 bg-slate-50 rounded-2xl">
+              <div class="w-10 h-10 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-xl flex items-center justify-center">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  ></path>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <a href="mailto:{{ request.email }}" class="text-sm text-blue-600 hover:text-blue-800 font-medium truncate block">
+                  {{ request.email }}
+                </a>
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-3 p-3 bg-slate-50 rounded-2xl">
+              <div class="w-10 h-10 bg-gradient-to-r from-pink-500 to-rose-500 rounded-xl flex items-center justify-center">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                  ></path>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <span class="text-sm text-slate-700 font-medium">{{ request.phone }}</span>
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-3 p-3 bg-slate-50 rounded-2xl">
+              <div class="w-10 h-10 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl flex items-center justify-center">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                  ></path>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <span
+                  class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800"
+                >
+                  {{ request.selectedPlanName || 'Non spécifié' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="bg-gradient-to-r from-slate-50 to-blue-50 rounded-2xl p-4">
+            <p class="text-sm text-slate-600 leading-relaxed line-clamp-3">
+              {{ request.projectDescription }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="px-6 pb-6 pt-2 border-t border-slate-100">
+          <div class="flex justify-between items-center">
+            <button
+              (click)="viewDetails(request); $event.stopPropagation()"
+              class="inline-flex items-center px-4 py-2 border-2 border-slate-200 text-slate-700 rounded-xl hover:border-blue-300 hover:text-blue-600 transition-all duration-200"
+            >
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                ></path>
+              </svg>
+              Détails
+            </button>
+
+            <div class="flex space-x-2" *ngIf="request.status === 'PENDING' || request.status === 'IN_REVIEW'">
+              <button
+                (click)="approveRequest(request); $event.stopPropagation()"
+                class="w-10 h-10 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </button>
+
+              <button
+                (click)="rejectRequest(request); $event.stopPropagation()"
+                class="w-10 h-10 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vue Tableau -->
+    <div
+      class="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden"
+      *ngIf="viewMode() === 'table' && !loading()"
+    >
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-slate-50">
+            <tr>
+              <th class="px-6 py-4 text-left">
+                <label class="inline-flex items-center">
+                  <input
+                    type="checkbox"
+                    [checked]="isAllSelected()"
+                    [indeterminate]="isSomeSelected()"
+                    (change)="toggleAllSelection()"
+                    class="w-5 h-5 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500"
+                  />
+                </label>
+              </th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700">ID</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700">Date</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700">Demandeur</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700">Email</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700">Entreprise</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700">Plan</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700">Statut</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr
+              *ngFor="let request of filteredRequests(); trackBy: trackByRequestId"
+              class="hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-purple-50/50 cursor-pointer transition-all duration-200"
+              (click)="viewDetails(request)"
+            >
+              <td class="px-6 py-4">
+                <label class="inline-flex items-center">
+                  <input
+                    type="checkbox"
+                    [checked]="isSelected(request)"
+                    (change)="toggleSelection(request)"
+                    (click)="$event.stopPropagation()"
+                    class="w-5 h-5 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500"
+                  />
+                </label>
+              </td>
+
+              <td class="px-6 py-4">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                  #{{ request.id }}
+                </span>
+              </td>
+
+              <td class="px-6 py-4">
+                <div class="text-sm">
+                  <div class="font-medium text-slate-900">{{ formatDate(request.createdDate) }}</div>
+                  <div class="text-slate-500">{{ getRelativeTime(request.createdDate) }}</div>
+                </div>
+              </td>
+
+              <td class="px-6 py-4">
+                <div class="flex items-center space-x-4">
+                  <div
+                    class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center text-white font-semibold"
+                  >
+                    {{ getInitials(request) }}
+                  </div>
+                  <div>
+                    <div class="font-semibold text-slate-900">{{ getFullName(request) }}</div>
+                    <div class="text-sm text-slate-500">{{ request.phone }}</div>
+                  </div>
+                </div>
+              </td>
+
+              <td class="px-6 py-4">
+                <a href="mailto:{{ request.email }}" class="text-blue-600 hover:text-blue-800 font-medium">
+                  {{ request.email }}
+                </a>
+              </td>
+
+              <td class="px-6 py-4">
+                <div>
+                  <div class="font-semibold text-slate-900">{{ request.companyName }}</div>
+                  <div class="text-sm text-slate-500">{{ getIndustryLabel(request.industry) }}</div>
+                </div>
+              </td>
+
+              <td class="px-6 py-4">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  {{ request.selectedPlanName || 'Non spécifié' }}
+                </span>
+              </td>
+
+              <td class="px-6 py-4">
+                <span
+                  class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold"
+                  [ngClass]="getStatusClasses(request.status)"
+                >
+                  <div class="w-2 h-2 rounded-full mr-2 animate-pulse" [ngClass]="getStatusDotClass(request.status)"></div>
+                  {{ getStatusLabel(request.status) }}
+                </span>
+              </td>
+
+              <td class="px-6 py-4">
+                <div class="flex items-center space-x-2">
+                  <button
+                    (click)="viewDetails(request); $event.stopPropagation()"
+                    class="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      ></path>
+                    </svg>
+                  </button>
+
+                  <button
+                    *ngIf="request.status === 'PENDING' || request.status === 'IN_REVIEW'"
+                    (click)="approveRequest(request); $event.stopPropagation()"
+                    class="p-2 text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg transition-all duration-200"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                  </button>
+
+                  <button
+                    *ngIf="request.status === 'PENDING' || request.status === 'IN_REVIEW'"
+                    (click)="rejectRequest(request); $event.stopPropagation()"
+                    class="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                  </button>
+
+                  <button
+                    (click)="$event.stopPropagation()"
+                    class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                  >
+                    <a href="mailto:{{ request.email }}">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                        ></path>
+                      </svg>
+                    </a>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="bg-slate-50/80 border-t border-slate-200/50 px-6 py-4 flex items-center justify-between">
+        <div class="text-sm text-slate-700">Affichage de {{ getDisplayRange() }} sur {{ totalElements() }} résultats</div>
+        <div class="flex items-center space-x-2">
+          <button
+            (click)="previousPage()"
+            [disabled]="currentPage === 0"
+            class="p-2 text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+          </button>
+
+          <span class="px-4 py-2 text-sm font-medium text-slate-700"> Page {{ currentPage + 1 }} sur {{ getTotalPages() }} </span>
+
+          <button
+            (click)="nextPage()"
+            [disabled]="currentPage >= getTotalPages() - 1"
+            class="p-2 text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- État vide -->
+    <div class="text-center py-20" *ngIf="!loading() && filteredRequests().length === 0">
+      <div class="max-w-md mx-auto">
+        <div class="w-24 h-24 bg-gradient-to-br from-slate-200 to-slate-300 rounded-3xl flex items-center justify-center mx-auto mb-6">
+          <svg class="w-12 h-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 009.586 13H7"
+            ></path>
+          </svg>
+        </div>
+        <h3 class="text-2xl font-bold text-slate-900 mb-3">Aucune demande trouvée</h3>
+        <p class="text-slate-500 mb-8 leading-relaxed">Il n'y a aucune demande correspondant à vos critères.</p>
+        <button
+          (click)="clearFilters()"
+          class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-2xl shadow-lg hover:shadow-xl hover:from-blue-600 hover:to-purple-600 transition-all duration-300"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            ></path>
+          </svg>
+          Réinitialiser
+        </button>
+      </div>
+    </div>
+
+    <!-- Indicateur de chargement -->
+    <div class="flex flex-col items-center justify-center py-20" *ngIf="loading()">
+      <div class="relative">
+        <div class="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
+        </div>
+      </div>
+      <p class="text-slate-600 mt-6 font-medium">Chargement...</p>
+    </div>
+  </div>
+</div>
+
+<!-- FAB Actions rapides -->
+<div class="fixed bottom-8 right-8 z-50">
+  <div class="relative">
+    <!-- Menu FAB -->
+    <div
+      class="absolute bottom-16 right-0 space-y-3 transition-all duration-300 origin-bottom-right"
+      [class.scale-0]="!showFabMenu()"
+      [class.scale-100]="showFabMenu()"
+    >
+      <button
+        (click)="refresh(); toggleFabMenu()"
+        class="flex items-center justify-center w-12 h-12 bg-blue-500 hover:bg-blue-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          ></path>
+        </svg>
+      </button>
+
+      <button
+        (click)="exportData({ format: 'excel', includeAll: true, selectedOnly: false }); toggleFabMenu()"
+        class="flex items-center justify-center w-12 h-12 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          ></path>
+        </svg>
+      </button>
+
+      <button
+        (click)="clearFilters(); toggleFabMenu()"
+        class="flex items-center justify-center w-12 h-12 bg-orange-500 hover:bg-orange-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+          ></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Bouton principal FAB -->
+    <button
+      (click)="toggleFabMenu()"
+      class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 flex items-center justify-center"
+    >
+      <svg
+        class="w-6 h-6 transition-transform duration-300"
+        [class.rotate-45]="showFabMenu()"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+      </svg>
+    </button>
+  </div>
+</div>

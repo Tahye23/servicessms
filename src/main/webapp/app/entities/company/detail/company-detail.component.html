@@ -1,0 +1,95 @@
+<div class="flex justify-center py-10 bg-gray-50 min-h-screen">
+  <div class="w-full max-w-2xl bg-white rounded-2xl shadow-md p-8">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Détail du Company</h2>
+
+    <jhi-alert-error></jhi-alert-error>
+    <jhi-alert></jhi-alert>
+
+    @if (company()) {
+      <div class="space-y-6">
+        <!-- ID -->
+        <div class="flex justify-between border-b pb-2">
+          <span class="text-gray-600 font-medium">ID</span>
+          <span class="text-gray-800">{{ company()!.id }}</span>
+        </div>
+
+        <!-- Name -->
+        <div class="flex justify-between border-b pb-2">
+          <span class="text-gray-600 font-medium">Name</span>
+          <span class="text-gray-800">{{ company()!.name }}</span>
+        </div>
+
+        <!-- Activity -->
+        <div class="flex justify-between border-b pb-2">
+          <span class="text-gray-600 font-medium">Activity</span>
+          <span class="text-gray-800">{{ company()!.activity }}</span>
+        </div>
+
+        <!-- Camtitre -->
+        <div class="flex justify-between border-b pb-2">
+          <span class="text-gray-600 font-medium">Camtitre</span>
+          <span class="text-gray-800">{{ company()!.camtitre }}</span>
+        </div>
+
+        <!-- Camdatecreation -->
+        <div class="flex justify-between border-b pb-2">
+          <span class="text-gray-600 font-medium">Date de création</span>
+          <span class="text-gray-800">{{ company()!.camdatecreation | formatMediumDate }}</span>
+        </div>
+
+        <!-- Camdatefin -->
+        <div class="flex justify-between border-b pb-2">
+          <span class="text-gray-600 font-medium">Date de fin</span>
+          <span class="text-gray-800">{{ company()!.camdatefin | formatMediumDatetime }}</span>
+        </div>
+
+        <!-- Camispub -->
+        <div class="flex justify-between border-b pb-2">
+          <span class="text-gray-600 font-medium">Publication</span>
+          <span class="text-gray-800">{{ company()!.camispub ? 'Oui' : 'Non' }}</span>
+        </div>
+
+        <!-- Cam User -->
+        <div class="flex justify-between border-b pb-2">
+          <span class="text-gray-600 font-medium">Utilisateur</span>
+          <span class="text-blue-600">
+            @if (company()!.camUser) {
+              <a [routerLink]="['/extended-user', company()!.camUser?.id, 'view']">
+                {{ company()!.camUser?.id }}
+              </a>
+            }
+          </span>
+        </div>
+
+        <!-- Camstatus -->
+        <div class="flex justify-between border-b pb-2">
+          <span class="text-gray-600 font-medium">Statut</span>
+          <span class="text-blue-600">
+            @if (company()!.camstatus) {
+              <a [routerLink]="['/referentiel', company()!.camstatus?.id, 'view']">
+                {{ company()!.camstatus?.id }}
+              </a>
+            }
+          </span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex justify-between mt-8 space-x-4">
+        <button
+          (click)="previousState()"
+          class="w-1/2 py-2 px-4 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100 transition"
+        >
+          Retour
+        </button>
+
+        <button
+          [routerLink]="['/company', company()!.id, 'edit']"
+          class="w-1/2 py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
+          Éditer
+        </button>
+      </div>
+    }
+  </div>
+</div>

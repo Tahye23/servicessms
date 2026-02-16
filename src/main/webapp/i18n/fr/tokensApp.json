@@ -1,0 +1,27 @@
+{
+  "migrationApp": {
+    "tokensApp": {
+      "home": {
+        "title": "TokensApps",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Tokens App",
+        "createOrEditLabel": "Créer ou éditer un Tokens App",
+        "notFound": "Aucun Tokens App trouvé"
+      },
+      "created": "Un nouveau Tokens App a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Tokens App avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Tokens App avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Tokens App {{ id }} ?"
+      },
+      "detail": {
+        "title": "Tokens App"
+      },
+      "id": "Id",
+      "dateExpiration": "Date Expiration",
+      "token": "Token",
+      "isExpired": "Is Expired",
+      "application": "application"
+    }
+  }
+}

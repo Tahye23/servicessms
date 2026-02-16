@@ -1,0 +1,57 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (fileextrait()) {
+      <div>
+        <h2 data-cy="fileextraitDetailsHeading"><span jhiTranslate="migrationApp.fileextrait.detail.title">Fileextrait</span></h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ fileextrait()!.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="migrationApp.fileextrait.fexidfile">Fexidfile</span></dt>
+          <dd>
+            <span>{{ fileextrait()!.fexidfile }}</span>
+          </dd>
+          <dt><span jhiTranslate="migrationApp.fileextrait.fexparent">Fexparent</span></dt>
+          <dd>
+            <span>{{ fileextrait()!.fexparent }}</span>
+          </dd>
+          <dt><span jhiTranslate="migrationApp.fileextrait.fexdata">Fexdata</span></dt>
+          <dd>
+            @if (fileextrait()!.fexdata) {
+              <div>
+                <a (click)="openFile(fileextrait()!.fexdata ?? '', fileextrait()!.fexdataContentType)" jhiTranslate="entity.action.open"
+                  >Ouvrir</a
+                >
+                {{ fileextrait()!.fexdataContentType }}, {{ byteSize(fileextrait()!.fexdata ?? '') }}
+              </div>
+            }
+          </dd>
+          <dt><span jhiTranslate="migrationApp.fileextrait.fextype">Fextype</span></dt>
+          <dd>
+            <span>{{ fileextrait()!.fextype }}</span>
+          </dd>
+          <dt><span jhiTranslate="migrationApp.fileextrait.fexname">Fexname</span></dt>
+          <dd>
+            <span>{{ fileextrait()!.fexname }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+        </button>
+
+        <button type="button" [routerLink]="['/fileextrait', fileextrait()!.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

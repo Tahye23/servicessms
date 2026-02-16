@@ -1,0 +1,36 @@
+{
+  "annotations": {
+    "changelogDate": "20240722135057"
+  },
+  "fields": [
+    {
+      "fieldName": "abpPrix",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "abpNbrAcces",
+      "fieldType": "Integer"
+    }
+  ],
+  "name": "Planabonnement",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "service",
+      "relationshipName": "abpSevice",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "referentiel",
+      "relationshipName": "abptype",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "no"
+}

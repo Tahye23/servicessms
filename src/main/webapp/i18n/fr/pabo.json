@@ -1,0 +1,10 @@
+{
+  "migrationApp": {
+    "Pabo": {
+      "null": "",
+      "BASIQUE": "BASIQUE",
+      "STANDARD": "STANDARD",
+      "PREMIUM": "PREMIUM"
+    }
+  }
+}

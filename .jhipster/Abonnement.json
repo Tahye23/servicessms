@@ -1,0 +1,43 @@
+{
+  "annotations": {
+    "changelogDate": "20240722134701"
+  },
+  "fields": [
+    {
+      "fieldName": "aboStatut",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "aboCompteur",
+      "fieldType": "Integer"
+    }
+  ],
+  "name": "Abonnement",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "application",
+      "relationshipName": "application",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "extendedUser",
+      "relationshipName": "AboUser",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "planabonnement",
+      "relationshipName": "AboPlan",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "no"
+}

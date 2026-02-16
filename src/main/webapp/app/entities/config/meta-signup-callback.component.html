@@ -1,0 +1,38 @@
+<div class="flex items-center justify-center h-screen bg-gray-50">
+  <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-sm text-center">
+    <!-- Spinner / Loading -->
+    <ng-container *ngIf="loading && !error">
+      <svg class="animate-spin h-12 w-12 mx-auto mb-4 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8h8a8 8 0 01-8 8v-8H4z"></path>
+      </svg>
+      <h2 class="text-xl font-semibold mb-2">Finalisation en cours…</h2>
+      <p class="text-gray-600">Merci de patienter pendant que nous configurons votre compte.</p>
+    </ng-container>
+
+    <!-- Message d'erreur -->
+    <ng-container *ngIf="error">
+      <h2 class="text-xl font-semibold text-red-600 mb-2">Oups !</h2>
+      <p class="text-gray-600">Une erreur est survenue, veuillez réessayer plus tard.</p>
+      <button (click)="closeNow()" class="mt-4 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">Fermer</button>
+    </ng-container>
+
+    <!-- Message de succès -->
+    <ng-container *ngIf="success">
+      <svg
+        class="h-16 w-16 text-green-500 mx-auto mb-4"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+      </svg>
+      <h2 class="text-2xl font-bold text-green-600 mb-2">Inscription réussie !</h2>
+      <p class="text-gray-600">Cette fenêtre se fermera dans quelques instants.</p>
+      <button (click)="closeNow()" class="mt-4 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded">Fermer maintenant</button>
+    </ng-container>
+  </div>
+</div>
+
+fragment = {{ fragment }}

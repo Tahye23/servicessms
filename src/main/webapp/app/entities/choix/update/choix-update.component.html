@@ -1,0 +1,108 @@
+<div class="flex justify-center">
+  <div class="w-full max-w-3xl bg-white rounded-xl shadow-md p-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center space-x-2" data-cy="ChoixCreateUpdateHeading">
+        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span jhiTranslate="migrationApp.choix.home.createOrEditLabel">Créer ou éditer un Choix</span>
+      </h2>
+
+      <jhi-alert-error></jhi-alert-error>
+
+      @if (editForm.controls.id.value !== null) {
+        <div class="mb-4">
+          <label for="field_id" class="block text-sm font-medium text-gray-700" jhiTranslate="migrationApp.choix.id">ID</label>
+          <input
+            type="number"
+            id="field_id"
+            name="id"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            data-cy="id"
+            formControlName="id"
+            readonly
+          />
+        </div>
+      }
+
+      <div class="mb-4">
+        <label for="field_chovaleur" class="block text-sm font-medium text-gray-700" jhiTranslate="migrationApp.choix.chovaleur"
+          >Chovaleur</label
+        >
+        <input
+          type="text"
+          id="field_chovaleur"
+          name="chovaleur"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+          data-cy="chovaleur"
+          formControlName="chovaleur"
+        />
+      </div>
+
+      <div class="mb-4">
+        <label for="field_choquestion" class="block text-sm font-medium text-gray-700" jhiTranslate="migrationApp.choix.choquestion"
+          >Choquestion</label
+        >
+        <select
+          id="field_choquestion"
+          name="choquestion"
+          data-cy="choquestion"
+          formControlName="choquestion"
+          [compareWith]="compareQuestion"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+        >
+          <option [ngValue]="null"></option>
+          @for (questionOption of questionsSharedCollection; track $index) {
+            <option [ngValue]="questionOption">{{ questionOption.id }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="mb-6">
+        <label
+          for="field_choquestionSuivante"
+          class="block text-sm font-medium text-gray-700"
+          jhiTranslate="migrationApp.choix.choquestionSuivante"
+          >Choquestion Suivante</label
+        >
+        <select
+          id="field_choquestionSuivante"
+          name="choquestionSuivante"
+          data-cy="choquestionSuivante"
+          formControlName="choquestionSuivante"
+          [compareWith]="compareQuestion"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+        >
+          <option [ngValue]="null"></option>
+          @for (questionOption of questionsSharedCollection; track $index) {
+            <option [ngValue]="questionOption">{{ questionOption.id }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="flex space-x-3">
+        <button
+          type="button"
+          id="cancel-save"
+          data-cy="entityCreateCancelButton"
+          (click)="previousState()"
+          class="flex items-center px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50"
+        >
+          <fa-icon icon="ban" class="mr-2"></fa-icon>
+          <span jhiTranslate="entity.action.cancel">Annuler</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="flex items-center px-4 py-2 border border-blue-600 rounded-md text-white bg-blue-600 hover:bg-blue-700"
+        >
+          <fa-icon icon="save" class="mr-2"></fa-icon>
+          <span jhiTranslate="entity.action.save">Sauvegarder</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.10.xsd">
+
+    <changeSet id="20240101000000-1" author="jhipster">
+        <createTable tableName="application_allowed_services">
+            <column name="application_id" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="service" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="application_id,service" tableName="application_allowed_services"/>
+
+        <addForeignKeyConstraint baseColumnNames="application_id"
+                                 baseTableName="application_allowed_services"
+                                 constraintName="fk_application_allowed_services_application_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="application"/>
+    </changeSet>
+
+</databaseChangeLog>

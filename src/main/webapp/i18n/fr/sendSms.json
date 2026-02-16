@@ -1,0 +1,35 @@
+{
+  "migrationApp": {
+    "sendSms": {
+      "home": {
+        "title": "SendSms",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Send Sms",
+        "createOrEditLabel": "Créer ou éditer un Send Sms",
+        "notFound": "Aucun Send Sms trouvé"
+      },
+      "created": "Un nouveau Send Sms a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Send Sms avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Send Sms avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Send Sms {{ id }} ?"
+      },
+      "detail": {
+        "title": "Send Sms"
+      },
+      "id": "ID",
+      "sender": "Sender",
+      "receiver": "Receiver",
+      "msgdata": "Msgdata",
+      "sendateEnvoi": "Date Envoi",
+      "dialogue": "Dialogue",
+      "isSent": "IsSent",
+      "isbulk": "Isbulk",
+      "Titre": "Titre",
+      "user": "Compte",
+      "destinateur": "Destinateur",
+      "destinataires": "Destinataires",
+      "Statut": "Statut"
+    }
+  }
+}

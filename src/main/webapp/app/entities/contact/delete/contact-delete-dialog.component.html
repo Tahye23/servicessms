@@ -1,0 +1,42 @@
+<div *ngIf="contact" class="fixed inset-0 flex items-center justify-center z-50">
+  <!-- Fond semi-transparent -->
+  <div class="fixed inset-0 bg-gray-800 opacity-50"></div>
+
+  <!-- Contenu du modal -->
+  <div class="bg-white rounded-lg shadow-lg max-w-md w-full mx-4 z-10">
+    <form name="deleteForm" (ngSubmit)="confirmDelete(contact.id!)">
+      <!-- En-tête -->
+      <div class="border-b border-gray-200 px-4 py-2">
+        <h4 class="text-lg font-semibold" data-cy="contactDeleteDialogHeading" jhiTranslate="entity.delete.title">
+          Confirmation de suppression
+        </h4>
+      </div>
+      <!-- Corps -->
+      <div class="px-4 py-4">
+        <jhi-alert-error></jhi-alert-error>
+        <p
+          id="jhi-delete-contact-heading"
+          jhiTranslate="migrationApp.contact.delete.question"
+          [translateValues]="{ id: contact.id }"
+          class="text-gray-700"
+        >
+          Êtes-vous certain de vouloir supprimer le Contact {{ contact.id }} ?
+        </p>
+      </div>
+      <!-- Pied de modal -->
+      <div class="border-t border-gray-200 px-4 py-2 flex justify-end space-x-2">
+        <button type="button" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400" (click)="cancel()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+        </button>
+        <button
+          id="jhi-confirm-delete-contact"
+          data-cy="entityConfirmDeleteButton"
+          type="submit"
+          class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+        >
+          <fa-icon icon="times"></fa-icon>&nbsp;<span jhiTranslate="entity.action.delete">Supprimer</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

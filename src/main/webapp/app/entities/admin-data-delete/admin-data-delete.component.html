@@ -1,0 +1,428 @@
+<div class="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-8">
+  <!-- Vérification du code secret -->
+  <div class="bg-white p-6 rounded shadow-md w-full max-w-md">
+    <h2 class="text-2xl font-bold mb-4 text-center">Suppression Administrative</h2>
+
+    <div *ngIf="!accessGranted">
+      <label class="block mb-2">Code Secret</label>
+      <input type="password" [(ngModel)]="codeSecret" class="w-full p-2 border rounded mb-4" placeholder="Entrer le code secret" />
+      <button (click)="verifySecretCode()" class="bg-blue-500 text-white w-full py-2 rounded hover:bg-blue-600">Valider</button>
+    </div>
+
+    <!-- Actions rapides -->
+    <div *ngIf="accessGranted" class="flex flex-col gap-4 mt-6">
+      <button (click)="deleteAllContacts()" class="bg-red-500 text-white w-full py-2 rounded hover:bg-red-600">
+        Supprimer Tous les Contacts
+      </button>
+      <button (click)="deleteAllSms()" class="bg-red-500 text-white w-full py-2 rounded hover:bg-red-600">Supprimer Tous les SMS</button>
+      <button (click)="deleteAllTempales()" class="bg-red-500 text-white w-full py-2 rounded hover:bg-red-600">
+        Supprimer Tous les Templates
+      </button>
+    </div>
+  </div>
+
+  <!-- Section Synchronisation SendSms -->
+  <div *ngIf="accessGranted" class="max-w-xl mx-auto mt-10 p-6 bg-white shadow-xl rounded-2xl border border-gray-100">
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">🔄 Synchronisation SendSms</h2>
+
+    <div class="mb-4">
+      <label for="sendSmsId" class="block text-sm font-medium text-gray-700 mb-1">ID SendSms</label>
+      <input
+        id="sendSmsId"
+        type="number"
+        [(ngModel)]="sendSmsId"
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="Entrez l'ID de send_sms"
+      />
+    </div>
+
+    <div class="flex space-x-4 mb-4">
+      <button
+        [disabled]="isLoading"
+        (click)="syncDeliveryStatus()"
+        class="flex-1 py-2 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:bg-gray-400"
+      >
+        🔁 Sync DeliveryStatus
+      </button>
+
+      <button
+        [disabled]="isLoading"
+        (click)="updateSendSmsStatus()"
+        class="flex-1 py-2 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:bg-gray-400"
+      >
+        🧮 Update Totaux
+      </button>
+    </div>
+
+    <button
+      [disabled]="isLoading"
+      (click)="deleteSendSmsWithMessages()"
+      class="w-full py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:bg-gray-400 font-medium"
+    >
+      🗑️ Supprimer SendSms + SMS
+    </button>
+
+    <div *ngIf="isLoading" class="mt-4 flex justify-center">
+      <div class="animate-spin h-6 w-6 border-4 border-blue-400 border-t-transparent rounded-full"></div>
+    </div>
+
+    <div
+      *ngIf="message"
+      class="mt-4 text-center text-sm whitespace-pre-line"
+      [ngClass]="{ 'text-green-600': success, 'text-red-600': !success }"
+    >
+      {{ message }}
+    </div>
+  </div>
+
+  <!-- Section Suppression Groupe + Contacts + Messages -->
+  <div *ngIf="accessGranted" class="max-w-xl mx-auto mt-10 p-6 bg-white shadow-xl rounded-2xl border border-gray-100">
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">🗑️ Suppression Groupe Complète</h2>
+
+    <div class="mb-4">
+      <label for="groupeId" class="block text-sm font-medium text-gray-700 mb-1">ID Groupe</label>
+      <input
+        id="groupeId"
+        type="number"
+        [(ngModel)]="groupeId"
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+        placeholder="Entrez l'ID du groupe"
+      />
+    </div>
+
+    <button
+      [disabled]="isLoading"
+      (click)="deleteGroupeWithContactsAndMessages()"
+      class="w-full py-3 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium disabled:bg-gray-400"
+    >
+      🗑️ Supprimer Groupe + Contacts + Messages
+    </button>
+
+    <div *ngIf="isLoading" class="mt-4 flex justify-center">
+      <div class="animate-spin h-6 w-6 border-4 border-red-400 border-t-transparent rounded-full"></div>
+    </div>
+
+    <div
+      *ngIf="message"
+      class="mt-4 text-center text-sm whitespace-pre-line"
+      [ngClass]="{ 'text-green-600': success, 'text-red-600': !success }"
+    >
+      {{ message }}
+    </div>
+
+    <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+      <p class="text-xs text-yellow-800">
+        ⚠️ <strong>Attention :</strong> Cette action supprimera définitivement : <br />• Le groupe <br />• Tous les contacts liés <br />•
+        Tous les SMS des contacts <br />• Tous les SendSms du groupe <br />Cette opération est <strong>irréversible</strong>.
+      </p>
+    </div>
+  </div>
+
+  <!-- Section Migration User Login -->
+  <div *ngIf="accessGranted" class="max-w-xl mx-auto mt-10 p-6 bg-white shadow-xl rounded-2xl border border-gray-100">
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">🔄 Migration User Login</h2>
+
+    <div class="mb-4">
+      <label for="migrationUserLogin" class="block text-sm font-medium text-gray-700 mb-1">Login Utilisateur</label>
+      <input
+        id="migrationUserLogin"
+        type="text"
+        [(ngModel)]="migrationUserLogin"
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+        placeholder="Entrez le login de l'utilisateur (ex: admin)"
+      />
+    </div>
+
+    <div class="flex space-x-4 mb-4">
+      <button
+        [disabled]="isLoadingMigration"
+        (click)="migrateUserLogin()"
+        class="flex-1 py-3 px-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-medium disabled:bg-gray-400"
+      >
+        🔄 Migrer 1 Utilisateur
+      </button>
+
+      <button
+        [disabled]="isLoadingMigration"
+        (click)="migrateAllUsers()"
+        class="flex-1 py-3 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium disabled:bg-gray-400"
+      >
+        🔄 Migrer TOUS
+      </button>
+    </div>
+
+    <div *ngIf="isLoadingMigration" class="mt-4 flex justify-center">
+      <div class="animate-spin h-6 w-6 border-4 border-purple-400 border-t-transparent rounded-full"></div>
+    </div>
+
+    <div
+      *ngIf="migrationMessage"
+      class="mt-4 p-4 rounded-lg text-sm whitespace-pre-line"
+      [ngClass]="{
+        'bg-green-50 text-green-700 border border-green-200': migrationSuccess,
+        'bg-red-50 text-red-700 border border-red-200': !migrationSuccess
+      }"
+    >
+      {{ migrationMessage }}
+    </div>
+
+    <div class="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+      <p class="text-xs text-purple-800">
+        ℹ️ <strong>Info :</strong> Cette migration ajoute le champ <code>user_login</code> aux SMS existants en récupérant l'information
+        depuis les SendSms. <br /><br />
+        <strong>Migration 1 Utilisateur :</strong> Migre uniquement les SMS de l'utilisateur spécifié.
+        <br />
+        <strong>Migration TOUS :</strong> Migre les SMS de tous les utilisateurs du système (peut prendre du temps).
+      </p>
+    </div>
+  </div>
+
+  <!-- Section Recalcul Abonnement -->
+  <div *ngIf="accessGranted" class="max-w-xl mx-auto mt-10 p-6 bg-white shadow-xl rounded-2xl border border-gray-100">
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">🔄 Recalculer Abonnement</h2>
+
+    <div class="mb-4">
+      <label for="userLogin" class="block text-sm font-medium text-gray-700 mb-1">Login Utilisateur</label>
+      <input
+        id="userLogin"
+        type="text"
+        [(ngModel)]="userLogin"
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="Entrez le login de l'utilisateur"
+      />
+    </div>
+
+    <button
+      [disabled]="isLoading"
+      (click)="recalculateUserAbonnement()"
+      class="w-full py-3 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium disabled:bg-gray-400"
+    >
+      🧮 Recalculer l'utilisation réelle
+    </button>
+
+    <div *ngIf="isLoading" class="mt-4 flex justify-center">
+      <div class="animate-spin h-6 w-6 border-4 border-indigo-400 border-t-transparent rounded-full"></div>
+    </div>
+
+    <div
+      *ngIf="message"
+      class="mt-4 text-center text-sm whitespace-pre-line"
+      [ngClass]="{ 'text-green-600': success, 'text-red-600': !success }"
+    >
+      {{ message }}
+    </div>
+
+    <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+      <p class="text-xs text-blue-800">
+        ℹ️ <strong>Info :</strong> Cette action recalcule l'utilisation réelle (SMS + WhatsApp) depuis la base de données et met à jour
+        l'abonnement de l'utilisateur.
+      </p>
+    </div>
+  </div>
+
+  <!-- ==================== NOUVELLE SECTION: GESTION DES QUOTAS ==================== -->
+  <div *ngIf="accessGranted" class="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-xl rounded-2xl border border-gray-100">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6">📊 Gestion des Quotas d'Abonnement</h2>
+
+    <!-- Input utilisateur -->
+    <div class="mb-6">
+      <label for="quotaUserLogin" class="block text-sm font-medium text-gray-700 mb-2">Login Utilisateur</label>
+      <input
+        id="quotaUserLogin"
+        type="text"
+        [(ngModel)]="quotaUserLogin"
+        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
+        placeholder="Entrez le login de l'utilisateur (ex: admin)"
+      />
+    </div>
+
+    <!-- Bouton Consulter -->
+    <button
+      [disabled]="isLoadingQuota"
+      (click)="viewQuota()"
+      class="w-full mb-6 py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium disabled:bg-gray-400"
+    >
+      🔍 Consulter les Quotas
+    </button>
+
+    <!-- Grille d'actions -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <!-- Augmenter les quotas -->
+      <div class="border border-gray-200 rounded-lg p-4 bg-gradient-to-br from-green-50 to-white">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">⬆️ Augmenter les Quotas</h3>
+
+        <div class="mb-3">
+          <label class="block text-sm font-medium text-gray-700 mb-1">SMS à ajouter</label>
+          <input
+            type="number"
+            [(ngModel)]="smsIncrease"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="Ex: 10000"
+            min="0"
+          />
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">WhatsApp à ajouter</label>
+          <input
+            type="number"
+            [(ngModel)]="whatsappIncrease"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="Ex: 5000"
+            min="0"
+          />
+        </div>
+
+        <button
+          [disabled]="isLoadingQuota"
+          (click)="increaseQuota()"
+          class="w-full py-2 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium disabled:bg-gray-400"
+        >
+          ➕ Augmenter
+        </button>
+
+        <p class="text-xs text-gray-600 mt-2">💡 Ajoute les valeurs aux quotas actuels</p>
+      </div>
+
+      <!-- Remplacer les quotas -->
+      <div class="border border-gray-200 rounded-lg p-4 bg-gradient-to-br from-orange-50 to-white">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">🔄 Remplacer les Quotas</h3>
+
+        <div class="mb-3">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nouvelle limite SMS</label>
+          <input
+            type="number"
+            [(ngModel)]="newSmsLimit"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+            placeholder="Ex: 100000"
+            min="0"
+          />
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nouvelle limite WhatsApp</label>
+          <input
+            type="number"
+            [(ngModel)]="newWhatsappLimit"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+            placeholder="Ex: 50000"
+            min="0"
+          />
+        </div>
+
+        <button
+          [disabled]="isLoadingQuota"
+          (click)="updateQuota()"
+          class="w-full py-2 px-4 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition font-medium disabled:bg-gray-400"
+        >
+          🔄 Remplacer
+        </button>
+
+        <p class="text-xs text-gray-600 mt-2">⚠️ Remplace complètement les limites actuelles</p>
+      </div>
+    </div>
+
+    <!-- Loader -->
+    <div *ngIf="isLoadingQuota" class="mt-4 flex justify-center">
+      <div class="animate-spin h-8 w-8 border-4 border-blue-400 border-t-transparent rounded-full"></div>
+    </div>
+
+    <!-- Message de résultat -->
+    <div
+      *ngIf="quotaMessage"
+      class="mt-6 p-4 rounded-lg text-sm whitespace-pre-line font-mono"
+      [ngClass]="{
+        'bg-green-50 text-green-700 border-2 border-green-200': quotaSuccess,
+        'bg-red-50 text-red-700 border-2 border-red-200': !quotaSuccess
+      }"
+    >
+      {{ quotaMessage }}
+    </div>
+
+    <!-- Affichage détaillé des quotas (si disponible) -->
+    <div *ngIf="quotaInfo && quotaSuccess" class="mt-6 space-y-4">
+      <h3 class="text-lg font-semibold text-gray-800 mb-4">📋 Détails des Abonnements</h3>
+
+      <div
+        *ngFor="let abo of quotaInfo.abonnements; let i = index"
+        class="border border-gray-200 rounded-lg p-4 bg-gradient-to-r from-blue-50 to-white"
+      >
+        <div class="flex justify-between items-start mb-3">
+          <div>
+            <h4 class="font-semibold text-gray-800">{{ abo.planName }}</h4>
+            <span class="text-xs text-gray-500">ID: {{ abo.id }}</span>
+          </div>
+          <span
+            class="px-3 py-1 rounded-full text-xs font-semibold"
+            [ngClass]="{
+              'bg-green-100 text-green-800': abo.status === 'ACTIVE',
+              'bg-gray-100 text-gray-800': abo.status !== 'ACTIVE'
+            }"
+          >
+            {{ abo.status }}
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- SMS -->
+          <div class="bg-white rounded-lg p-3 border border-gray-200">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-medium text-gray-700">📱 SMS</span>
+              <span class="text-xs text-gray-500">{{ abo.smsUsed }} / {{ abo.smsLimit }}</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+              <div
+                class="h-2.5 rounded-full transition-all"
+                [ngClass]="{
+                  'bg-green-600': abo.smsUsed / abo.smsLimit < 0.7,
+                  'bg-yellow-600': abo.smsUsed / abo.smsLimit >= 0.7 && abo.smsUsed / abo.smsLimit < 0.9,
+                  'bg-red-600': abo.smsUsed / abo.smsLimit >= 0.9
+                }"
+                [style.width.%]="(abo.smsUsed / abo.smsLimit) * 100"
+              ></div>
+            </div>
+            <p class="text-xs text-gray-600 mt-1">{{ abo.smsRemaining }} restants</p>
+          </div>
+
+          <!-- WhatsApp -->
+          <div class="bg-white rounded-lg p-3 border border-gray-200">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-medium text-gray-700">💬 WhatsApp</span>
+              <span class="text-xs text-gray-500">{{ abo.whatsappUsed }} / {{ abo.whatsappLimit }}</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+              <div
+                class="h-2.5 rounded-full transition-all"
+                [ngClass]="{
+                  'bg-green-600': abo.whatsappUsed / abo.whatsappLimit < 0.7,
+                  'bg-yellow-600': abo.whatsappUsed / abo.whatsappLimit >= 0.7 && abo.whatsappUsed / abo.whatsappLimit < 0.9,
+                  'bg-red-600': abo.whatsappUsed / abo.whatsappLimit >= 0.9
+                }"
+                [style.width.%]="(abo.whatsappUsed / abo.whatsappLimit) * 100"
+              ></div>
+            </div>
+            <p class="text-xs text-gray-600 mt-1">{{ abo.whatsappRemaining }} restants</p>
+          </div>
+        </div>
+
+        <!-- Dates -->
+        <div class="mt-3 pt-3 border-t border-gray-200 flex justify-between text-xs text-gray-600">
+          <span>📅 Début: {{ abo.startDate }}</span>
+          <span *ngIf="abo.endDate">📅 Fin: {{ abo.endDate }}</span>
+          <span *ngIf="!abo.endDate" class="text-green-600 font-semibold">♾️ Illimité dans le temps</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info box -->
+    <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+      <p class="text-xs text-blue-800">
+        <strong>ℹ️ Guide d'utilisation :</strong><br />
+        <strong>1. Consulter :</strong> Affiche les quotas actuels et l'utilisation<br />
+        <strong>2. Augmenter :</strong> Ajoute des SMS/WhatsApp aux limites existantes (ex: +10000 SMS)<br />
+        <strong>3. Remplacer :</strong> Définit de nouvelles limites absolues (ex: nouvelle limite = 100000 SMS)<br /><br />
+        💡 Utilisez "Augmenter" pour des bonus temporaires et "Remplacer" pour changer définitivement les quotas.
+      </p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,28 @@
+{
+  "annotations": {
+    "changelogDate": "20240722130228"
+  },
+  "fields": [],
+  "name": "Groupedecontact",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "groupe",
+      "relationshipName": "cgrgroupe",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "contact",
+      "otherEntityRelationshipName": "groupedecontact",
+      "relationshipName": "contact",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "no"
+}

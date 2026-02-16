@@ -1,0 +1,817 @@
+<div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-4xl mx-auto overflow-hidden">
+    <nav class="bg-gray flex items-center mb-6 text-sm">
+      <a (click)="goBack()" class="text-gray-600 hover:text-indigo-600 flex items-center cursor-pointer transition-colors duration-200">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Retour
+      </a>
+      <span class="mx-2 text-gray-400">/</span>
+      <span class="text-gray-900 font-medium">Nouveau template</span>
+    </nav>
+  </div>
+
+  <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
+    <!-- Header avec logo WhatsApp -->
+    <div class="bg-green-600 p-4 flex items-center space-x-3">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 448 512">
+        <path
+          fill="#ffffff"
+          d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7 .9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"
+        />
+      </svg>
+      <h1 class="text-2xl font-bold text-white">Création Template WhatsApp</h1>
+    </div>
+
+    <!-- Notification d'erreur -->
+    <div *ngIf="errorMessage" class="bg-red-50 border-l-4 border-red-500 p-4 my-4 mx-6">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-red-700">{{ errorMessage }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informations générales du template -->
+    <div class="p-6 border-b border-gray-200">
+      <h2 class="text-lg font-medium text-gray-900 mb-4">Informations générales</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nom du template</label>
+          <input
+            type="text"
+            [(ngModel)]="template.name"
+            (ngModelChange)="onNameChange($event)"
+            placeholder="ex : mon_template_v1"
+            class="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            [class.border-red-500]="template.name && !isNameValid"
+            [class.border-gray-300]="!template.name || isNameValid"
+          />
+          <div *ngIf="template.name && !isNameValid" class="mt-1 text-sm text-red-600">
+            ⛔ Ne doit contenir que : a–z, 0–9 et « _ », sans espaces ni majuscules.
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Langue</label>
+          <select
+            [(ngModel)]="template.language"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+          >
+            <option value="en_US">Anglais (US)</option>
+            <option value="fr">Français</option>
+            <option value="ar">Arabe</option>
+            <option value="es">Espagnol</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
+          <select
+            [(ngModel)]="template.category"
+            (ngModelChange)="onCategoryChange($event)"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+          >
+            <option *ngFor="let cat of categories" [value]="cat.value">
+              {{ cat.label }}
+            </option>
+          </select>
+
+          <!-- Description de la catégorie -->
+          <div class="mt-2 text-xs text-gray-500">
+            {{ currentCategory.description }}
+          </div>
+
+          <!-- Avertissement pour l'authentification -->
+          <div *ngIf="isAuthenticationCategory" class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded">
+            <div class="flex items-start">
+              <svg class="h-4 w-4 text-blue-400 mt-0.5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <p class="text-xs text-blue-700">
+                Les templates d'authentification nécessitent un placeholder pour le code OTP et sont soumis à des validations strictes.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Configuration OTP pour l'authentification -->
+      <div *ngIf="isAuthenticationCategory" class="mt-6 p-4 bg-gray-50 rounded-lg">
+        <h3 class="text-sm font-medium text-gray-900 mb-3">Configuration OTP</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Longueur du code</label>
+            <select [(ngModel)]="otpLength" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+              <option [value]="4">4 chiffres</option>
+              <option [value]="6">6 chiffres</option>
+              <option [value]="8">8 chiffres</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Type de code</label>
+            <select [(ngModel)]="otpType" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
+              <option value="NUMERIC">Numérique (0-9)</option>
+              <option value="ALPHANUMERIC">Alphanumérique (A-Z, 0-9)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section éditeur unifié -->
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-lg font-medium text-gray-900">Contenu du template</h2>
+        <button
+          (click)="saveTemplate()"
+          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path
+              fill-rule="evenodd"
+              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          Enregistrer
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <!-- Côté gauche: éditeur -->
+        <div class="lg:col-span-3 space-y-6">
+          <!-- Éditeur unifié -->
+          <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+            <!-- En-tête de l'éditeur -->
+            <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
+              <h3 class="text-sm font-medium text-gray-700">Template WhatsApp Unifié</h3>
+            </div>
+
+            <!-- Barre d'insertion de champs dynamiques -->
+            <div class="p-4 bg-white border-b border-gray-200">
+              <p class="text-sm text-gray-700 mb-3 flex items-center font-medium">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5 mr-2 text-green-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Insérer un champ dynamique :
+              </p>
+
+              <!-- Onglets pour champs -->
+              <div class="mb-4 border-b border-gray-200">
+                <ul class="flex flex-wrap -mb-px">
+                  <li class="mr-2">
+                    <button
+                      [ngClass]="{ 'border-b-2 border-green-500 text-green-600': activeFieldTab === 'standard' }"
+                      class="inline-block p-2 text-sm font-medium transition-colors duration-200"
+                      (click)="activeFieldTab = 'standard'"
+                    >
+                      Champs standard
+                    </button>
+                  </li>
+                  <li class="mr-2">
+                    <button
+                      [ngClass]="{ 'border-b-2 border-green-500 text-green-600': activeFieldTab === 'custom' }"
+                      class="inline-block p-2 text-sm font-medium transition-colors duration-200"
+                      (click)="activeFieldTab = 'custom'"
+                    >
+                      Champs personnalisés
+                    </button>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Champs standard -->
+              <div *ngIf="activeFieldTab === 'standard'" class="flex flex-wrap gap-2">
+                <button
+                  *ngFor="let field of ['nom', 'prenom', 'telephone']"
+                  type="button"
+                  (click)="openFieldDialog(field, null)"
+                  class="px-3 py-1 bg-green-50 text-green-700 rounded-md hover:bg-green-100 transition-colors duration-200 text-sm flex items-center"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                  {{ field }}
+                </button>
+
+                <!-- Champ OTP spécial pour l'authentification -->
+                <button
+                  *ngIf="isAuthenticationCategory"
+                  type="button"
+                  (click)="openFieldDialog('otp', null)"
+                  class="px-3 py-1 bg-blue-50 text-blue-700 rounded-md hover:bg-blue-100 transition-colors duration-200 text-sm flex items-center"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 7a2 2 0 012 2m0 0a2 2 0 01-2 2m2-2h.01M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                  Code OTP
+                </button>
+
+                <!-- Champs utilitaires -->
+                <ng-container *ngIf="isUtilityCategory">
+                  <button
+                    *ngFor="let field of ['order_id', 'amount', 'date', 'status']"
+                    type="button"
+                    (click)="openFieldDialog(field, null)"
+                    class="px-3 py-1 bg-purple-50 text-purple-700 rounded-md hover:bg-purple-100 transition-colors duration-200 text-sm flex items-center"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    {{ field }}
+                  </button>
+                </ng-container>
+              </div>
+
+              <!-- Champs personnalisés -->
+              <div *ngIf="activeFieldTab === 'custom'" class="flex flex-wrap gap-2">
+                <button
+                  *ngFor="let field of getCustomFieldsArray()"
+                  type="button"
+                  (click)="openFieldDialog(field.key, field.value)"
+                  class="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-md hover:bg-indigo-100 transition-colors duration-200 text-sm flex items-center"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                  {{ field.key }} <span class="text-xs ml-1 text-indigo-500">({{ field.value.maxLength }} car.)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Dialogue modal pour configurer le champ dynamique -->
+            <div *ngIf="showFieldDialog" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+              <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+                <div class="flex justify-between items-center mb-4">
+                  <h3 class="text-lg font-medium text-gray-900">Configurer le champ {{ selectedField }}</h3>
+                  <button (click)="showFieldDialog = false" class="text-gray-400 hover:text-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="space-y-4">
+                  <!-- Longueur maximale -->
+                  <div *ngIf="!selectedCustomField && selectedField !== 'otp'">
+                    <label for="maxLength" class="block text-sm font-medium text-gray-700 mb-1">Longueur maximale</label>
+                    <input
+                      type="number"
+                      id="maxLength"
+                      [(ngModel)]="fieldMaxLength"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                      placeholder="Ex: 50"
+                    />
+                  </div>
+
+                  <!-- Info spéciale pour OTP -->
+                  <div *ngIf="selectedField === 'otp'" class="bg-blue-50 p-3 rounded-md">
+                    <p class="text-sm text-blue-700">
+                      Le code OTP sera automatiquement généré avec {{ otpLength }} caractères de type {{ otpType }}.
+                    </p>
+                  </div>
+
+                  <!-- Exemple pour tous les types de champs -->
+                  <div *ngIf="selectedField !== 'otp'">
+                    <label for="example" class="block text-sm font-medium text-gray-700 mb-1">Exemple de valeur</label>
+                    <input
+                      type="text"
+                      id="example"
+                      [(ngModel)]="fieldExample"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                      [placeholder]="getPlaceholderExample(selectedField)"
+                    />
+                  </div>
+
+                  <div class="ml-auto flex items-center">
+                    <select
+                      [(ngModel)]="currentEditorIndex"
+                      class="text-sm border border-gray-200 bg-white rounded-md px-3 py-1.5 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                    >
+                      <option value="0">En-tête</option>
+                      <option value="1">Corps</option>
+                      <option value="2">Pied de page</option>
+                    </select>
+                  </div>
+
+                  <!-- Aperçu -->
+                  <div class="bg-gray-50 p-3 rounded-md">
+                    <p class="text-sm font-medium text-gray-700 mb-1">Aperçu:</p>
+                    <code class="text-sm bg-gray-100 px-2 py-1 rounded">
+                      <span *ngIf="selectedField === 'otp'">{{ '{' }}{{ 'otp' }}{{ '}' }}&#125;</span>
+                      <span *ngIf="selectedField !== 'otp'"
+                        >{{ '{' }}{{ '{' }}{{ selectedField }}{{ selectedCustomField ? '' : ':' + fieldMaxLength }}:{{ fieldExample
+                        }}{{ '}' }}{{ '}' }}&#125;</span
+                      >
+                    </code>
+                  </div>
+
+                  <!-- Boutons d'action -->
+                  <div class="flex justify-end gap-3">
+                    <button
+                      (click)="showFieldDialog = false"
+                      class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors duration-200"
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      (click)="insertConfiguredField()"
+                      class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200"
+                    >
+                      Insérer
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section HEADER -->
+            <div class="p-4 border-b border-green-200 bg-white">
+              <div class="flex items-center mb-3 bg-gray-50 p-3 rounded-lg shadow-sm">
+                <div class="w-2 h-2 rounded-full bg-blue-500 mr-3"></div>
+                <label class="text-sm font-medium text-gray-800">En-tête (Header)</label>
+                <div class="ml-auto flex items-center">
+                  <select
+                    [(ngModel)]="template.components[0].format"
+                    class="text-sm border border-gray-200 bg-white rounded-md px-3 py-1.5 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                    *ngIf="template.components[0]?.type === 'HEADER'"
+                  >
+                    <option value="TEXT">Texte</option>
+                    <option value="IMAGE">Image</option>
+                    <option value="VIDEO">Vidéo</option>
+                    <option value="DOCUMENT">Document</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Section Média -->
+              <div
+                *ngIf="
+                  template.components[0].type === 'HEADER' &&
+                  ['IMAGE', 'VIDEO', 'AUDIO', 'DOCUMENT'].includes(template.components[0].format || '')
+                "
+                class="mb-4"
+              >
+                <!-- État: Aucun média sélectionné -->
+                <div *ngIf="!template.components[0].mediaUrl" class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                  <div class="flex flex-col items-center justify-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-10 w-10 text-gray-400 mb-2"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        *ngIf="template.components[0].format === 'IMAGE'"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                      <path
+                        *ngIf="template.components[0].format === 'VIDEO'"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                      />
+                      <path
+                        *ngIf="template.components[0].format === 'AUDIO'"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M12 6v12m0 0a3 3 0 01-3-3V9a3 3 0 016 0v6a3 3 0 01-3 3z"
+                      />
+                      <path
+                        *ngIf="template.components[0].format === 'DOCUMENT'"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                    <p class="text-sm text-gray-500 mb-3">Aucun {{ template.components[0].format?.toLowerCase() }} sélectionné(e)</p>
+                    <label class="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-all">
+                      <span>Sélectionner un fichier</span>
+                      <input
+                        type="file"
+                        [accept]="getFileAcceptType(template.components[0].format || 'IMAGE')"
+                        (change)="onHeaderMediaSelect($event, template.components[0])"
+                        class="hidden"
+                      />
+                    </label>
+
+                    <!-- Limites de taille par type -->
+                    <div class="mt-2 text-xs text-gray-400">
+                      <span *ngIf="template.components[0].format === 'IMAGE'">Max: 5MB (JPG, PNG, WebP)</span>
+                      <span *ngIf="template.components[0].format === 'VIDEO'">Max: 16MB (MP4, 3GPP)</span>
+                      <span *ngIf="template.components[0].format === 'AUDIO'">Max: 16MB (AAC, M4A, AMR, MP3, OGG)</span>
+                      <span *ngIf="template.components[0].format === 'DOCUMENT'">Max: 100MB (PDF, DOC, XLS, etc.)</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- État: Média sélectionné -->
+                <div *ngIf="template.components[0].mediaUrl" class="border rounded-lg p-3 bg-gray-50">
+                  <div class="flex flex-col">
+                    <!-- Aperçu du média -->
+                    <div class="flex justify-center mb-3">
+                      <img
+                        *ngIf="template.components[0].format === 'IMAGE'"
+                        [src]="template.components[0].mediaUrl"
+                        class="max-h-48 rounded-md shadow object-contain"
+                      />
+                      <video
+                        *ngIf="template.components[0].format === 'VIDEO'"
+                        [src]="template.components[0].mediaUrl"
+                        controls
+                        class="max-h-48 rounded-md shadow"
+                      ></video>
+                      <audio
+                        *ngIf="template.components[0].format === 'AUDIO'"
+                        [src]="template.components[0].mediaUrl"
+                        controls
+                        class="w-full max-w-sm"
+                      ></audio>
+                      <div *ngIf="template.components[0].format === 'DOCUMENT'" class="flex items-center p-4 bg-white rounded border">
+                        <svg class="h-8 w-8 text-gray-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                          />
+                        </svg>
+                        <div>
+                          <p class="text-sm font-medium">{{ template.components[0].fileName || 'Document' }}</p>
+                          <p class="text-xs text-gray-500">{{ formatFileSize(template.components[0].fileSize || 0) }}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Actions pour le média -->
+                    <div class="flex justify-end space-x-2">
+                      <button
+                        (click)="template.components[0].mediaUrl = ''"
+                        class="text-red-500 hover:text-red-700 bg-white border border-red-300 px-3 py-1.5 rounded-md text-sm transition-all flex items-center"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
+                        </svg>
+                        Supprimer
+                      </button>
+                      <label
+                        class="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm transition-all flex items-center"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                          />
+                        </svg>
+                        Remplacer
+                        <input
+                          type="file"
+                          [accept]="getFileAcceptType(template.components[0].format || 'IMAGE')"
+                          (change)="onHeaderMediaSelect($event, template.components[0])"
+                          class="hidden"
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section Texte (si format TEXT) -->
+              <div *ngIf="template.components[0].format === 'TEXT'">
+                <quill-editor
+                  #editor
+                  [(ngModel)]="template.components[0].text"
+                  (onSelectionChanged)="onchangeHeader(0)"
+                  [modules]="quillModules"
+                  placeholder="Saisissez le contenu de l'en-tête..."
+                  class="bg-white focus:outline-none editor-container"
+                ></quill-editor>
+                <div class="mt-1 text-xs text-gray-400">Caractères : {{ template.components[0].text?.length || 0 }}</div>
+              </div>
+            </div>
+
+            <!-- Section BODY -->
+            <div class="p-4 border-b border-green-200 bg-white relative">
+              <div class="absolute -top-px left-0 w-full border-t-2 border-dashed border-green-300"></div>
+              <div class="flex items-center mb-2">
+                <div class="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
+                <label class="text-sm font-medium text-gray-700">Corps (Body)</label>
+                <div class="ml-auto">
+                  <span class="text-xs text-gray-500">Obligatoire</span>
+                </div>
+              </div>
+
+              <quill-editor
+                #editor
+                [(ngModel)]="template.components[1].text"
+                [modules]="quillModules"
+                (onSelectionChanged)="onchangeHeader(1)"
+                placeholder="Saisissez le contenu principal..."
+                class="bg-white focus:outline-none editor-container"
+              ></quill-editor>
+
+              <div class="mt-1 flex justify-between">
+                <span class="text-xs text-gray-400">Caractères : {{ template.components[1].text?.length || 0 }}</span>
+                <span class="text-xs text-gray-400">Max 1024 caractères</span>
+              </div>
+            </div>
+
+            <!-- Section FOOTER -->
+            <div class="p-4 border-b border-green-200 bg-white relative">
+              <div class="absolute -top-px left-0 w-full border-t-2 border-dashed border-green-300"></div>
+              <div class="flex items-center mb-2">
+                <div class="w-2 h-2 rounded-full bg-purple-500 mr-2"></div>
+                <label class="text-sm font-medium text-gray-700">Pied de page (Footer)</label>
+              </div>
+
+              <quill-editor
+                #editor
+                [(ngModel)]="template.components[2].text"
+                [modules]="quillModules"
+                (onSelectionChanged)="onchangeHeader(2)"
+                placeholder="Saisissez le contenu du pied de page..."
+                class="bg-white focus:outline-none editor-container"
+              ></quill-editor>
+
+              <div class="mt-1 text-xs text-gray-400">Caractères : {{ template.components[2].text?.length || 0 }}</div>
+            </div>
+
+            <!-- Section BUTTONS -->
+            <div class="p-4 bg-white relative">
+              <div class="absolute -top-px left-0 w-full border-t-2 border-dashed border-green-300"></div>
+              <div class="flex items-center mb-3">
+                <div class="w-2 h-2 rounded-full bg-orange-500 mr-2"></div>
+                <label class="text-sm font-medium text-gray-700">Boutons</label>
+                <div class="ml-auto text-xs text-gray-500">Max {{ maxButtonsAllowed }} boutons</div>
+              </div>
+
+              <div *ngIf="template.components[3]">
+                <div
+                  *ngFor="let btn of template.components[3].buttons; let j = index"
+                  class="mb-3 p-3 bg-gray-50 rounded-md border border-gray-200"
+                >
+                  <div class="flex justify-between items-center mb-2">
+                    <h4 class="text-xs font-medium text-gray-700">Bouton #{{ j + 1 }}</h4>
+                    <button
+                      (click)="removeButton(template.components[3], j)"
+                      class="p-1 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50"
+                      [disabled]="template.components[3].buttons?.length === 1"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path
+                          fill-rule="evenodd"
+                          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="flex flex-col sm:flex-row gap-2">
+                    <div class="flex-grow">
+                      <input
+                        [(ngModel)]="btn.text"
+                        placeholder="Texte du bouton"
+                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+                      />
+                    </div>
+
+                    <div>
+                      <select
+                        [(ngModel)]="btn.type"
+                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+                      >
+                        <option *ngFor="let btnType of allowedButtonTypes" [value]="btnType">
+                          {{ getButtonTypeLabel(btnType) }}
+                        </option>
+                      </select>
+
+                      <div *ngIf="btn.type === 'URL'" class="mt-2">
+                        <input
+                          [(ngModel)]="btn.url"
+                          placeholder="https://exemple.com"
+                          class="w-full px-3 py-2 text-sm border rounded-md focus:ring-green-500 focus:border-green-500"
+                        />
+                      </div>
+
+                      <div *ngIf="btn.type === 'PHONE_NUMBER'" class="mt-2">
+                        <input
+                          [(ngModel)]="btn.phoneNumber"
+                          placeholder="+221770000000"
+                          class="w-full px-3 py-2 text-sm border rounded-md focus:ring-green-500 focus:border-green-500"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  (click)="addButton(template.components[3])"
+                  [disabled]="(template.components[3].buttons?.length || 0) >= maxButtonsAllowed"
+                  class="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <svg class="h-3 w-3 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path
+                      fill-rule="evenodd"
+                      d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  Ajouter un bouton
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Côté droit: aperçu -->
+        <div class="lg:col-span-2">
+          <div class="bg-white border border-gray-200 rounded-lg shadow-sm sticky top-6">
+            <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
+              <h3 class="text-sm font-medium text-gray-700">Aperçu du template</h3>
+            </div>
+
+            <div class="p-4">
+              <div class="bg-gray-100 rounded-lg p-4 max-w-xs mx-auto">
+                <div class="bg-white rounded-lg p-3 shadow-sm">
+                  <!-- Header -->
+                  <div *ngIf="template.components[0]" class="pb-2 border-b border-gray-100">
+                    <!-- Aperçu média -->
+                    <div *ngIf="template.components[0].mediaUrl" class="mt-2 bg-gray-100 rounded flex items-center justify-center">
+                      <div *ngIf="template.components[0].format === 'IMAGE'" class="mt-2">
+                        <img
+                          [src]="template.components[0].mediaUrl"
+                          alt="Aperçu de l'en-tête"
+                          class="w-full h-32 object-cover rounded-md border"
+                        />
+                      </div>
+                      <div *ngIf="template.components[0].format === 'VIDEO'" class="mt-2">
+                        <div class="w-full h-32 bg-gray-200 rounded-md border flex items-center justify-center">
+                          <svg class="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.01M15 10h1.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                          <span class="ml-2 text-sm text-gray-500">Vidéo</span>
+                        </div>
+                      </div>
+                      <div *ngIf="template.components[0].format === 'DOCUMENT'" class="mt-2">
+                        <div class="w-full h-16 bg-gray-200 rounded-md border flex items-center justify-center">
+                          <!-- Icône selon le type de fichier -->
+                          <svg
+                            *ngIf="isAudioFile(template.components[0])"
+                            class="w-6 h-6 text-blue-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M12 6v12"
+                            />
+                          </svg>
+                          <svg
+                            *ngIf="!isAudioFile(template.components[0])"
+                            class="w-6 h-6 text-gray-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                            />
+                          </svg>
+
+                          <!-- Texte selon le type -->
+                          <span *ngIf="isAudioFile(template.components[0])" class="ml-2 text-sm text-blue-500">Fichier Audio</span>
+                          <span *ngIf="!isAudioFile(template.components[0])" class="ml-2 text-sm text-gray-500">Document</span>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Texte header -->
+                    <div
+                      *ngIf="template.components[0].format === 'TEXT'"
+                      [innerHTML]="template.components[0].safeText"
+                      class="break-words whitespace-pre-wrap w-full"
+                    ></div>
+                  </div>
+
+                  <!-- Body -->
+                  <div
+                    *ngIf="template.components[1] && template.components[1].text"
+                    class="break-words whitespace-pre-wrap w-full"
+                    [innerHTML]="template.components[1].safeText"
+                  ></div>
+
+                  <!-- Footer -->
+                  <div *ngIf="template.components[2] && template.components[2].text" class="pt-2 border-t border-gray-100">
+                    <div class="break-words whitespace-pre-wrap w-full" [innerHTML]="template.components[2].safeText"></div>
+                  </div>
+
+                  <!-- Buttons -->
+                  <div
+                    *ngIf="template.components[3] && template.components[3].buttons?.length"
+                    class="flex flex-col gap-2 mt-3 pt-2 border-t border-gray-100"
+                  >
+                    <div
+                      *ngFor="let btn of template.components[3].buttons"
+                      class="text-center px-3 py-2 bg-green-50 text-green-700 rounded-md text-xs font-medium"
+                      [class.bg-blue-50]="btn.type === 'URL'"
+                      [class.text-blue-700]="btn.type === 'URL'"
+                      [class.bg-purple-50]="btn.type === 'PHONE_NUMBER'"
+                      [class.text-purple-700]="btn.type === 'PHONE_NUMBER'"
+                    >
+                      {{ btn.text || 'Texte du bouton' }}
+                      <span class="text-xs opacity-75 block">{{ getButtonTypeLabel(btn.type) }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mt-3 flex justify-center">
+                  <div class="h-6 w-28 bg-gray-300 rounded-full flex items-center justify-center">
+                    <div class="h-1 w-10 bg-gray-500 rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-4 text-center text-xs text-gray-500">Les champs dynamiques seront remplacés lors de l'envoi</div>
+
+              <!-- Informations sur la catégorie -->
+              <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+                <h4 class="text-xs font-medium text-gray-700 mb-2">Informations template</h4>
+                <div class="space-y-1 text-xs text-gray-600">
+                  <div>
+                    Catégorie: <span class="font-medium">{{ currentCategory.label }}</span>
+                  </div>
+                  <div>
+                    Boutons max: <span class="font-medium">{{ maxButtonsAllowed }}</span>
+                  </div>
+                  <div *ngIf="isAuthenticationCategory">
+                    OTP: <span class="font-medium">{{ otpLength }} {{ otpType.toLowerCase() }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading overlay -->
+<div *ngIf="loading" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 backdrop-filter backdrop-blur-sm">
+  <div class="bg-white p-8 rounded-xl shadow-2xl flex flex-col items-center">
+    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600"></div>
+    <p class="mt-4 text-gray-700 font-medium">Traitement en cours...</p>
+  </div>
+</div>

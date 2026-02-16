@@ -1,0 +1,75 @@
+<div class="max-w-6xl mx-auto p-6">
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <!-- Main Content -->
+    <div class="lg:col-span-3">
+      <div *ngIf="userService()" class="bg-white shadow rounded-xl p-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">
+          <span jhiTranslate="migrationApp.userService.detail.title">User Service</span>
+        </h2>
+
+        <hr class="my-4" />
+
+        <jhi-alert-error></jhi-alert-error>
+        <jhi-alert></jhi-alert>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Left Column -->
+          <div>
+            <div class="mb-4">
+              <span class="block text-gray-600 text-sm mb-1" jhiTranslate="global.field.id">ID</span>
+              <span class="font-medium text-gray-900">{{ userService()!.id }}</span>
+            </div>
+            <div class="mb-4">
+              <span class="block text-gray-600 text-sm mb-1" jhiTranslate="migrationApp.userService.service">Service</span>
+              <span class="font-medium text-gray-900">
+                <ng-container *ngIf="userService()!.service">
+                  <a [routerLink]="['/service', userService()!.service?.id, 'view']" class="text-blue-600 hover:underline">
+                    {{ userService()!.service?.id }}
+                  </a>
+                </ng-container>
+              </span>
+            </div>
+          </div>
+
+          <!-- Right Column -->
+          <div>
+            <div class="mb-4">
+              <span class="block text-gray-600 text-sm mb-1" jhiTranslate="migrationApp.userService.user">User</span>
+              <span class="font-medium text-gray-900">
+                <ng-container *ngIf="userService()!.user">
+                  <a [routerLink]="['/extended-user', userService()!.user?.id, 'view']" class="text-blue-600 hover:underline">
+                    {{ userService()!.user?.id }}
+                  </a>
+                </ng-container>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions Panel -->
+    <div>
+      <div class="bg-white shadow rounded-xl p-4 flex flex-col space-y-4">
+        <button
+          type="submit"
+          (click)="previousState()"
+          class="flex items-center justify-center px-4 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition"
+          data-cy="entityDetailsBackButton"
+        >
+          <fa-icon icon="arrow-left" class="mr-2"></fa-icon>
+          <span jhiTranslate="entity.action.back">Retour</span>
+        </button>
+
+        <button
+          type="button"
+          [routerLink]="['/user-service', userService()!.id, 'edit']"
+          class="flex items-center justify-center px-4 py-2 text-sm font-medium text-green-600 border border-green-600 rounded-lg hover:bg-green-600 hover:text-white transition"
+        >
+          <fa-icon icon="pencil-alt" class="mr-2"></fa-icon>
+          <span jhiTranslate="entity.action.edit">Editer</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

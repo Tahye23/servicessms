@@ -1,0 +1,101 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-fileextrait-heading"
+        data-cy="FileextraitCreateUpdateHeading"
+        jhiTranslate="migrationApp.fileextrait.home.createOrEditLabel"
+      >
+        Créer ou éditer un Fileextrait
+      </h2>
+
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="migrationApp.fileextrait.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        <div class="mb-3">
+          <label class="form-label" for="field_fexidfile" jhiTranslate="migrationApp.fileextrait.fexidfile">Fexidfile</label>
+          <input type="text" class="form-control" name="fexidfile" id="field_fexidfile" data-cy="fexidfile" formControlName="fexidfile" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_fexparent" jhiTranslate="migrationApp.fileextrait.fexparent">Fexparent</label>
+          <input type="text" class="form-control" name="fexparent" id="field_fexparent" data-cy="fexparent" formControlName="fexparent" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_fexdata" jhiTranslate="migrationApp.fileextrait.fexdata">Fexdata</label>
+          <div>
+            @if (editForm.get('fexdata')!.value) {
+              <div class="form-text text-danger clearfix">
+                <a
+                  class="pull-start"
+                  (click)="openFile(editForm.get('fexdata')!.value!, editForm.get('fexdataContentType')!.value!)"
+                  jhiTranslate="entity.action.open"
+                  >Ouvrir</a
+                ><br />
+                <span class="pull-start"
+                  >{{ editForm.get('fexdataContentType')!.value }}, {{ byteSize(editForm.get('fexdata')!.value!) }}</span
+                >
+                <button
+                  type="button"
+                  (click)="editForm.patchValue({ fexdata: undefined, fexdataContentType: undefined })"
+                  class="btn btn-secondary btn-xs pull-end"
+                >
+                  <fa-icon icon="times"></fa-icon>
+                </button>
+              </div>
+            }
+            <input
+              type="file"
+              id="file_fexdata"
+              data-cy="fexdata"
+              (change)="setFileData($event, 'fexdata', false)"
+              jhiTranslate="entity.action.addblob"
+            />
+          </div>
+          <input type="hidden" class="form-control" name="fexdata" id="field_fexdata" data-cy="fexdata" formControlName="fexdata" />
+          <input
+            type="hidden"
+            class="form-control"
+            name="fexdataContentType"
+            id="field_fexdataContentType"
+            formControlName="fexdataContentType"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_fextype" jhiTranslate="migrationApp.fileextrait.fextype">Fextype</label>
+          <input type="text" class="form-control" name="fextype" id="field_fextype" data-cy="fextype" formControlName="fextype" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_fexname" jhiTranslate="migrationApp.fileextrait.fexname">Fexname</label>
+          <input type="text" class="form-control" name="fexname" id="field_fexname" data-cy="fexname" formControlName="fexname" />
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Sauvegarder</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

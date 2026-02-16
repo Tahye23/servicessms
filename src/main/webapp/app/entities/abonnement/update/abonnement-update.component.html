@@ -1,0 +1,875 @@
+<div class="min-h-screen py-8 px-4">
+  <div class="max-w-6xl mx-auto">
+    <!-- En-tête moderne -->
+    <div class="mb-8">
+      <nav class="flex items-center space-x-2 text-sm text-gray-600 mb-4">
+        <a [routerLink]="['/abonnement']" class="hover:text-blue-600 transition-colors">Abonnements</a>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+        <span class="text-gray-900 font-medium"> {{ editForm.get('id')?.value ? 'Modifier' : 'Créer' }} un abonnement </span>
+      </nav>
+
+      <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
+        <div class="flex items-center space-x-4">
+          <div class="p-4 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 shadow-lg">
+            <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-3xl font-bold text-gray-900">{{ editForm.get('id')?.value ? '✏️ Modifier' : '➕ Créer' }} un Abonnement</h1>
+            <p class="text-gray-600 mt-1">Gestion avancée des abonnements avec plans personnalisés</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulaire principal -->
+    <form [formGroup]="editForm" (ngSubmit)="saveWithValidation()" novalidate class="space-y-8">
+      <!-- Alertes -->
+      <jhi-alert-error></jhi-alert-error>
+
+      <!-- ID (lecture seule) -->
+      <div *ngIf="editForm.get('id')?.value !== null" class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
+        <div class="flex items-center mb-4">
+          <div class="p-3 rounded-xl bg-gray-100">
+            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+              />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 ml-4">Identifiant</h3>
+        </div>
+        <input
+          id="id"
+          type="text"
+          formControlName="id"
+          readonly
+          class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-2xl text-gray-700 cursor-not-allowed font-mono text-lg"
+          placeholder="Auto-généré"
+        />
+      </div>
+
+      <!-- Section 1: Informations de Base -->
+      <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
+        <div class="flex items-center mb-8">
+          <div class="p-3 rounded-xl bg-blue-100">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 ml-4">📋 Informations de Base</h3>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Utilisateur -->
+          <div class="lg:col-span-2">
+            <label for="user" class="block mb-3 font-semibold text-gray-700 text-lg">
+              Utilisateur <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <select
+                id="user"
+                formControlName="user"
+                required
+                class="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 appearance-none bg-white"
+              >
+                <option [ngValue]="null" disabled>-- Sélectionner un utilisateur --</option>
+                <option *ngFor="let user of extendedUsersSharedCollection" [ngValue]="user">
+                  {{ user.id }} - {{ user.user?.login || user.phoneNumber || 'Utilisateur' }}
+                </option>
+              </select>
+              <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+            <div
+              *ngIf="editForm.get('user')?.invalid && (editForm.get('user')?.touched || editForm.get('user')?.dirty)"
+              class="mt-2 p-3 bg-red-50 border border-red-200 rounded-xl"
+            >
+              <div class="flex items-center text-red-700">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                Veuillez sélectionner un utilisateur.
+              </div>
+            </div>
+          </div>
+
+          <!-- Statut -->
+          <div>
+            <label for="status" class="block mb-3 font-semibold text-gray-700"> Statut <span class="text-red-500">*</span> </label>
+            <div class="relative">
+              <select
+                id="status"
+                formControlName="status"
+                required
+                class="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 appearance-none bg-white"
+              >
+                <option *ngFor="let status of subscriptionStatusOptions" [value]="status">
+                  {{ getStatusDisplayName(status) }}
+                </option>
+              </select>
+              <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Date de début -->
+          <div>
+            <label for="startDate" class="block mb-3 font-semibold text-gray-700">
+              Date de début <span class="text-red-500">*</span>
+            </label>
+            <input
+              id="startDate"
+              type="date"
+              formControlName="startDate"
+              required
+              class="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+            />
+          </div>
+
+          <!-- Date de fin -->
+          <div>
+            <label for="endDate" class="block mb-3 font-semibold text-gray-700"> Date de fin </label>
+            <input
+              id="endDate"
+              type="date"
+              formControlName="endDate"
+              class="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+            />
+            <p class="text-sm text-gray-500 mt-2 flex items-center">
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"
+                />
+              </svg>
+              Laissez vide pour un abonnement permanent
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Type de Plan -->
+      <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
+        <div class="flex items-center mb-8">
+          <div class="p-3 rounded-xl bg-green-100">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+              />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 ml-4">📦 Gestion du Plan d'Abonnement</h3>
+        </div>
+
+        <!-- Sélecteur de type de plan -->
+        <div class="mb-8">
+          <label class="block mb-6 font-semibold text-gray-700 text-lg">Type de plan</label>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Plan Standard -->
+            <label class="group cursor-pointer">
+              <input type="radio" [value]="false" formControlName="isCustomPlan" class="sr-only" (change)="onPlanTypeChange()" />
+              <div
+                class="p-6 border-2 rounded-2xl transition-all duration-200 group-hover:shadow-lg"
+                [class.border-green-500]="!isCustomPlan"
+                [class.bg-green-50]="!isCustomPlan"
+                [class.border-gray-300]="isCustomPlan"
+                [class.bg-white]="isCustomPlan"
+              >
+                <div class="flex items-center space-x-3">
+                  <div
+                    class="w-6 h-6 rounded-full border-2 flex items-center justify-center"
+                    [class.border-green-500]="!isCustomPlan"
+                    [class.bg-green-500]="!isCustomPlan"
+                    [class.border-gray-300]="isCustomPlan"
+                  >
+                    <div *ngIf="!isCustomPlan" class="w-3 h-3 bg-white rounded-full"></div>
+                  </div>
+                  <div>
+                    <div class="font-semibold text-gray-900 flex items-center">
+                      <span class="mr-2">📋</span>
+                      Plan Standard
+                    </div>
+                    <p class="text-sm text-gray-500">Choisir parmi les plans prédéfinis</p>
+                  </div>
+                </div>
+              </div>
+            </label>
+
+            <!-- Plan Personnalisé -->
+            <label class="group cursor-pointer">
+              <input type="radio" [value]="true" formControlName="isCustomPlan" class="sr-only" (change)="onPlanTypeChange()" />
+              <div
+                class="p-6 border-2 rounded-2xl transition-all duration-200 group-hover:shadow-lg"
+                [class.border-green-500]="isCustomPlan"
+                [class.bg-green-50]="isCustomPlan"
+                [class.border-gray-300]="!isCustomPlan"
+                [class.bg-white]="!isCustomPlan"
+              >
+                <div class="flex items-center space-x-3">
+                  <div
+                    class="w-6 h-6 rounded-full border-2 flex items-center justify-center"
+                    [class.border-green-500]="isCustomPlan"
+                    [class.bg-green-500]="isCustomPlan"
+                    [class.border-gray-300]="!isCustomPlan"
+                  >
+                    <div *ngIf="isCustomPlan" class="w-3 h-3 bg-white rounded-full"></div>
+                  </div>
+                  <div>
+                    <div class="font-semibold text-gray-900 flex items-center">
+                      <span class="mr-2">⚙️</span>
+                      Plan Personnalisé
+                    </div>
+                    <p class="text-sm text-gray-500">Créer un plan sur mesure</p>
+                  </div>
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Plan Standard -->
+        <div *ngIf="!isCustomPlan" class="space-y-6">
+          <div>
+            <label for="plan" class="block mb-3 font-semibold text-gray-700"> Plan d'abonnement <span class="text-red-500">*</span> </label>
+            <div class="relative">
+              <select
+                id="plan"
+                formControlName="plan"
+                required
+                class="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all duration-200 appearance-none bg-white"
+                (change)="onPlanChange()"
+              >
+                <option [ngValue]="null" disabled>-- Sélectionner un plan --</option>
+                <option *ngFor="let plan of planabonnementsSharedCollection" [ngValue]="plan">
+                  {{ plan.abpName }} ({{ plan.planType }}) -
+                  {{ plan.abpPrice ? plan.abpPrice + ' ' + plan.abpCurrency : 'Gratuit' }}
+                </option>
+              </select>
+              <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+            <div
+              *ngIf="editForm.get('plan')?.invalid && (editForm.get('plan')?.touched || editForm.get('plan')?.dirty)"
+              class="mt-2 p-3 bg-red-50 border border-red-200 rounded-xl"
+            >
+              <div class="flex items-center text-red-700">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                Veuillez sélectionner un plan.
+              </div>
+            </div>
+          </div>
+
+          <!-- Affichage des détails du plan sélectionné -->
+          <div *ngIf="selectedPlan" class="p-6 bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl border border-green-200">
+            <h4 class="font-bold text-gray-800 mb-6 flex items-center text-lg">
+              <div class="p-2 rounded-lg bg-green-500 mr-3">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"
+                  />
+                </svg>
+              </div>
+              Détails du plan sélectionné
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div class="text-center p-4 bg-white rounded-2xl shadow-sm border border-blue-200">
+                <div class="p-3 bg-blue-100 rounded-xl w-fit mx-auto mb-3">
+                  <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                    />
+                  </svg>
+                </div>
+                <div class="text-sm text-gray-600 mb-1">SMS</div>
+                <div class="font-bold text-xl text-blue-600">{{ formatLimit(selectedPlan.smsLimit) }}</div>
+              </div>
+
+              <div class="text-center p-4 bg-white rounded-2xl shadow-sm border border-green-200">
+                <div class="p-3 bg-green-100 rounded-xl w-fit mx-auto mb-3">
+                  <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                      d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"
+                    />
+                  </svg>
+                </div>
+                <div class="text-sm text-gray-600 mb-1">WhatsApp</div>
+                <div class="font-bold text-xl text-green-600">{{ formatLimit(selectedPlan.whatsappLimit) }}</div>
+              </div>
+
+              <div class="text-center p-4 bg-white rounded-2xl shadow-sm border border-purple-200">
+                <div class="p-3 bg-purple-100 rounded-xl w-fit mx-auto mb-3">
+                  <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+                    />
+                  </svg>
+                </div>
+                <div class="text-sm text-gray-600 mb-1">Utilisateurs</div>
+                <div class="font-bold text-xl text-purple-600">{{ formatLimit(selectedPlan.usersLimit) }}</div>
+              </div>
+
+              <div class="text-center p-4 bg-white rounded-2xl shadow-sm border border-orange-200">
+                <div class="p-3 bg-orange-100 rounded-xl w-fit mx-auto mb-3">
+                  <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                </div>
+                <div class="text-sm text-gray-600 mb-1">Templates</div>
+                <div class="font-bold text-xl text-orange-600">{{ formatLimit(selectedPlan.templatesLimit) }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Plan Personnalisé -->
+        <div *ngIf="selectedPlan || isCustomPlan" class="space-y-8">
+          <!-- Informations générales du plan personnalisé -->
+          <div class="p-6 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-200">
+            <div class="flex items-center mb-6">
+              <div class="p-3 rounded-xl bg-gray-100">
+                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
+                </svg>
+              </div>
+              <h4 class="text-lg font-bold text-gray-800 ml-4">📝 Informations Générales</h4>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div>
+                <label for="customName" class="block mb-3 font-medium text-gray-700">Nom du plan</label>
+                <input
+                  id="customName"
+                  type="text"
+                  formControlName="customName"
+                  placeholder="Ex: Plan Entreprise Spécial"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all duration-200"
+                />
+              </div>
+
+              <div>
+                <label for="customPrice" class="block mb-3 font-medium text-gray-700">Prix (MRU)</label>
+                <input
+                  id="customPrice"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  formControlName="customPrice"
+                  placeholder="0.00"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all duration-200"
+                />
+              </div>
+
+              <div>
+                <label for="customPeriod" class="block mb-3 font-medium text-gray-700">Période de facturation</label>
+                <div class="relative">
+                  <select
+                    id="customPeriod"
+                    formControlName="customPeriod"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all duration-200 appearance-none bg-white"
+                  >
+                    <option value="">-- Sélectionner une période --</option>
+                    <option value="MONTHLY">Mensuel</option>
+                    <option value="YEARLY">Annuel</option>
+                    <option value="LIFETIME">À vie</option>
+                  </select>
+                  <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label for="customDescription" class="block mb-3 font-medium text-gray-700">Description</label>
+                <textarea
+                  id="customDescription"
+                  formControlName="customDescription"
+                  rows="3"
+                  placeholder="Description du plan personnalisé..."
+                  class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all duration-200 resize-none"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Limites des ressources -->
+          <div class="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-200">
+            <div class="flex items-center mb-6">
+              <div class="p-3 rounded-xl bg-blue-100">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
+                </svg>
+              </div>
+              <h4 class="text-lg font-bold text-gray-800 ml-4">🔢 Limites des Ressources</h4>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div>
+                <label for="customSmsLimit" class="block mb-3 font-medium text-gray-700"> SMS par mois </label>
+                <input
+                  id="customSmsLimit"
+                  type="number"
+                  min="-1"
+                  formControlName="customSmsLimit"
+                  placeholder="Ex: 1000"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+                />
+                <p class="text-xs text-gray-500 mt-1">-1 = illimité</p>
+              </div>
+
+              <div>
+                <label for="customWhatsappLimit" class="block mb-3 font-medium text-gray-700"> WhatsApp par mois </label>
+                <input
+                  id="customWhatsappLimit"
+                  type="number"
+                  min="-1"
+                  formControlName="customWhatsappLimit"
+                  placeholder="Ex: 1000"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+                />
+                <p class="text-xs text-gray-500 mt-1">-1 = illimité</p>
+              </div>
+
+              <div>
+                <label for="customUsersLimit" class="block mb-3 font-medium text-gray-700"> Nombre d'utilisateurs </label>
+                <input
+                  id="customUsersLimit"
+                  type="number"
+                  min="-1"
+                  formControlName="customUsersLimit"
+                  placeholder="Ex: 10"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+                />
+                <p class="text-xs text-gray-500 mt-1">-1 = illimité</p>
+              </div>
+
+              <div>
+                <label for="customTemplatesLimit" class="block mb-3 font-medium text-gray-700"> Templates </label>
+                <input
+                  id="customTemplatesLimit"
+                  type="number"
+                  min="-1"
+                  formControlName="customTemplatesLimit"
+                  placeholder="Ex: 50"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+                />
+                <p class="text-xs text-gray-500 mt-1">-1 = illimité</p>
+              </div>
+
+              <div>
+                <label for="customApiCallsLimit" class="block mb-3 font-medium text-gray-700"> Appels API/jour </label>
+                <input
+                  id="customApiCallsLimit"
+                  type="number"
+                  min="-1"
+                  formControlName="customApiCallsLimit"
+                  placeholder="Ex: 5000"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+                />
+                <p class="text-xs text-gray-500 mt-1">-1 = illimité</p>
+              </div>
+
+              <div>
+                <label for="customStorageLimitMb" class="block mb-3 font-medium text-gray-700"> Stockage (MB) </label>
+                <input
+                  id="customStorageLimitMb"
+                  type="number"
+                  min="1"
+                  formControlName="customStorageLimitMb"
+                  placeholder="Ex: 1000"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Permissions -->
+          <div class="p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl border border-purple-200">
+            <div class="flex items-center mb-6">
+              <div class="p-3 rounded-xl bg-purple-100">
+                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                  />
+                </svg>
+              </div>
+              <h4 class="text-lg font-bold text-gray-800 ml-4">🔐 Permissions et Fonctionnalités</h4>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="group">
+                <label
+                  class="flex items-center p-4 bg-white rounded-2xl border border-gray-200 cursor-pointer hover:shadow-md transition-all duration-200"
+                >
+                  <input
+                    id="customCanManageUsers"
+                    type="checkbox"
+                    formControlName="customCanManageUsers"
+                    class="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
+                  />
+                  <div class="ml-4">
+                    <div class="flex items-center font-medium text-gray-700">
+                      <span class="mr-2">👥</span>
+                      Gérer les utilisateurs
+                    </div>
+                    <p class="text-sm text-gray-500">Ajouter, modifier et supprimer des utilisateurs</p>
+                  </div>
+                </label>
+              </div>
+
+              <div class="group">
+                <label
+                  class="flex items-center p-4 bg-white rounded-2xl border border-gray-200 cursor-pointer hover:shadow-md transition-all duration-200"
+                >
+                  <input
+                    id="customCanManageTemplates"
+                    type="checkbox"
+                    formControlName="customCanManageTemplates"
+                    class="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
+                  />
+                  <div class="ml-4">
+                    <div class="flex items-center font-medium text-gray-700">
+                      <span class="mr-2">📝</span>
+                      Gérer les templates
+                    </div>
+                    <p class="text-sm text-gray-500">Créer et modifier des modèles de messages</p>
+                  </div>
+                </label>
+              </div>
+
+              <div class="group">
+                <label
+                  class="flex items-center p-4 bg-white rounded-2xl border border-gray-200 cursor-pointer hover:shadow-md transition-all duration-200"
+                >
+                  <input
+                    id="customCanViewConversations"
+                    type="checkbox"
+                    formControlName="customCanViewConversations"
+                    class="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
+                  />
+                  <div class="ml-4">
+                    <div class="flex items-center font-medium text-gray-700">
+                      <span class="mr-2">💬</span>
+                      Voir les conversations
+                    </div>
+                    <p class="text-sm text-gray-500">Accéder à l'historique des conversations</p>
+                  </div>
+                </label>
+              </div>
+
+              <div class="group">
+                <label
+                  class="flex items-center p-4 bg-white rounded-2xl border border-gray-200 cursor-pointer hover:shadow-md transition-all duration-200"
+                >
+                  <input
+                    id="customCanViewAnalytics"
+                    type="checkbox"
+                    formControlName="customCanViewAnalytics"
+                    class="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
+                  />
+                  <div class="ml-4">
+                    <div class="flex items-center font-medium text-gray-700">
+                      <span class="mr-2">📊</span>
+                      Voir les analytics
+                    </div>
+                    <p class="text-sm text-gray-500">Accéder aux statistiques et rapports</p>
+                  </div>
+                </label>
+              </div>
+
+              <div class="group md:col-span-2">
+                <label
+                  class="flex items-center p-4 bg-white rounded-2xl border border-gray-200 cursor-pointer hover:shadow-md transition-all duration-200"
+                >
+                  <input
+                    id="customPrioritySupport"
+                    type="checkbox"
+                    formControlName="customPrioritySupport"
+                    class="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
+                  />
+                  <div class="ml-4">
+                    <div class="flex items-center font-medium text-gray-700">
+                      <span class="mr-2">🚀</span>
+                      Support prioritaire
+                    </div>
+                    <p class="text-sm text-gray-500">Accès au support technique prioritaire</p>
+                  </div>
+                </label>
+              </div>
+              <div class="group">
+                <label
+                  class="flex items-center p-4 bg-white rounded-2xl border border-gray-200 cursor-pointer hover:shadow-md transition-all duration-200"
+                >
+                  <input
+                    id="canViewDashboard"
+                    type="checkbox"
+                    formControlName="canViewDashboard"
+                    class="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
+                  />
+                  <div class="ml-4">
+                    <div class="flex items-center font-medium text-gray-700">
+                      <span class="mr-2">📊</span>
+                      Accès au dashboard
+                    </div>
+                    <p class="text-sm text-gray-500">Voir les statistiques et rapports globaux</p>
+                  </div>
+                </label>
+              </div>
+
+              <!-- Gestion API -->
+              <div class="group">
+                <label
+                  class="flex items-center p-4 bg-white rounded-2xl border border-gray-200 cursor-pointer hover:shadow-md transition-all duration-200"
+                >
+                  <input
+                    id="canManageAPI"
+                    type="checkbox"
+                    formControlName="canManageAPI"
+                    class="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
+                  />
+                  <div class="ml-4">
+                    <div class="flex items-center font-medium text-gray-700">
+                      <span class="mr-2">🔑</span>
+                      Gestion de l'API
+                    </div>
+                    <p class="text-sm text-gray-500">Autoriser l'accès et la gestion des clés API</p>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Crédits et Ressources -->
+      <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
+        <div class="flex items-center mb-8">
+          <div class="p-3 rounded-xl bg-emerald-100">
+            <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+              />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 ml-4">💳 Crédits Supplémentaires</h3>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Crédits SMS -->
+          <div class="p-6 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl border border-blue-200">
+            <div class="flex items-center mb-6">
+              <label class="flex items-center cursor-pointer">
+                <input
+                  id="bonusSmsEnabled"
+                  type="checkbox"
+                  formControlName="bonusSmsEnabled"
+                  class="w-6 h-6 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                />
+                <div class="ml-4">
+                  <div class="font-bold text-gray-700 text-lg flex items-center">
+                    <span class="mr-2">📨</span>
+                    Ajouter crédits SMS
+                  </div>
+                  <p class="text-sm text-gray-500">Allocation de SMS supplémentaires</p>
+                </div>
+              </label>
+            </div>
+
+            <div *ngIf="editForm.get('bonusSmsEnabled')?.value" class="space-y-4">
+              <div>
+                <label for="bonusSmsAmount" class="block mb-3 font-medium text-gray-700"> Nombre de crédits SMS </label>
+                <input
+                  id="bonusSmsAmount"
+                  type="number"
+                  min="0"
+                  formControlName="bonusSmsAmount"
+                  placeholder="Ex: 100"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+                />
+                <p class="text-xs text-gray-400 mt-2">Crédits valables pendant la durée de l'abonnement</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Crédits WhatsApp -->
+          <div class="p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border border-green-200">
+            <div class="flex items-center mb-6">
+              <label class="flex items-center cursor-pointer">
+                <input
+                  id="bonusWhatsappEnabled"
+                  type="checkbox"
+                  formControlName="bonusWhatsappEnabled"
+                  class="w-6 h-6 text-green-600 border-gray-300 rounded focus:ring-2 focus:ring-green-500"
+                />
+                <div class="ml-4">
+                  <div class="font-bold text-gray-700 text-lg flex items-center">
+                    <span class="mr-2">📲</span>
+                    Ajouter crédits WhatsApp
+                  </div>
+                  <p class="text-sm text-gray-500">Allocation de messages WhatsApp supplémentaires</p>
+                </div>
+              </label>
+            </div>
+
+            <div *ngIf="editForm.get('bonusWhatsappEnabled')?.value" class="space-y-4">
+              <div>
+                <label for="bonusWhatsappAmount" class="block mb-3 font-medium text-gray-700"> Nombre de crédits WhatsApp </label>
+                <input
+                  id="bonusWhatsappAmount"
+                  type="number"
+                  min="0"
+                  formControlName="bonusWhatsappAmount"
+                  placeholder="Ex: 100"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all duration-200"
+                />
+                <p class="text-xs text-gray-400 mt-2">Crédits valables pendant la durée de l'abonnement</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Informations supplémentaires sur les crédits -->
+        <div class="mt-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-blue-500 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                clip-rule="evenodd"
+              ></path>
+            </svg>
+            <div>
+              <h4 class="font-medium text-gray-900 mb-1">À propos des crédits supplémentaires</h4>
+              <p class="text-sm text-gray-600">
+                Les crédits supplémentaires s'ajoutent aux limites de base du plan et sont disponibles immédiatement après activation de
+                l'abonnement.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Boutons d'action -->
+      <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+          <!-- Informations de statut -->
+          <div class="flex items-center space-x-4">
+            <div class="p-3 rounded-xl bg-gray-100">
+              <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">Statut du formulaire</p>
+              <p class="font-semibold text-gray-900">
+                {{ editForm.valid ? 'Prêt à enregistrer' : 'Champs requis manquants' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Boutons -->
+          <div class="flex space-x-4">
+            <button
+              type="button"
+              (click)="previousState()"
+              class="flex items-center px-6 py-3 bg-white/70 backdrop-blur-sm border border-gray-300 rounded-2xl shadow-lg text-gray-700 font-medium hover:bg-white hover:shadow-xl transition-all duration-300"
+              [disabled]="isSaving"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Annuler
+            </button>
+
+            <button
+              type="submit"
+              class="flex items-center px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              [disabled]="isSaving"
+            >
+              <svg *ngIf="!isSaving" class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              <svg
+                *ngIf="isSaving"
+                class="w-5 h-5 mr-2 animate-spin"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+              {{ isSaving ? 'Enregistrement...' : editForm.get('id')?.value ? "Modifier l'abonnement" : "Créer l'abonnement" }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

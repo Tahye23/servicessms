@@ -1,0 +1,188 @@
+<style>
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th,
+  td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 2px solid #ccc; /* La couleur et l'épaisseur de la barre */
+  }
+</style>
+
+<p-card
+  [style]="{
+    border: '2px solid white ',
+    borderRadius: '20px',
+    margin: '30px'
+  }"
+  header="Fileextraits"
+>
+  <h2 id="page-heading" data-cy="FileextraitHeading">
+    <div class="d-flex justify-content-start">
+      <p-button
+        (click)="load()"
+        [disabled]="isLoading"
+        [style]="{
+          border: '2px solid ',
+          borderRadius: '10px',
+          width: '180px',
+          fontSize: '14px',
+          margin: '3px'
+        }"
+        pRipple
+        size="small"
+        styleClass="p-button-sm"
+        [outlined]="true"
+        severity="info"
+      >
+        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+        <span jhiTranslate="migrationApp.fileextrait.home.refreshListLabel">Actualiser la liste</span>
+      </p-button>
+
+      <p-button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        [style]="{
+          border: '2px solid ',
+          borderRadius: '10px',
+          width: '220px',
+          fontSize: '14px',
+          margin: '3px'
+        }"
+        styleClass="p-button-sm"
+        p-button-rounded
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        [outlined]="true"
+        severity="info"
+        [routerLink]="['/fileextrait/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="migrationApp.fileextrait.home.createLabel">Créer un nouveau Fileextrait</span>
+      </p-button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  @if (fileextraits?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="migrationApp.fileextrait.home.notFound">Aucun Fileextrait trouvé</span>
+    </div>
+  }
+
+  @if (fileextraits && fileextraits.length > 0) {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="global.field.id">ID</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="fexidfile">
+              <div class="d-flex">
+                <span jhiTranslate="migrationApp.fileextrait.fexidfile">Fexidfile</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="fexparent">
+              <div class="d-flex">
+                <span jhiTranslate="migrationApp.fileextrait.fexparent">Fexparent</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="fexdata">
+              <div class="d-flex">
+                <span jhiTranslate="migrationApp.fileextrait.fexdata">Fexdata</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="fextype">
+              <div class="d-flex">
+                <span jhiTranslate="migrationApp.fileextrait.fextype">Fextype</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="fexname">
+              <div class="d-flex">
+                <span jhiTranslate="migrationApp.fileextrait.fexname">Fexname</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (fileextrait of fileextraits; track trackId) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/fileextrait', fileextrait.id, 'view']">{{ fileextrait.id }}</a>
+              </td>
+              <td>{{ fileextrait.fexidfile }}</td>
+              <td>{{ fileextrait.fexparent }}</td>
+              <td>
+                @if (fileextrait.fexdata) {
+                  <a (click)="openFile(fileextrait.fexdata, fileextrait.fexdataContentType)" jhiTranslate="entity.action.open">Ouvrir</a>
+                  <span>{{ fileextrait.fexdataContentType }}, {{ byteSize(fileextrait.fexdata) }}</span>
+                }
+              </td>
+              <td>{{ fileextrait.fextype }}</td>
+              <td>{{ fileextrait.fexname }}</td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/fileextrait', fileextrait.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Voir</span>
+                  </a>
+
+                  <a [routerLink]="['/fileextrait', fileextrait.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editer</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(fileextrait)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Supprimer</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (fileextraits && fileextraits.length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page, totalItems: totalItems, itemsPerPage: itemsPerPage }"></jhi-item-count>
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems"
+          [page]="page"
+          [pageSize]="itemsPerPage"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        ></ngb-pagination>
+      </div>
+    </div>
+  }
+</p-card>

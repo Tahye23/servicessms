@@ -1,0 +1,36 @@
+{
+  "annotations": {
+    "changelogDate": "20240722133952"
+  },
+  "fields": [
+    {
+      "fieldName": "qusordre",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "qusmessage",
+      "fieldType": "String"
+    }
+  ],
+  "name": "Question",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "company",
+      "relationshipName": "qusenquette",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "referentiel",
+      "relationshipName": "qustypequestion",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "no"
+}

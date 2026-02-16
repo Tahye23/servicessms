@@ -1,0 +1,850 @@
+<div *ngIf="viewMode === 'LIST'">
+  <p-table [value]="configs">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Canal</th>
+        <th>Utilisateur</th>
+        <th>Host</th>
+        <th>Port</th>
+        <th>Info</th>
+        <th>Statut</th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-cfg>
+      <tr>
+        <td>{{ cfg.channel }}</td>
+        <td>{{ cfg.username || '-' }}</td>
+        <td>{{ cfg.host || '-' }}</td>
+        <td>{{ cfg.port || '-' }}</td>
+        <td>{{ cfg.extraInfo || '-' }}</td>
+        <td>
+          <span [class.ok]="cfg.verified">✔</span>
+          <span [class.ko]="!cfg.verified">✖</span>
+        </td>
+        <td>
+          <button (click)="openCreate(cfg.channel)">Modifier</button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <button (click)="openCreate('WHATSAPP')">+ WhatsApp</button>
+  <button (click)="openCreate('SMS')">+ SMS</button>
+  <button (click)="openCreate('EMAIL')">+ Email</button>
+</div>
+
+<div *ngIf="viewMode === 'FORM'">
+  <!-- tes composants existants -->
+</div>
+
+<div
+  class="min-h-screen py-6 px-2 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900"
+>
+  <!-- Onglets -->
+  <div class="flex items-center gap-3 p-2 bg-gradient-to-r from-slate-50 to-slate-100 rounded-2xl w-fit">
+    <!-- WhatsApp -->
+    <button
+      (click)="switchTab('WHATSAPP')"
+      [ngClass]="
+        activeTab === 'WHATSAPP'
+          ? 'bg-gradient-to-br from-green-400 to-green-600 text-white shadow-lg shadow-green-200'
+          : 'bg-white/70 text-gray-600 hover:text-green-600 hover:bg-white'
+      "
+      class="relative px-6 py-3 rounded-xl font-semibold transition-all duration-300 ease-out flex items-center gap-2 group backdrop-blur-sm"
+    >
+      <!-- Icône WhatsApp -->
+      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+        <path
+          d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.272-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371 0-.57 0-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-9.746 9.806c0 2.734.732 5.4 2.124 7.738L2.929 22l2.262-.727A9.845 9.845 0 0012.051 24c5.428 0 9.835-4.406 9.835-9.835 0-2.63-.997-5.098-2.81-6.95A9.823 9.823 0 0012.051 2.5h-.004zm0 18.335c-2.11 0-4.17-.652-5.914-1.88l-.424-.252-4.395 1.412 1.436-4.244-.262-.415A8.368 8.368 0 013.667 12.051c0-4.627 3.766-8.393 8.384-8.393 2.236 0 4.34.869 5.924 2.446 1.583 1.577 2.455 3.682 2.455 5.924 0 4.627-3.766 8.393-8.384 8.393z"
+        />
+      </svg>
+      <span>WhatsApp</span>
+      <div
+        class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        [ngClass]="activeTab === 'WHATSAPP' ? 'hidden' : 'bg-green-50/30'"
+      ></div>
+    </button>
+
+    <!-- SMS -->
+    <button
+      (click)="switchTab('SMS')"
+      [ngClass]="
+        activeTab === 'SMS'
+          ? 'bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-lg shadow-blue-200'
+          : 'bg-white/70 text-gray-600 hover:text-blue-600 hover:bg-white'
+      "
+      class="relative px-6 py-3 rounded-xl font-semibold transition-all duration-300 ease-out flex items-center gap-2 group backdrop-blur-sm"
+    >
+      <!-- Icône SMS -->
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v9a2 2 0 01-2 2h-4l-4 4v-4z"
+        />
+      </svg>
+      <span>SMS</span>
+      <div
+        class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        [ngClass]="activeTab === 'SMS' ? 'hidden' : 'bg-blue-50/30'"
+      ></div>
+    </button>
+
+    <!-- Email (Gmail Style) -->
+    <button
+      (click)="switchTab('EMAIL')"
+      [ngClass]="
+        activeTab === 'EMAIL' ? 'bg-gradient-to-br from-red-500 to-red-600 text-white shadow-md' : 'bg-white text-gray-700 hover:bg-gray-50'
+      "
+      class="px-5 py-2 rounded-md font-medium transition-all duration-200 ease-out flex items-center gap-2 text-sm"
+    >
+      <!-- Gmail Icon Style -->
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none">
+        <!-- Enveloppe Gmail avec triangle rouge et bleu -->
+        <rect
+          x="2"
+          y="4"
+          width="20"
+          height="16"
+          rx="1"
+          [ngClass]="activeTab === 'EMAIL' ? 'fill-white/20 stroke-white stroke-1' : 'fill-none stroke-gray-300 stroke-1.5'"
+        />
+        <path
+          d="M2 4l10 8l10-8"
+          [ngClass]="activeTab === 'EMAIL' ? 'stroke-white stroke-1.5' : 'stroke-gray-400 stroke-1.5'"
+          fill="none"
+          stroke-linecap="round"
+        />
+        <!-- Points de couleur Gmail caractéristiques -->
+        <circle cx="6" cy="8" r="1.5" class="fill-red-500" [style.opacity]="activeTab === 'EMAIL' ? '0.3' : '1'" />
+        <circle cx="12" cy="8" r="1.5" class="fill-yellow-500" [style.opacity]="activeTab === 'EMAIL' ? '0.3' : '1'" />
+        <circle cx="18" cy="8" r="1.5" class="fill-blue-500" [style.opacity]="activeTab === 'EMAIL' ? '0.3' : '1'" />
+      </svg>
+      <span>Email</span>
+    </button>
+  </div>
+
+  <style>
+    /* Animation hover subtile Gmail style */
+    button {
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Effet ripple au survol */
+    button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      transform: translate(-50%, -50%);
+      transition:
+        width 0.6s,
+        height 0.6s;
+    }
+
+    button:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+  </style>
+
+  <!-- Contenu selon onglet -->
+  <div class="mt-6">
+    <!-- WhatsApp -->
+    <div *ngIf="activeTab === 'WHATSAPP'">
+      <div class="max-w-5xl mx-auto space-y-8">
+        <div
+          class="min-h-screen py-6 px-2 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900"
+        >
+          <div class="max-w-5xl mx-auto space-y-8">
+            <!-- Header Parallax -->
+            <header
+              class="relative overflow-hidden bg-gradient-to-r from-indigo-700 via-purple-700 to-blue-700 rounded-3xl py-10 px-5 sm:px-10 shadow-2xl"
+            >
+              <div class="absolute inset-0 bg-black/30 rounded-3xl"></div>
+              <div class="relative text-center z-10">
+                <h1 class="text-3xl sm:text-5xl font-extrabold text-white mb-3 drop-shadow-xl">
+                  Configuration
+                  <span class="bg-gradient-to-r from-yellow-300 to-orange-400 bg-clip-text text-transparent animate-gradient">
+                    WhatsApp API
+                  </span>
+                </h1>
+                <p class="text-lg sm:text-xl text-indigo-100 max-w-2xl mx-auto drop-shadow">
+                  Configurez votre intégration Meta WhatsApp Business en quelques clics
+                </p>
+              </div>
+              <div class="absolute -top-16 -right-16 w-40 h-40 bg-white opacity-10 rounded-full blur-2xl"></div>
+              <div class="absolute -bottom-16 -left-16 w-40 h-40 bg-white opacity-10 rounded-full blur-2xl"></div>
+            </header>
+
+            <!-- Guide de configuration -->
+            <section
+              class="backdrop-blur-xl bg-white/80 border border-white/30 shadow-2xl rounded-3xl p-5 sm:p-8 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+            >
+              <div class="flex items-center gap-4 mb-6">
+                <div
+                  class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg"
+                >
+                  <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                  Guide de configuration
+                </h2>
+              </div>
+              <div class="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-100 rounded-2xl p-4 sm:p-6 shadow-inner">
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-800 mb-6 flex items-center">
+                  <span class="w-8 h-8 bg-indigo-500 text-white rounded-full flex items-center justify-center text-base font-bold mr-3"
+                    >1</span
+                  >
+                  Comment configurer votre API Meta WhatsApp
+                </h3>
+                <div class="grid sm:grid-cols-2 gap-4">
+                  <div class="space-y-2">
+                    <div class="flex items-center p-3 bg-white rounded-xl shadow-sm hover:shadow-md transition">
+                      <span class="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3"
+                        >✓</span
+                      >
+                      <span class="text-sm text-gray-700"
+                        >Accédez au
+                        <a
+                          href="https://developers.facebook.com/apps/"
+                          target="_blank"
+                          class="text-indigo-600 hover:text-indigo-800 underline decoration-2 underline-offset-2 font-medium"
+                          >Meta Developers Portal</a
+                        >
+                      </span>
+                    </div>
+                    <div class="flex items-center p-3 bg-white rounded-xl shadow-sm hover:shadow-md transition">
+                      <span class="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3"
+                        >✓</span
+                      >
+                      <span class="text-sm text-gray-700">Créez ou sélectionnez votre application</span>
+                    </div>
+                    <div class="flex items-center p-3 bg-white rounded-xl shadow-sm hover:shadow-md transition">
+                      <span class="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3"
+                        >✓</span
+                      >
+                      <span class="text-sm text-gray-700">Activez l'API WhatsApp Business</span>
+                    </div>
+                  </div>
+                  <div class="space-y-2">
+                    <div class="flex items-center p-3 bg-white rounded-xl shadow-sm hover:shadow-md transition">
+                      <span class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3"
+                        >4</span
+                      >
+                      <span class="text-sm text-gray-700">Collez l'URL du Webhook ci-dessous dans le portail</span>
+                    </div>
+                    <div class="flex items-center p-3 bg-white rounded-xl shadow-sm hover:shadow-md transition">
+                      <span class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3"
+                        >5</span
+                      >
+                      <span class="text-sm text-gray-700">Générez un token d'accès permanent et copiez-le</span>
+                    </div>
+                    <div class="flex items-center p-3 bg-white rounded-xl shadow-sm hover:shadow-md transition">
+                      <span class="w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3"
+                        >6</span
+                      >
+                      <span class="text-sm text-gray-700">Récupérez les URL d'API nécessaires</span>
+                    </div>
+                    <div class="flex items-center p-3 bg-white rounded-xl shadow-sm hover:shadow-md transition">
+                      <span class="w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3"
+                        >7</span
+                      >
+                      <span class="text-sm text-gray-700">Enregistrez la configuration et testez la connexion</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Administration Avancée -->
+            <section
+              class="backdrop-blur-xl bg-white/90 border border-white/30 shadow-2xl rounded-3xl p-5 sm:p-8 hover:shadow-2xl transition-all duration-300"
+            >
+              <!-- Header Section -->
+              <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 mb-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                  <!-- Title Section -->
+                  <div class="flex items-center">
+                    <div class="relative">
+                      <div
+                        class="w-12 sm:w-14 h-12 sm:h-14 bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/25"
+                      >
+                        <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37z"
+                          />
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                      </div>
+                      <div
+                        class="absolute -inset-1 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl opacity-20 animate-pulse"
+                      ></div>
+                    </div>
+                    <div class="ml-3 sm:ml-4">
+                      <h2
+                        class="text-xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 bg-clip-text text-transparent"
+                      >
+                        Administration Avancée
+                      </h2>
+                      <p class="text-gray-500 text-xs sm:text-sm mt-1 font-medium">Configurez votre intégration WhatsApp</p>
+                    </div>
+                  </div>
+                  <!-- Actions Section -->
+                  <!-- Actions Section -->
+                  <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-x-3 gap-y-2 w-full">
+                    <!-- Configuration Persistence Button -->
+                    <button
+                      *ngIf="isAdmin()"
+                      (click)="goToConfigAdmin()"
+                      class="group relative inline-flex items-center justify-center px-5 py-3 bg-gradient-to-r from-slate-50 to-gray-100 hover:from-slate-100 hover:to-gray-200 text-gray-700 hover:text-gray-900 rounded-xl font-semibold transition-all duration-300 shadow-sm hover:shadow-md border border-gray-200/50 hover:border-gray-300/50 transform hover:-translate-y-0.5 w-full sm:w-auto"
+                    >
+                      <svg
+                        class="w-4 h-4 mr-2 transition-transform group-hover:scale-110"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37z"
+                        />
+                      </svg>
+                      <span class="text-sm lg:text-base">Configuration</span>
+                    </button>
+
+                    <!-- Dev Mode Toggle -->
+                    <div class="group relative w-full sm:w-auto">
+                      <label
+                        class="flex items-center cursor-pointer bg-white hover:bg-gray-50 rounded-xl px-4 py-3 border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md transition-all duration-300 w-full sm:w-auto"
+                      >
+                        <span class="mr-3 text-sm lg:text-base font-semibold text-gray-700 group-hover:text-gray-900">Mode Dév</span>
+                        <div class="relative">
+                          <input type="checkbox" [(ngModel)]="showAdminOptions" class="sr-only peer" />
+                          <div
+                            class="w-12 h-6 bg-gray-200 peer-checked:bg-gradient-to-r peer-checked:from-indigo-500 peer-checked:to-purple-600 rounded-full transition-all duration-300 shadow-inner peer-checked:shadow-indigo-200"
+                          ></div>
+                          <div
+                            class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transform peer-checked:translate-x-6 transition-all duration-300 peer-checked:shadow-lg"
+                          ></div>
+                        </div>
+                      </label>
+                    </div>
+
+                    <!-- Coexistence Button -->
+                    <button
+                      (click)="launchCoexistenceSignup()"
+                      class="group relative inline-flex items-center justify-center px-5 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-white rounded-xl font-semibold transition-all duration-300 shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 transform hover:-translate-y-0.5 w-full sm:w-auto"
+                    >
+                      <span class="text-sm lg:text-base">Coexistence</span>
+                    </button>
+
+                    <!-- Auto Connection Button -->
+                    <button
+                      type="button"
+                      (click)="launchMetaSignup()"
+                      class="group relative inline-flex items-center justify-center px-5 py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-xl font-semibold transition-all duration-300 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transform hover:-translate-y-0.5 w-full sm:w-auto"
+                    >
+                      <svg
+                        class="h-4 w-4 mr-2 transition-transform group-hover:rotate-12"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                        />
+                      </svg>
+                      <span class="text-sm lg:text-base">Connexion auto</span>
+                    </button>
+
+                    <!-- Enable Coexistence Button -->
+                    <button
+                      type="button"
+                      (click)="enableCoexistence()"
+                      [disabled]="!configForm.valid || coexistenceLoading"
+                      class="group relative inline-flex items-center justify-center px-5 py-3 bg-gradient-to-r from-orange-400 to-amber-500 hover:from-orange-500 hover:to-amber-600 disabled:from-gray-300 disabled:to-gray-400 text-white rounded-xl font-semibold transition-all duration-300 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 disabled:shadow-none transform hover:-translate-y-0.5 disabled:hover:translate-y-0 disabled:cursor-not-allowed w-full sm:w-auto"
+                    >
+                      <svg
+                        *ngIf="coexistenceLoading"
+                        class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path
+                          class="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      <span class="text-sm lg:text-base">{{ coexistenceLoading ? 'Activation…' : 'Activer Coexistence' }}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <!-- Success Message -->
+              <div
+                *ngIf="configForm.get('valid')?.value && !showAdminOptions"
+                class="bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-4 shadow-sm"
+              >
+                <div class="flex items-center">
+                  <div class="flex-shrink-0">
+                    <div
+                      class="w-8 h-8 bg-gradient-to-r from-emerald-500 to-green-600 rounded-full flex items-center justify-center shadow-sm"
+                    >
+                      <svg
+                        class="w-5 h-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="ml-3">
+                    <p class="text-emerald-800 font-semibold text-sm lg:text-base">Configuration validée avec succès</p>
+                    <p class="text-emerald-600 text-xs lg:text-sm mt-1">Votre intégration WhatsApp est prête à être utilisée</p>
+                    <p class="text-emerald-600 text-xs lg:text-sm mt-1">Votre intégration WhatsApp est prête à être utilisée</p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                *ngIf="showAdminOptions"
+                class="bg-gradient-to-br from-white/90 to-gray-50/90 border border-gray-200 rounded-2xl p-8 shadow-inner backdrop-blur-sm"
+              >
+                <h3 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+                  <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center mr-3">
+                    <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </div>
+                  Configuration API Meta-WhatsApp
+                </h3>
+
+                <!-- Webhook -->
+                <div class="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 shadow-sm">
+                  <label class="block text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                    <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                      />
+                    </svg>
+                    URL du Webhook
+                  </label>
+                  <div class="flex rounded-xl overflow-hidden shadow-md">
+                    <input
+                      [value]="webhookUrl"
+                      readonly
+                      class="flex-1 bg-white border-0 px-4 py-3 font-mono text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
+                    <button
+                      (click)="copyWebhook()"
+                      [disabled]="webhookCopied"
+                      class="bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 disabled:from-green-500 disabled:to-green-600 text-white px-6 py-3 flex items-center transition-all duration-300 transform hover:scale-105 disabled:scale-100"
+                    >
+                      <svg *ngIf="!webhookCopied" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6..." />
+                      </svg>
+                      <svg *ngIf="webhookCopied" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      {{ webhookCopied ? 'Copié !' : 'Copier' }}
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Formulaire -->
+                <form [formGroup]="configForm" class="space-y-6">
+                  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Business ID -->
+                    <div class="group">
+                      <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        ID Business <span class="text-red-500">*</span>
+                      </label>
+                      <div class="relative">
+                        <input
+                          formControlName="businessId"
+                          type="text"
+                          placeholder="1234567890"
+                          (input)="onFieldChange('businessId')"
+                          class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md group-focus-within:scale-102 group-focus-within:shadow-lg"
+                        />
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                          <svg
+                            class="w-5 h-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                      <p
+                        *ngIf="configForm.get('businessId')?.invalid && configForm.get('businessId')?.touched"
+                        class="mt-2 text-red-500 text-sm flex items-center"
+                      >
+                        <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        Requis
+                      </p>
+                    </div>
+
+                    <!-- Access Token -->
+                    <div class="group">
+                      <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Token d'accès <span class="text-red-500">*</span>
+                      </label>
+                      <div class="relative">
+                        <input
+                          formControlName="accessToken"
+                          type="password"
+                          placeholder="EAAI..."
+                          (input)="onFieldChange('accessToken')"
+                          class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md group-focus-within:scale-102 group-focus-within:shadow-lg"
+                        />
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                          <svg
+                            class="w-5 h-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M15 7a2 2 0 012 2m0 0a2 2 0 012 2v6a2 2 0 01-2 2H7a2 2 0 01-2-2V9a2 2 0 012-2m8 0V7a2 2 0 00-2-2H9a2 2 0 00-2 2v2m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v0"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                      <p
+                        *ngIf="configForm.get('accessToken')?.invalid && configForm.get('accessToken')?.touched"
+                        class="mt-2 text-red-500 text-sm flex items-center"
+                      >
+                        <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        Requis
+                      </p>
+                    </div>
+
+                    <!-- Phone Number ID -->
+                    <div class="group">
+                      <label class="block text-sm font-semibold text-gray-700 mb-2"> ID Numéro <span class="text-red-500">*</span> </label>
+                      <div class="relative">
+                        <input
+                          formControlName="phoneNumberId"
+                          type="text"
+                          placeholder="9876543210"
+                          (input)="onFieldChange('phoneNumberId')"
+                          class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md group-focus-within:scale-102 group-focus-within:shadow-lg"
+                        />
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                          <svg
+                            class="w-5 h-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                      <p
+                        *ngIf="configForm.get('phoneNumberId')?.invalid && configForm.get('phoneNumberId')?.touched"
+                        class="mt-2 text-red-500 text-sm flex items-center"
+                      >
+                        <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        Requis
+                      </p>
+                    </div>
+
+                    <!-- App ID -->
+                    <div class="group">
+                      <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        ID Application <span class="text-red-500">*</span>
+                      </label>
+                      <div class="relative">
+                        <input
+                          formControlName="appId"
+                          type="text"
+                          placeholder="9876543210"
+                          (input)="onFieldChange('appId')"
+                          class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm hover:shadow-md group-focus-within:scale-102 group-focus-within:shadow-lg"
+                        />
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                          <svg
+                            class="w-5 h-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                      <p
+                        *ngIf="configForm.get('appId')?.invalid && configForm.get('appId')?.touched"
+                        class="mt-2 text-red-500 text-sm flex items-center"
+                      >
+                        <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        Requis
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Informations de statut -->
+                  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+                    <!-- isValid -->
+                    <div
+                      class="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <div class="flex items-center justify-between">
+                        <span class="text-sm font-semibold text-gray-700 flex items-center">
+                          <svg class="w-4 h-4 mr-2 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                          Configuration valide
+                        </span>
+                        <span
+                          [ngClass]="configForm.get('valid')?.value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                          class="px-3 py-1 rounded-full text-sm font-semibold"
+                        >
+                          {{ configForm.get('valid')?.value ? 'Oui' : 'Non' }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- application -->
+                    <div
+                      class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <div class="flex items-center justify-between">
+                        <span class="text-sm font-semibold text-gray-700 flex items-center">
+                          <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 00-2 2v2a2 2 0 002 2m0 0h14m-14 0v2a2 2 0 002 2h10a2 2 0 002-2v-2m-14 0V9a2 2 0 012-2h10a2 2 0 012 2v2"
+                            />
+                          </svg>
+                          Application
+                        </span>
+                        <span class="text-sm text-gray-800 font-medium truncate max-w-32">
+                          {{ configForm.get('application')?.value || '—' }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- updatedAt -->
+                    <div
+                      class="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <div class="flex items-center justify-between">
+                        <span class="text-sm font-semibold text-gray-700 flex items-center">
+                          <svg
+                            class="w-4 h-4 mr-2 text-purple-600"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M12 8v4l2 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+
+                          Dernière mise à jour
+                        </span>
+                        <span class="text-sm text-gray-800 font-medium">
+                          {{ configForm.get('updatedAt')?.value | date: 'dd MMM yyyy, HH:mm' : '' : 'fr' || '—' }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Actions -->
+                  <div class="flex flex-col lg:flex-row gap-4 mt-8">
+                    <!-- Bouton Test -->
+                    <button
+                      type="button"
+                      (click)="testConfig()"
+                      [disabled]="testLoading || verified"
+                      class="group relative flex-1 flex items-center justify-center px-6 py-4 bg-gradient-to-r from-slate-50 to-slate-100 hover:from-slate-100 hover:to-slate-200 text-slate-700 rounded-2xl font-semibold transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-200/50 active:scale-[0.98] active:shadow-lg border border-slate-200/60 hover:border-slate-300/80 disabled:opacity-60 disabled:hover:scale-100 disabled:hover:shadow-none backdrop-blur-sm"
+                    >
+                      <!-- Effet de brillance au survol -->
+                      <div
+                        class="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                      ></div>
+
+                      <!-- Icône de chargement -->
+                      <div *ngIf="testLoading" class="relative mr-3">
+                        <div class="w-5 h-5 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin"></div>
+                      </div>
+
+                      <!-- Icône de test (quand pas en chargement) -->
+                      <svg
+                        *ngIf="!testLoading"
+                        class="w-5 h-5 mr-3 transition-transform group-hover:rotate-12"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+
+                      <span class="relative z-10 tracking-wide">
+                        {{ testLoading ? 'Test en cours…' : 'Tester la configuration' }}
+                      </span>
+                    </button>
+
+                    <!-- Bouton Enregistrer -->
+                    <button
+                      type="button"
+                      (click)="saveConfig()"
+                      [disabled]="loading || verified || isConfigured"
+                      class="group relative flex-1 flex items-center justify-center px-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-2xl font-semibold transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-xl hover:shadow-indigo-500/30 active:scale-[0.98] active:shadow-lg disabled:opacity-60 disabled:hover:scale-100 disabled:hover:shadow-none backdrop-blur-sm overflow-hidden"
+                    >
+                      <!-- Effet de brillance au survol -->
+                      <div
+                        class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none transform -skew-x-12 group-hover:translate-x-full"
+                      ></div>
+
+                      <!-- Icône de chargement -->
+                      <div *ngIf="loading" class="relative mr-3">
+                        <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      </div>
+
+                      <!-- Icône de sauvegarde (quand pas en chargement) -->
+                      <svg
+                        *ngIf="!loading"
+                        class="w-5 h-5 mr-3 transition-transform group-hover:scale-110"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+                        />
+                      </svg>
+
+                      <span class="relative z-10 tracking-wide">
+                        {{ loading ? 'Enregistrement…' : 'Enregistrer la configuration' }}
+                      </span>
+                    </button>
+                  </div>
+
+                  <!-- Feedback -->
+                  <div class="mt-4">
+                    <p *ngIf="testSuccess === false" class="text-red-600">{{ testError }}</p>
+                    <p *ngIf="testSuccess === true" class="text-green-700">✔️ Test réussi</p>
+                    <p *ngIf="isConfigured" class="text-green-700">✔️ Configuration existante chargée</p>
+                    <p *ngIf="verified" class="text-green-700">✔️ Configuration vérifiée</p>
+                  </div>
+                </form>
+              </div>
+            </section>
+          </div>
+          <app-toast #toast></app-toast>
+        </div>
+      </div>
+    </div>
+    <app-channel-config *ngIf="activeTab === 'SMS'" [channel]="'SMS'" [toast]="toast"> </app-channel-config>
+    <app-channel-config *ngIf="activeTab === 'EMAIL'" [channel]="'EMAIL'" [toast]="toast"> </app-channel-config>
+  </div>
+</div>

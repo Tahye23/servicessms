@@ -1,0 +1,69 @@
+<div class="flex justify-center">
+  <div class="w-full max-w-3xl bg-white rounded-xl shadow p-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-authority-heading"
+        data-cy="AuthorityCreateUpdateHeading"
+        class="text-2xl font-semibold text-gray-800 mb-6"
+        jhiTranslate="migrationApp.adminAuthority.home.createOrEditLabel"
+      >
+        Créer ou éditer un Authority
+      </h2>
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <!-- Champ Name -->
+      <div class="mb-4">
+        <label for="field_name" class="block text-sm font-medium text-gray-700" jhiTranslate="migrationApp.adminAuthority.name">
+          Name
+        </label>
+        <input
+          type="text"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+          name="name"
+          id="field_name"
+          data-cy="name"
+          formControlName="name"
+          [readonly]="editForm.get('name')!.disabled"
+        />
+        @if (editForm.get('name')!.invalid && (editForm.get('name')!.dirty || editForm.get('name')!.touched)) {
+          <div class="mt-1 text-sm text-red-600">
+            @if (editForm.get('name')?.errors?.required) {
+              <div jhiTranslate="entity.validation.required">Ce champ est obligatoire.</div>
+            }
+            @if (editForm.get('name')?.errors?.maxlength) {
+              <div jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '50' }">
+                Ce champ doit faire moins de 50 caractères.
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Boutons -->
+      <div class="flex space-x-3 mt-6">
+        <button
+          type="button"
+          id="cancel-save"
+          data-cy="entityCreateCancelButton"
+          class="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-md shadow-sm hover:bg-gray-700 transition"
+          (click)="previousState()"
+        >
+          <fa-icon icon="ban" class="mr-2"></fa-icon>
+          <span jhiTranslate="entity.action.cancel">Annuler</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md shadow-sm hover:bg-blue-700 transition"
+        >
+          <fa-icon icon="save" class="mr-2"></fa-icon>
+          <span jhiTranslate="entity.action.save">Sauvegarder</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

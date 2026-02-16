@@ -1,0 +1,27 @@
+{
+  "migrationApp": {
+    "userService": {
+      "home": {
+        "title": "UserServices",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau User Service",
+        "createOrEditLabel": "Créer ou éditer un User Service",
+        "notFound": "Aucun User Service trouvé"
+      },
+      "created": "Un nouveau User Service a été créé avec l'identifiant {{ param }}",
+      "updated": "Le User Service avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le User Service avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le User Service {{ id }} ?"
+      },
+      "detail": {
+        "title": "User Service"
+      },
+      "id": "ID",
+      "urSService": "Ur S Service",
+      "urSUser": "Ur S User",
+      "service": "Service",
+      "user": "User"
+    }
+  }
+}

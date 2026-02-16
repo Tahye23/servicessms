@@ -1,0 +1,27 @@
+{
+  "migrationApp": {
+    "planabonnement": {
+      "home": {
+        "title": "Planabonnements",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Planabonnement",
+        "createOrEditLabel": "Créer ou éditer un Planabonnement",
+        "notFound": "Aucun Planabonnement trouvé"
+      },
+      "created": "Un nouveau Planabonnement a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Planabonnement avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Planabonnement avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Planabonnement {{ id }} ?"
+      },
+      "detail": {
+        "title": "Planabonnement"
+      },
+      "id": "ID",
+      "abpPrix": "Abp Prix",
+      "abpNbrAcces": "Abp Nbr Acces",
+      "abpSevice": "Abp Sevice",
+      "abptype": "Abptype"
+    }
+  }
+}

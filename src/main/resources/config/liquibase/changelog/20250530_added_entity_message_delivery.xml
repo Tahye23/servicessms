@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="20240530-01-create-message-delivery-status" author="saadna">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <not>
+                <tableExists tableName="message_delivery_status"/>
+            </not>
+        </preConditions>
+        <createTable tableName="message_delivery_status">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="message_id" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="error_title" type="VARCHAR(255)"/>
+            <column name="error_details" type="TEXT"/>
+            <column name="phone" type="VARCHAR(32)"/>
+            <column name="received_at" type="TIMESTAMP"/>
+            <column name="processed_at" type="TIMESTAMP"/>
+        </createTable>
+
+
+    </changeSet>
+</databaseChangeLog>

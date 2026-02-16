@@ -1,0 +1,672 @@
+<!-- Container principal avec arrière-plan moderne -->
+<div *ngIf="application()" class="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50 p-4 md:p-6">
+  <div class="max-w-6xl mx-auto">
+    <!-- Breadcrumb -->
+    <nav class="flex mb-8" aria-label="Breadcrumb">
+      <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+          <a href="#" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-purple-600 transition-colors">
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"
+              ></path>
+            </svg>
+            Accueil
+          </a>
+        </li>
+        <li>
+          <div class="flex items-center">
+            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                clip-rule="evenodd"
+              ></path>
+            </svg>
+            <a href="#" class="ml-1 text-sm font-medium text-gray-700 hover:text-purple-600 md:ml-2 transition-colors">Applications</a>
+          </div>
+        </li>
+        <li>
+          <div class="flex items-center">
+            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                clip-rule="evenodd"
+              ></path>
+            </svg>
+            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">{{ application()!.name }}</span>
+          </div>
+        </li>
+      </ol>
+    </nav>
+
+    <!-- Header avec informations principales -->
+    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6 md:p-8 mb-8 animate-fade-in">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+        <!-- Informations de l'application -->
+        <div class="flex-1">
+          <div class="flex items-center gap-4 mb-4">
+            <div class="p-3 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl shadow-lg">
+              <svg class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                />
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-3xl md:text-4xl font-bold text-gray-900">{{ application()!.name }}</h1>
+              <p class="text-gray-600 mt-1">ID: {{ application()!.id }}</p>
+            </div>
+          </div>
+
+          <!-- Badges de statut -->
+          <div class="flex flex-wrap gap-3">
+            <span
+              *ngIf="application()!.isActive"
+              class="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full flex items-center gap-1"
+            >
+              <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              Actif
+            </span>
+            <span *ngIf="!application()!.isActive" class="px-3 py-1 bg-gray-100 text-gray-800 text-sm font-medium rounded-full">
+              Inactif
+            </span>
+
+            <span
+              *ngIf="application()!.environment"
+              class="px-3 py-1 text-sm font-medium rounded-full"
+              [ngClass]="{
+                'bg-blue-100 text-blue-800': application()!.environment === 'development',
+                'bg-yellow-100 text-yellow-800': application()!.environment === 'staging',
+                'bg-green-100 text-green-800': application()!.environment === 'production'
+              }"
+            >
+              {{ application()!.environment | titlecase }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex flex-col sm:flex-row gap-3">
+          <button
+            (click)="previousState()"
+            class="flex items-center justify-center gap-2 px-6 py-3 bg-white border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium shadow-sm"
+          >
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Retour
+          </button>
+
+          <button
+            [routerLink]="['/application', application()!.id, 'edit']"
+            class="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
+          >
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              />
+            </svg>
+            Modifier
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alertes -->
+    <div class="mb-6 space-y-4">
+      <jhi-alert-error></jhi-alert-error>
+      <jhi-alert></jhi-alert>
+    </div>
+
+    <!-- Grille principale avec informations -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <!-- Token API et sécurité -->
+      <div class="lg:col-span-2 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xl font-semibold text-gray-900 flex items-center gap-2">
+            <svg class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+              />
+            </svg>
+            Token API & Sécurité
+          </h3>
+        </div>
+
+        <!-- Token API -->
+        <div class="space-y-4">
+          <div class="bg-gray-50 rounded-xl p-4">
+            <div class="flex items-center justify-between mb-2">
+              <label class="text-sm font-medium text-gray-700">Token API</label>
+              <div class="flex gap-2">
+                <button
+                  *ngIf="getDisplayToken()"
+                  (click)="copyToken(getDisplayToken()!)"
+                  class="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  Copier
+                </button>
+                <button (click)="regenerateToken()" class="text-xs text-purple-600 hover:text-purple-800 font-medium">
+                  {{ getActiveToken() ? 'Régénérer' : 'Créer un token' }}
+                </button>
+              </div>
+            </div>
+            <div *ngIf="getDisplayToken()" class="font-mono text-sm bg-white p-3 rounded border break-all">
+              {{ showFullToken ? getDisplayToken() : (getDisplayToken() | slice: 0 : 40) + '...' }}
+            </div>
+            <div *ngIf="!getDisplayToken()" class="text-sm text-gray-500 italic p-3">Aucun token généré</div>
+            <div class="flex justify-between items-center mt-2">
+              <button *ngIf="getDisplayToken()" (click)="showFullToken = !showFullToken" class="text-xs text-gray-500 hover:text-gray-700">
+                {{ showFullToken ? 'Masquer' : 'Afficher' }} le token complet
+              </button>
+              <span *ngIf="getActiveToken()?.lastUsedAt" class="text-xs text-gray-500">
+                Dernière utilisation: {{ formatLastTokenUse() }}
+              </span>
+            </div>
+            <!-- Informations supplémentaires sur le token -->
+            <div *ngIf="getActiveToken()" class="mt-3 pt-3 border-t border-gray-200">
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <span class="text-gray-500">Statut:</span>
+                  <span
+                    class="ml-2 px-2 py-0.5 rounded-full font-medium"
+                    [ngClass]="getActiveToken()!.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'"
+                  >
+                    {{ getActiveToken()!.active ? 'Actif' : 'Inactif' }}
+                  </span>
+                </div>
+                <div>
+                  <span *ngIf="getActiveToken()!.dateExpiration" class="text-gray-500">Expire le:</span>
+                  <span class="ml-2 text-gray-900">
+                    {{ getActiveToken()!.dateExpiration | date: 'short' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Webhook -->
+          <div class="bg-gray-50 rounded-xl p-4" *ngIf="application()!.webhookUrl">
+            <div class="flex items-center justify-between mb-2">
+              <label class="text-sm font-medium text-gray-700">Webhook URL</label>
+              <button
+                (click)="testWebhook()"
+                [disabled]="isTestingWebhook"
+                class="text-xs text-green-600 hover:text-green-800 font-medium disabled:opacity-50"
+              >
+                {{ isTestingWebhook ? 'Test...' : 'Tester' }}
+              </button>
+            </div>
+            <div class="font-mono text-sm bg-white p-3 rounded border break-all">
+              {{ application()!.webhookUrl }}
+            </div>
+            <div *ngIf="application()!.webhookSecret" class="mt-2">
+              <label class="text-xs text-gray-500">Secret configuré</label>
+              <div class="text-xs text-gray-700 font-mono">●●●●●●●●●●●●</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistiques rapides -->
+      <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6">
+        <h3 class="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
+          <svg class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            />
+          </svg>
+          Utilisation
+        </h3>
+
+        <div class="space-y-4">
+          <!-- Utilisation journalière -->
+          <div class="bg-blue-50 rounded-xl p-4">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-sm font-medium text-blue-700">Aujourd'hui</span>
+              <span class="text-lg font-bold text-blue-900">{{ application()!.currentDailyUsage || 0 }}</span>
+            </div>
+            <div *ngIf="application()!.dailyLimit" class="mt-2">
+              <div class="flex justify-between text-xs text-blue-600 mb-1">
+                <span>Limite: {{ application()!.dailyLimit }}</span>
+                <span>{{ getUsagePercentage(application()!.currentDailyUsage, application()!.dailyLimit) }}%</span>
+              </div>
+              <div class="w-full bg-blue-200 rounded-full h-2">
+                <div
+                  class="h-2 rounded-full transition-all duration-300"
+                  [class]="getUsageBarColor(getUsagePercentage(application()!.currentDailyUsage, application()!.dailyLimit))"
+                  [style.width.%]="getUsagePercentage(application()!.currentDailyUsage, application()!.dailyLimit)"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Utilisation mensuelle -->
+          <div class="bg-green-50 rounded-xl p-4">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-sm font-medium text-green-700">Ce mois</span>
+              <span class="text-lg font-bold text-green-900">{{ application()!.currentMonthlyUsage || 0 }}</span>
+            </div>
+            <div *ngIf="application()!.monthlyLimit" class="mt-2">
+              <div class="flex justify-between text-xs text-green-600 mb-1">
+                <span>Limite: {{ application()!.monthlyLimit }}</span>
+                <span>{{ getUsagePercentage(application()!.currentMonthlyUsage, application()!.monthlyLimit) }}%</span>
+              </div>
+              <div class="w-full bg-green-200 rounded-full h-2">
+                <div
+                  class="h-2 rounded-full transition-all duration-300"
+                  [class]="getUsageBarColor(getUsagePercentage(application()!.currentMonthlyUsage, application()!.monthlyLimit))"
+                  [style.width.%]="getUsagePercentage(application()!.currentMonthlyUsage, application()!.monthlyLimit)"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total des appels -->
+          <div class="bg-purple-50 rounded-xl p-4">
+            <div class="flex justify-between items-center">
+              <span class="text-sm font-medium text-purple-700">Total des appels</span>
+              <span class="text-lg font-bold text-purple-900">{{ application()!.totalApiCalls || 0 }}</span>
+            </div>
+            <div *ngIf="application()!.lastApiCall" class="mt-1">
+              <span class="text-xs text-purple-600"> Dernier appel: {{ formatLastApiCall(application()!.lastApiCall) }} </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informations détaillées -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <!-- Informations générales -->
+      <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6">
+        <h3 class="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
+          <svg class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          Informations générales
+        </h3>
+
+        <dl class="space-y-4">
+          <div class="flex justify-between py-2 border-b border-gray-100">
+            <dt class="text-sm font-medium text-gray-500">Description</dt>
+            <dd class="text-sm text-gray-900 text-right max-w-xs">
+              {{ application()!.description || 'Aucune description' }}
+            </dd>
+          </div>
+
+          <div class="flex justify-between py-2 border-b border-gray-100" *ngIf="application()!.createdAt">
+            <dt class="text-sm font-medium text-gray-500">Créée le</dt>
+            <dd class="text-sm text-gray-900">{{ application()!.createdAt | date: 'medium' }}</dd>
+          </div>
+
+          <div class="flex justify-between py-2 border-b border-gray-100" *ngIf="application()!.updatedAt">
+            <dt class="text-sm font-medium text-gray-500">Modifiée le</dt>
+            <dd class="text-sm text-gray-900">{{ application()!.updatedAt | date: 'medium' }}</dd>
+          </div>
+
+          <div class="flex justify-between py-2 border-b border-gray-100" *ngIf="application()!.utilisateur">
+            <dt class="text-sm font-medium text-gray-500">Propriétaire</dt>
+            <dd class="text-sm text-gray-900">
+              <a
+                [routerLink]="['/extended-user', application()!.utilisateur?.id, 'view']"
+                class="text-purple-600 hover:text-purple-800 hover:underline"
+              >
+                {{ application()!.utilisateur?.user?.login || application()!.utilisateur?.id }}
+              </a>
+            </dd>
+          </div>
+
+          <div class="flex justify-between py-2 border-b border-gray-100" *ngIf="application()!.api">
+            <dt class="text-sm font-medium text-gray-500">API</dt>
+            <dd class="text-sm text-gray-900">
+              <a [routerLink]="['/api', application()!.api?.id, 'view']" class="text-purple-600 hover:text-purple-800 hover:underline">
+                {{ application()!.api?.apiNom || application()!.api?.id }}
+              </a>
+            </dd>
+          </div>
+
+          <div class="flex justify-between py-2" *ngIf="application()!.planabonnement">
+            <dt class="text-sm font-medium text-gray-500">Plan d'abonnement</dt>
+            <dd class="text-sm text-gray-900">
+              <a
+                [routerLink]="['/planabonnement', application()!.planabonnement?.id, 'view']"
+                class="text-purple-600 hover:text-purple-800 hover:underline"
+              >
+                {{ application()!.planabonnement?.abpName || application()!.planabonnement?.id }}
+              </a>
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- Services et permissions -->
+      <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6">
+        <h3 class="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
+          <svg class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m5.012-3H20m-7 7v3a2 2 0 01-2 2H9a2 2 0 01-2-2v-3m2-6V9a2 2 0 012-2h2a2 2 0 012 2v3M7 7V5a2 2 0 012-2h6a2 2 0 012 2v2"
+            />
+          </svg>
+          Services & Permissions
+        </h3>
+
+        <!-- Services autorisés -->
+        <div class="mb-6">
+          <h4 class="text-sm font-medium text-gray-700 mb-3">Services autorisés</h4>
+          <div *ngIf="application()!.allowedServices?.length; else noServices" class="flex flex-wrap gap-2">
+            <span
+              *ngFor="let service of application()!.allowedServices"
+              class="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full flex items-center gap-1"
+            >
+              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                />
+              </svg>
+              {{ getServiceDisplayName(service) }}
+            </span>
+          </div>
+          <ng-template #noServices>
+            <span class="text-sm text-gray-500 italic">Aucun service configuré</span>
+          </ng-template>
+        </div>
+
+        <!-- Limites configurées -->
+        <div class="space-y-4">
+          <h4 class="text-sm font-medium text-gray-700">Limites configurées</h4>
+
+          <div class="bg-gray-50 rounded-xl p-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <span class="text-xs text-gray-500">Limite journalière</span>
+                <div class="text-lg font-semibold text-gray-900">
+                  {{ application()!.dailyLimit || 'Illimitée' }}
+                </div>
+              </div>
+              <div>
+                <span class="text-xs text-gray-500">Limite mensuelle</span>
+                <div class="text-lg font-semibold text-gray-900">
+                  {{ application()!.monthlyLimit || 'Illimitée' }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions rapides -->
+          <div class="flex gap-2 pt-4">
+            <button
+              (click)="toggleStatus()"
+              [disabled]="isUpdatingStatus"
+              class="flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-colors"
+              [ngClass]="
+                application()!.isActive ? 'bg-red-50 text-red-700 hover:bg-red-100' : 'bg-green-50 text-green-700 hover:bg-green-100'
+              "
+            >
+              {{ isUpdatingStatus ? 'Mise à jour...' : application()!.isActive ? 'Désactiver' : 'Activer' }}
+            </button>
+            <button
+              (click)="resetCounters()"
+              [disabled]="isResettingCounters"
+              class="flex-1 px-4 py-2 bg-gray-50 text-gray-700 hover:bg-gray-100 text-sm font-medium rounded-lg transition-colors"
+            >
+              {{ isResettingCounters ? 'Reset...' : 'Reset compteurs' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historique des appels API -->
+    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6 mb-8">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-semibold text-gray-900 flex items-center gap-2">
+          <svg class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            />
+          </svg>
+          Activité récente
+        </h3>
+        <div class="flex gap-2">
+          <select
+            [(ngModel)]="selectedTimeRange"
+            (change)="loadApiCallHistory()"
+            class="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+          >
+            <option value="1h">Dernière heure</option>
+            <option value="24h">24 heures</option>
+            <option value="7d">7 jours</option>
+            <option value="30d">30 jours</option>
+          </select>
+          <button
+            (click)="loadApiCallHistory()"
+            [disabled]="isLoadingHistory"
+            class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium disabled:opacity-50"
+          >
+            {{ isLoadingHistory ? 'Chargement...' : 'Actualiser' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Graphique ou tableau des appels -->
+      <div *ngIf="apiCallHistory?.length; else noHistory" class="space-y-4">
+        <!-- Résumé des métriques -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div class="bg-blue-50 rounded-xl p-4 text-center">
+            <div class="text-2xl font-bold text-blue-600">{{ getTotalCalls() }}</div>
+            <div class="text-sm text-blue-600">Total appels</div>
+          </div>
+          <div class="bg-green-50 rounded-xl p-4 text-center">
+            <div class="text-2xl font-bold text-green-600">{{ getSuccessRate() }}%</div>
+            <div class="text-sm text-green-600">Taux de succès</div>
+          </div>
+          <div class="bg-yellow-50 rounded-xl p-4 text-center">
+            <div class="text-2xl font-bold text-yellow-600">{{ getAverageResponseTime() }}ms</div>
+            <div class="text-sm text-yellow-600">Temps moyen</div>
+          </div>
+          <div class="bg-purple-50 rounded-xl p-4 text-center">
+            <div class="text-2xl font-bold text-purple-600">{{ getErrorCount() }}</div>
+            <div class="text-sm text-purple-600">Erreurs</div>
+          </div>
+        </div>
+
+        <!-- Liste des appels récents -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 text-left font-medium text-gray-700">Timestamp</th>
+                <th class="px-4 py-3 text-left font-medium text-gray-700">Endpoint</th>
+                <th class="px-4 py-3 text-left font-medium text-gray-700">Méthode</th>
+                <th class="px-4 py-3 text-left font-medium text-gray-700">Status</th>
+                <th class="px-4 py-3 text-left font-medium text-gray-700">Temps</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <tr *ngFor="let call of apiCallHistory.slice(0, 10)" class="hover:bg-gray-50">
+                <td class="px-4 py-3 text-gray-900">{{ call.timestamp | date: 'short' }}</td>
+                <td class="px-4 py-3 text-gray-900 font-mono">{{ call.endpoint }}</td>
+                <td class="px-4 py-3">
+                  <span
+                    class="px-2 py-1 text-xs font-medium rounded-full"
+                    [ngClass]="{
+                      'bg-blue-100 text-blue-800': call.method === 'GET',
+                      'bg-green-100 text-green-800': call.method === 'POST',
+                      'bg-yellow-100 text-yellow-800': call.method === 'PUT',
+                      'bg-red-100 text-red-800': call.method === 'DELETE'
+                    }"
+                  >
+                    {{ call.method }}
+                  </span>
+                </td>
+                <td class="px-4 py-3">
+                  <span
+                    class="px-2 py-1 text-xs font-medium rounded-full"
+                    [ngClass]="{
+                      'bg-green-100 text-green-800': call.status < 300,
+                      'bg-yellow-100 text-yellow-800': call.status >= 300 && call.status < 400,
+                      'bg-red-100 text-red-800': call.status >= 400
+                    }"
+                  >
+                    {{ call.status }}
+                  </span>
+                </td>
+                <td class="px-4 py-3 text-gray-900">{{ call.responseTime }}ms</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <ng-template #noHistory>
+        <div class="text-center py-12">
+          <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1"
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            />
+          </svg>
+          <h4 class="text-lg font-medium text-gray-900 mb-2">Aucune activité</h4>
+          <p class="text-gray-600">Aucun appel API n'a été effectué récemment pour cette application.</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6">
+      <h3 class="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
+        <svg class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+        Actions rapides
+      </h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <button
+          (click)="exportData()"
+          [disabled]="isExporting"
+          class="flex items-center justify-center gap-2 p-4 bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 transition-colors"
+        >
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+          <span class="font-medium">{{ isExporting ? 'Export...' : 'Exporter' }}</span>
+        </button>
+
+        <button
+          (click)="cloneApplication()"
+          [disabled]="isCloning"
+          class="flex items-center justify-center gap-2 p-4 bg-green-50 text-green-700 rounded-xl hover:bg-green-100 transition-colors"
+        >
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+            />
+          </svg>
+          <span class="font-medium">{{ isCloning ? 'Clone...' : 'Cloner' }}</span>
+        </button>
+
+        <button
+          (click)="viewLogs()"
+          class="flex items-center justify-center gap-2 p-4 bg-yellow-50 text-yellow-700 rounded-xl hover:bg-yellow-100 transition-colors"
+        >
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+          <span class="font-medium">Voir les logs</span>
+        </button>
+
+        <button
+          (click)="openApiDocumentation()"
+          class="flex items-center justify-center gap-2 p-4 bg-purple-50 text-purple-700 rounded-xl hover:bg-purple-100 transition-colors"
+        >
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+            />
+          </svg>
+          <span class="font-medium">Documentation</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Styles CSS pour les animations -->
+<style>
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
+
+  /* Glassmorphism effect */
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+  }
+
+  /* Responsive table */
+  @media (max-width: 768px) {
+    .overflow-x-auto table {
+      font-size: 0.75rem;
+    }
+
+    .overflow-x-auto th,
+    .overflow-x-auto td {
+      padding: 0.5rem;
+    }
+  }
+</style>

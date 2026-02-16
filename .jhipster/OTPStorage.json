@@ -1,0 +1,42 @@
+{
+  "annotations": {
+    "changelogDate": "20240722134358"
+  },
+  "fields": [
+    {
+      "fieldName": "otsOTP",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "phoneNumber",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "otsdateexpir",
+      "fieldType": "ZonedDateTime"
+    },
+    {
+      "fieldName": "isOtpUsed",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "isExpired",
+      "fieldType": "Boolean"
+    }
+  ],
+  "name": "OTPStorage",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "extendedUser",
+      "otherEntityRelationshipName": "otpuser",
+      "relationshipName": "User",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "no"
+}

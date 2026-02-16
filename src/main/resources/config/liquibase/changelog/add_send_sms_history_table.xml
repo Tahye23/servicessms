@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="create-send-sms-history-table" author="developer">
+        <createTable tableName="send_sms_history">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="send_sms_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="retry_count" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attempt_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="total_success" type="integer" defaultValue="0"/>
+            <column name="total_failed" type="integer" defaultValue="0"/>
+            <column name="total_pending" type="integer" defaultValue="0"/>
+            <column name="last_error" type="text"/>
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="add-foreign-key-send-sms-history" author="developer">
+        <addForeignKeyConstraint
+            baseTableName="send_sms_history"
+            baseColumnNames="send_sms_id"
+            constraintName="fk_send_sms_history_send_sms"
+            referencedTableName="send_sms"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="create-indexes-send-sms-history" author="developer">
+        <createIndex tableName="send_sms_history" indexName="idx_send_sms_history_send_sms_id">
+            <column name="send_sms_id"/>
+        </createIndex>
+
+        <createIndex tableName="send_sms_history" indexName="idx_send_sms_history_retry_count">
+            <column name="send_sms_id"/>
+            <column name="retry_count"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="add-timing-and-status-columns-to-send-sms-history" author="developer">
+
+        <!-- Ajouter la colonne start_time -->
+        <addColumn tableName="send_sms_history">
+            <column name="start_time" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <!-- Ajouter la colonne end_time -->
+        <addColumn tableName="send_sms_history">
+            <column name="end_time" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <!-- Ajouter la colonne duration_seconds -->
+        <addColumn tableName="send_sms_history">
+            <column name="duration_seconds" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <!-- Ajouter la colonne completion_status -->
+        <addColumn tableName="send_sms_history">
+            <column name="completion_status" type="varchar(20)" defaultValue="IN_PROGRESS">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <!-- Créer un index sur send_sms_id et completion_status -->
+        <createIndex tableName="send_sms_history" indexName="idx_send_sms_history_status">
+            <column name="send_sms_id"/>
+            <column name="completion_status"/>
+        </createIndex>
+
+    </changeSet>
+
+</databaseChangeLog>

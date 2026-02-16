@@ -1,0 +1,369 @@
+<!-- external-api-messages.component.html -->
+
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="container mx-auto px-4 max-w-7xl">
+    <!-- Header -->
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+      <h1 class="text-2xl font-bold text-gray-800 flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 mr-3 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+          />
+        </svg>
+        Messages API Externe
+      </h1>
+      <p class="text-gray-600 mt-2">Suivi des messages envoyés via l'API externe</p>
+    </div>
+
+    <!-- Statistiques -->
+    <div *ngIf="stats" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
+      <!-- Total SMS -->
+      <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-blue-500">
+        <div class="text-xs text-gray-600 font-medium mb-1">Total SMS</div>
+        <div class="text-2xl font-bold text-blue-600">{{ stats.totalSms }}</div>
+      </div>
+
+      <!-- Total WhatsApp -->
+      <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-green-500">
+        <div class="text-xs text-gray-600 font-medium mb-1">Total WA</div>
+        <div class="text-2xl font-bold text-green-600">{{ stats.totalWhatsapp }}</div>
+      </div>
+
+      <!-- SMS Réussis -->
+      <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-emerald-500">
+        <div class="text-xs text-gray-600 font-medium mb-1">SMS OK</div>
+        <div class="text-2xl font-bold text-emerald-600">{{ stats.successSms }}</div>
+      </div>
+
+      <!-- WA Réussis -->
+      <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-teal-500">
+        <div class="text-xs text-gray-600 font-medium mb-1">WA OK</div>
+        <div class="text-2xl font-bold text-teal-600">{{ stats.successWhatsapp }}</div>
+      </div>
+
+      <!-- SMS Échoués -->
+      <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-red-500">
+        <div class="text-xs text-gray-600 font-medium mb-1">SMS KO</div>
+        <div class="text-2xl font-bold text-red-600">{{ stats.failedSms }}</div>
+      </div>
+
+      <!-- WA Échoués -->
+      <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-orange-500">
+        <div class="text-xs text-gray-600 font-medium mb-1">WA KO</div>
+        <div class="text-2xl font-bold text-orange-600">{{ stats.failedWhatsapp }}</div>
+      </div>
+
+      <!-- Total Segments -->
+      <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-gray-500">
+        <div class="text-xs text-gray-600 font-medium mb-1">Segments</div>
+        <div class="text-2xl font-bold text-gray-600">{{ stats.totalSegments }}</div>
+      </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <!-- Filtre Type -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+          <select
+            [(ngModel)]="selectedType"
+            (change)="applyFilters()"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Tous</option>
+            <option value="SMS">SMS</option>
+            <option value="WHATSAPP">WhatsApp</option>
+          </select>
+        </div>
+
+        <!-- Filtre Statut -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Statut</label>
+          <select
+            [(ngModel)]="selectedStatus"
+            (change)="applyFilters()"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Tous</option>
+            <option value="SENT">Envoyé</option>
+            <option value="FAILED">Échoué</option>
+          </select>
+        </div>
+
+        <!-- Recherche -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Recherche</label>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (keyup.enter)="applyFilters()"
+            placeholder="Numéro..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-end gap-2">
+          <button (click)="applyFilters()" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">
+            Filtrer
+          </button>
+          <button (click)="resetFilters()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition">
+            Reset
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Liste des messages -->
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div *ngIf="loading" class="flex items-center justify-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+      </div>
+
+      <div *ngIf="!loading && messages.length === 0" class="text-center py-12">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-16 w-16 mx-auto text-gray-400 mb-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+          />
+        </svg>
+        <p class="text-gray-600">Aucun message trouvé</p>
+      </div>
+
+      <div *ngIf="!loading && messages.length > 0" class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-50 border-b">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Type</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Statut</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Destinataire</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Expéditeur</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Segments</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Date</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Détails</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <tr *ngFor="let msg of messages" class="hover:bg-gray-50 transition">
+              <!-- Type -->
+              <td class="px-4 py-3">
+                <span [ngClass]="getTypeColor(msg.type)" class="px-2 py-1 rounded-full text-xs font-medium">
+                  {{ msg.type }}
+                </span>
+              </td>
+
+              <!-- Statut -->
+              <td class="px-4 py-3">
+                <span [ngClass]="getStatusColor(msg.status)" class="px-2 py-1 rounded-full text-xs font-medium">
+                  {{ msg.status === 'SENT' ? 'Envoyé' : 'Échoué' }}
+                </span>
+              </td>
+
+              <!-- Destinataire -->
+              <td class="px-4 py-3">
+                <div class="text-sm font-medium text-gray-900">{{ msg.receiver }}</div>
+              </td>
+
+              <!-- Expéditeur -->
+              <td class="px-4 py-3">
+                <div class="text-sm text-gray-600">{{ msg.sender }}</div>
+              </td>
+
+              <!-- Segments -->
+              <td class="px-4 py-3">
+                <div class="text-sm font-medium text-gray-900">{{ msg.totalMessage }}</div>
+              </td>
+
+              <!-- Date -->
+              <td class="px-4 py-3">
+                <div class="text-sm text-gray-600">{{ msg.sendDate | date: 'short' }}</div>
+              </td>
+
+              <!-- Détails -->
+              <td class="px-4 py-3">
+                <button class="text-blue-600 hover:text-blue-800 text-sm font-medium" (click)="showDetails(msg)">Voir</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div *ngIf="!loading && totalElements > pageSize" class="border-t px-6 py-4 flex items-center justify-between">
+        <div class="text-sm text-gray-600">
+          Total: <span class="font-medium">{{ totalElements }}</span> messages
+        </div>
+        <div class="flex gap-2">
+          <button
+            (click)="previousPage()"
+            [disabled]="currentPage === 0"
+            class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Précédent
+          </button>
+          <span class="px-4 py-2 bg-gray-100 rounded-lg font-medium"> {{ currentPage + 1 }} / {{ totalPages }} </span>
+          <button
+            (click)="nextPage()"
+            [disabled]="currentPage >= totalPages - 1"
+            class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Suivant
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal de détails -->
+<div *ngIf="showDetailsModal && selectedMessage" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4">
+  <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">
+    <!-- Header -->
+    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 rounded-t-xl flex-shrink-0">
+      <div class="flex items-center">
+        <div class="bg-blue-100 p-2 rounded-lg mr-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-gray-800">Détails du message</h2>
+          <p class="text-sm text-gray-600">ID: {{ selectedMessage.id }}</p>
+        </div>
+      </div>
+      <button (click)="closeDetailsModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="px-6 py-6 overflow-y-auto flex-1 space-y-6">
+      <!-- Statut et Type -->
+      <div class="grid grid-cols-2 gap-4">
+        <div class="bg-gray-50 rounded-lg p-4">
+          <div class="text-xs text-gray-600 font-medium mb-2">Type</div>
+          <span [ngClass]="getTypeColor(selectedMessage.type)" class="px-3 py-1.5 rounded-full text-sm font-medium inline-block">
+            {{ selectedMessage.type }}
+          </span>
+        </div>
+
+        <div class="bg-gray-50 rounded-lg p-4">
+          <div class="text-xs text-gray-600 font-medium mb-2">Statut</div>
+          <span [ngClass]="getStatusColor(selectedMessage.status)" class="px-3 py-1.5 rounded-full text-sm font-medium inline-block">
+            {{ selectedMessage.status === 'SENT' ? 'Envoyé' : 'Échoué' }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Informations principales -->
+      <div class="space-y-4">
+        <div class="border-b pb-2">
+          <h3 class="text-sm font-semibold text-gray-700 mb-3">Informations d'envoi</h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs font-medium text-gray-600">Destinataire</label>
+            <div class="mt-1 text-sm font-medium text-gray-900">{{ selectedMessage.receiver }}</div>
+          </div>
+
+          <div>
+            <label class="text-xs font-medium text-gray-600">Expéditeur</label>
+            <div class="mt-1 text-sm text-gray-700">{{ selectedMessage.sender }}</div>
+          </div>
+
+          <div>
+            <label class="text-xs font-medium text-gray-600">Date d'envoi</label>
+            <div class="mt-1 text-sm text-gray-700">{{ selectedMessage.sendDate | date: 'medium' }}</div>
+          </div>
+
+          <div>
+            <label class="text-xs font-medium text-gray-600">Segments</label>
+            <div class="mt-1 text-sm font-semibold text-gray-900">{{ selectedMessage.totalMessage }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message ID (WhatsApp) -->
+      <div *ngIf="selectedMessage.messageId" class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <label class="text-xs font-medium text-blue-700">Message ID (WhatsApp)</label>
+        <div class="mt-2 font-mono text-sm text-blue-900 break-all">{{ selectedMessage.messageId }}</div>
+      </div>
+
+      <!-- Contenu du message -->
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-2">Contenu du message</label>
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-wrap">
+          {{ selectedMessage.msgdata || 'Aucun contenu' }}
+        </div>
+      </div>
+
+      <!-- Erreur -->
+      <div *ngIf="selectedMessage.status === 'FAILED' && selectedMessage.last_error" class="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div class="flex items-start">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 text-red-600 mr-2 mt-0.5 flex-shrink-0"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div class="flex-1">
+            <label class="text-xs font-semibold text-red-700 block mb-2">Erreur</label>
+            <div class="text-sm text-red-800 break-words">{{ selectedMessage.last_error }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Métadonnées API -->
+      <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+        <label class="text-xs font-medium text-gray-600 block mb-3">Métadonnées API</label>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-600">Source:</span>
+            <span class="font-medium text-gray-900">API Externe</span>
+          </div>
+          <div class="flex justify-between" *ngIf="getMetadata(selectedMessage).app_name">
+            <span class="text-gray-600">Application:</span>
+            <span class="font-medium text-gray-900">{{ getMetadata(selectedMessage).app_name }}</span>
+          </div>
+          <div class="flex justify-between" *ngIf="getMetadata(selectedMessage).template_name">
+            <span class="text-gray-600">Template:</span>
+            <span class="font-medium text-gray-900">{{ getMetadata(selectedMessage).template_name }}</span>
+          </div>
+          <div class="flex justify-between" *ngIf="getMetadata(selectedMessage).business_id">
+            <span class="text-gray-600">Business ID:</span>
+            <span class="font-mono text-sm text-gray-900">{{ getMetadata(selectedMessage).business_id }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-xl flex justify-end flex-shrink-0">
+      <button (click)="closeDetailsModal()" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors">
+        Fermer
+      </button>
+    </div>
+  </div>
+</div>

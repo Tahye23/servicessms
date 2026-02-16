@@ -1,0 +1,501 @@
+<div class="min-h-screen py-8 px-4">
+  <div class="max-w-5xl mx-auto" *ngIf="abonnement; else loadingOrEmpty">
+    <!-- En-tête avec breadcrumb -->
+    <div class="mb-8">
+      <nav class="flex items-center space-x-2 text-sm text-gray-600 mb-4">
+        <a [routerLink]="['/abonnement']" class="hover:text-blue-600 transition-colors">Abonnements</a>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+        <span class="text-gray-900 font-medium">Détail #{{ abonnement.id }}</span>
+      </nav>
+
+      <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="p-4 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 shadow-lg">
+              <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-3xl font-bold text-gray-900">Abonnement #{{ abonnement.id }}</h1>
+              <div class="flex items-center mt-2 space-x-4">
+                <!-- Badge statut -->
+                <span
+                  class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                  [ngClass]="{
+                    'bg-green-100 text-green-800': abonnement.status?.toString() === 'ACTIVE',
+                    'bg-red-100 text-red-800': abonnement.status?.toString() === 'EXPIRED' || abonnement.status?.toString() === 'CANCELLED',
+                    'bg-yellow-100 text-yellow-800':
+                      abonnement.status?.toString() === 'SUSPENDED' || abonnement.status?.toString() === 'PENDING_PAYMENT',
+                    'bg-blue-100 text-blue-800': abonnement.status?.toString() === 'TRIAL',
+                    'bg-gray-100 text-gray-800': !abonnement.status
+                  }"
+                >
+                  <span
+                    class="w-2 h-2 rounded-full mr-2"
+                    [ngClass]="{
+                      'bg-green-400': abonnement.status?.toString() === 'ACTIVE',
+                      'bg-red-400': abonnement.status?.toString() === 'EXPIRED' || abonnement.status?.toString() === 'CANCELLED',
+                      'bg-yellow-400': abonnement.status?.toString() === 'SUSPENDED' || abonnement.status?.toString() === 'PENDING_PAYMENT',
+                      'bg-blue-400': abonnement.status?.toString() === 'TRIAL',
+                      'bg-gray-400': !abonnement.status
+                    }"
+                  ></span>
+                  {{ abonnement.status || 'N/A' }}
+                </span>
+
+                <!-- Badge essai -->
+                <span
+                  *ngIf="abonnement.isTrial"
+                  class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800"
+                >
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Mode Essai
+                </span>
+
+                <!-- Badge renouvellement auto -->
+                <span
+                  *ngIf="abonnement.autoRenew"
+                  class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800"
+                >
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                  Auto-renouvellement
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions rapides -->
+          <div class="flex space-x-3">
+            <button
+              type="button"
+              [routerLink]="['/abonnement', abonnement.id, 'edit']"
+              class="flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
+              </svg>
+              Éditer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alertes -->
+    <div class="mb-6">
+      <jhi-alert-error></jhi-alert-error>
+      <jhi-alert></jhi-alert>
+    </div>
+
+    <!-- Grille de cartes -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Colonne 1: Informations principales -->
+      <div class="lg:col-span-2 space-y-8">
+        <!-- Informations générales -->
+        <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
+          <div class="flex items-center mb-6">
+            <div class="p-3 rounded-xl bg-blue-100">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 ml-4">Informations générales</h3>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+              <div class="p-4 bg-gray-50 rounded-2xl">
+                <dt class="text-sm font-medium text-gray-500 mb-1">ID</dt>
+                <dd class="text-lg font-semibold text-gray-900">#{{ abonnement.id }}</dd>
+              </div>
+
+              <div class="p-4 bg-gray-50 rounded-2xl">
+                <dt class="text-sm font-medium text-gray-500 mb-1">Date de création</dt>
+                <dd class="text-lg font-semibold text-gray-900">
+                  {{ abonnement.createdDate ? (abonnement.createdDate | date: 'medium') : 'N/A' }}
+                </dd>
+              </div>
+
+              <div class="p-4 bg-gray-50 rounded-2xl">
+                <dt class="text-sm font-medium text-gray-500 mb-1">Dernière modification</dt>
+                <dd class="text-lg font-semibold text-gray-900">
+                  {{ abonnement.updatedDate ? (abonnement.updatedDate | date: 'medium') : 'N/A' }}
+                </dd>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div class="p-4 bg-gray-50 rounded-2xl">
+                <dt class="text-sm font-medium text-gray-500 mb-1">Date de début</dt>
+                <dd class="text-lg font-semibold text-gray-900">
+                  {{ abonnement.startDate ? (abonnement.startDate | date: 'mediumDate') : 'N/A' }}
+                </dd>
+              </div>
+
+              <div class="p-4 bg-gray-50 rounded-2xl">
+                <dt class="text-sm font-medium text-gray-500 mb-1">Date de fin</dt>
+                <dd class="text-lg font-semibold text-gray-900">
+                  {{ abonnement.endDate ? (abonnement.endDate | date: 'mediumDate') : 'N/A' }}
+                </dd>
+              </div>
+
+              <div *ngIf="abonnement.trialEndDate" class="p-4 bg-purple-50 rounded-2xl border-2 border-purple-200">
+                <dt class="text-sm font-medium text-purple-600 mb-1">Fin période d'essai</dt>
+                <dd class="text-lg font-semibold text-purple-900">
+                  {{ abonnement.trialEndDate | date: 'mediumDate' }}
+                </dd>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Utilisation des services -->
+        <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
+          <div class="flex items-center mb-6">
+            <div class="p-3 rounded-xl bg-green-100">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 ml-4">Utilisation des services</h3>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- SMS -->
+            <div class="p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border border-blue-200">
+              <div class="flex items-center justify-between mb-4">
+                <div class="p-3 bg-blue-500 rounded-xl">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <h4 class="text-sm font-medium text-blue-600 mb-1">SMS utilisés</h4>
+              <p class="text-2xl font-bold text-blue-900">{{ abonnement.smsUsed ?? 0 }}</p>
+              <p *ngIf="abonnement.customSmsLimit" class="text-sm text-blue-600 mt-1">/ {{ abonnement.customSmsLimit }} limite</p>
+            </div>
+
+            <!-- WhatsApp -->
+            <div class="p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl border border-green-200">
+              <div class="flex items-center justify-between mb-4">
+                <div class="p-3 bg-green-500 rounded-xl">
+                  <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                      d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <h4 class="text-sm font-medium text-green-600 mb-1">WhatsApp utilisés</h4>
+              <p class="text-2xl font-bold text-green-900">{{ abonnement.whatsappUsed ?? 0 }}</p>
+              <p *ngIf="abonnement.customWhatsappLimit" class="text-sm text-green-600 mt-1">
+                / {{ abonnement.customWhatsappLimit }} limite
+              </p>
+            </div>
+
+            <!-- Stockage -->
+            <div class="p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl border border-purple-200">
+              <div class="flex items-center justify-between mb-4">
+                <div class="p-3 bg-purple-500 rounded-xl">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <h4 class="text-sm font-medium text-purple-600 mb-1">Stockage utilisé</h4>
+              <p class="text-2xl font-bold text-purple-900">{{ abonnement.storageUsedMb ?? 0 }} MB</p>
+              <p *ngIf="abonnement.customStorageLimitMb" class="text-sm text-purple-600 mt-1">
+                / {{ abonnement.customStorageLimitMb }} MB limite
+              </p>
+            </div>
+
+            <!-- Appels API -->
+            <div class="p-6 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl border border-orange-200">
+              <div class="flex items-center justify-between mb-4">
+                <div class="p-3 bg-orange-500 rounded-xl">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <h4 class="text-sm font-medium text-orange-600 mb-1">Appels API aujourd'hui</h4>
+              <p class="text-2xl font-bold text-orange-900">{{ abonnement.apiCallsToday ?? 0 }}</p>
+              <p *ngIf="abonnement.customApiCallsLimit" class="text-sm text-orange-600 mt-1">
+                / {{ abonnement.customApiCallsLimit }} limite
+              </p>
+            </div>
+          </div>
+
+          <!-- Dernière activité API -->
+          <div *ngIf="abonnement.lastApiCallDate" class="mt-6 p-4 bg-gray-50 rounded-2xl">
+            <dt class="text-sm font-medium text-gray-500 mb-1">Dernier appel API</dt>
+            <dd class="text-lg font-semibold text-gray-900">
+              {{ abonnement.lastApiCallDate | date: 'medium' }}
+            </dd>
+          </div>
+        </div>
+
+        <!-- Bonus et reports (si applicable) -->
+        <div
+          *ngIf="
+            abonnement.bonusSmsEnabled ||
+            abonnement.bonusWhatsappEnabled ||
+            abonnement.allowSmsCarryover ||
+            abonnement.allowWhatsappCarryover
+          "
+          class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8"
+        >
+          <div class="flex items-center mb-6">
+            <div class="p-3 rounded-xl bg-yellow-100">
+              <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+                />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 ml-4">Bonus et reports</h3>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Bonus SMS -->
+            <div *ngIf="abonnement.bonusSmsEnabled" class="p-4 bg-blue-50 rounded-2xl border border-blue-200">
+              <h4 class="font-semibold text-blue-900 mb-2">Bonus SMS</h4>
+              <p class="text-2xl font-bold text-blue-600">+{{ abonnement.bonusSmsAmount ?? 0 }}</p>
+            </div>
+
+            <!-- Bonus WhatsApp -->
+            <div *ngIf="abonnement.bonusWhatsappEnabled" class="p-4 bg-green-50 rounded-2xl border border-green-200">
+              <h4 class="font-semibold text-green-900 mb-2">Bonus WhatsApp</h4>
+              <p class="text-2xl font-bold text-green-600">+{{ abonnement.bonusWhatsappAmount ?? 0 }}</p>
+            </div>
+
+            <!-- SMS reportés -->
+            <div
+              *ngIf="abonnement.allowSmsCarryover && abonnement.carriedOverSms"
+              class="p-4 bg-indigo-50 rounded-2xl border border-indigo-200"
+            >
+              <h4 class="font-semibold text-indigo-900 mb-2">SMS reportés</h4>
+              <p class="text-2xl font-bold text-indigo-600">{{ abonnement.carriedOverSms }}</p>
+            </div>
+
+            <!-- WhatsApp reportés -->
+            <div
+              *ngIf="abonnement.allowWhatsappCarryover && abonnement.carriedOverWhatsapp"
+              class="p-4 bg-teal-50 rounded-2xl border border-teal-200"
+            >
+              <h4 class="font-semibold text-teal-900 mb-2">WhatsApp reportés</h4>
+              <p class="text-2xl font-bold text-teal-600">{{ abonnement.carriedOverWhatsapp }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Colonne 2: Sidebar -->
+      <div class="space-y-8">
+        <!-- Utilisateur et Plan -->
+        <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
+          <h3 class="text-xl font-bold text-gray-900 mb-6">Détails associés</h3>
+
+          <!-- Utilisateur -->
+          <div *ngIf="abonnement.user" class="mb-6 p-4 bg-gray-50 rounded-2xl">
+            <dt class="text-sm font-medium text-gray-500 mb-3">Utilisateur</dt>
+            <div class="flex items-center space-x-3">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                <span class="text-white text-lg font-bold">{{ abonnement.user!.companyName!.charAt(0) || 'U' }}</span>
+              </div>
+              <div>
+                <a
+                  [routerLink]="['/extended-user', abonnement.user.id, 'view']"
+                  class="text-blue-600 hover:text-blue-800 font-semibold hover:underline transition-colors"
+                >
+                  {{ abonnement.user!.companyName || abonnement.user!.id }}
+                </a>
+                <p class="text-sm text-gray-500">ID: {{ abonnement.user.id }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Plan -->
+          <div *ngIf="abonnement.plan" class="p-4 bg-gray-50 rounded-2xl">
+            <dt class="text-sm font-medium text-gray-500 mb-3">Plan d'abonnement</dt>
+            <div class="space-y-2">
+              <a
+                [routerLink]="['/planabonnement', abonnement.plan.id, 'view']"
+                class="block text-blue-600 hover:text-blue-800 font-semibold hover:underline transition-colors"
+              >
+                {{ abonnement.customName || abonnement.plan.id }}
+              </a>
+              <p *ngIf="abonnement.customDescription" class="text-sm text-gray-600">
+                {{ abonnement.customDescription }}
+              </p>
+              <p *ngIf="abonnement.customPrice" class="text-lg font-bold text-green-600">
+                {{ abonnement.customPrice }}€
+                <span *ngIf="abonnement.customPeriod" class="text-sm text-gray-500">/ {{ abonnement.customPeriod }}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fonctionnalités personnalisées -->
+        <div *ngIf="abonnement.isCustomPlan" class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
+          <h3 class="text-xl font-bold text-gray-900 mb-6">Fonctionnalités</h3>
+
+          <div class="space-y-3">
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+              <span class="text-sm font-medium text-gray-700">Gestion d'utilisateurs</span>
+              <span class="text-lg">{{ abonnement.customCanManageUsers ? '✅' : '❌' }}</span>
+            </div>
+
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+              <span class="text-sm font-medium text-gray-700">Gestion de templates</span>
+              <span class="text-lg">{{ abonnement.customCanManageTemplates ? '✅' : '❌' }}</span>
+            </div>
+
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+              <span class="text-sm font-medium text-gray-700">Voir conversations</span>
+              <span class="text-lg">{{ abonnement.customCanViewConversations ? '✅' : '❌' }}</span>
+            </div>
+
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+              <span class="text-sm font-medium text-gray-700">Analytiques</span>
+              <span class="text-lg">{{ abonnement.customCanViewAnalytics ? '✅' : '❌' }}</span>
+            </div>
+
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+              <span class="text-sm font-medium text-gray-700">Support prioritaire</span>
+              <span class="text-lg">{{ abonnement.customPrioritySupport ? '✅' : '❌' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paiement -->
+        <div
+          *ngIf="abonnement.paymentMethod || abonnement.transactionId"
+          class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8"
+        >
+          <h3 class="text-xl font-bold text-gray-900 mb-6">Informations de paiement</h3>
+
+          <div class="space-y-4">
+            <div *ngIf="abonnement.paymentMethod" class="p-4 bg-gray-50 rounded-2xl">
+              <dt class="text-sm font-medium text-gray-500 mb-1">Méthode de paiement</dt>
+              <dd class="text-lg font-semibold text-gray-900">{{ abonnement.paymentMethod }}</dd>
+            </div>
+
+            <div *ngIf="abonnement.transactionId" class="p-4 bg-gray-50 rounded-2xl">
+              <dt class="text-sm font-medium text-gray-500 mb-1">ID de transaction</dt>
+              <dd class="text-lg font-semibold text-gray-900 font-mono">{{ abonnement.transactionId }}</dd>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions en bas de page -->
+    <div class="mt-12 bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="flex items-center space-x-4">
+          <div class="p-3 rounded-xl bg-gray-100">
+            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">Dernière mise à jour</p>
+            <p class="font-semibold text-gray-900">
+              {{ abonnement.updatedDate ? (abonnement.updatedDate | date: 'medium') : 'N/A' }}
+            </p>
+          </div>
+        </div>
+
+        <div class="flex space-x-4">
+          <button
+            type="button"
+            (click)="previousState()"
+            class="flex items-center px-6 py-3 bg-white/70 backdrop-blur-sm border border-gray-300 rounded-2xl shadow-lg text-gray-700 font-medium hover:bg-white hover:shadow-xl transition-all duration-300"
+          >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Retour à la liste
+          </button>
+
+          <button
+            type="button"
+            [routerLink]="['/abonnement', abonnement.id, 'edit']"
+            class="flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+          >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              />
+            </svg>
+            Modifier l'abonnement
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Template de chargement -->
+  <ng-template #loadingOrEmpty>
+    <div class="min-h-screen flex items-center justify-center">
+      <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-12 text-center">
+        <div class="flex flex-col items-center space-y-6">
+          <div class="p-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-600">
+            <svg class="w-12 h-12 text-white animate-spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-2">Chargement en cours...</h3>
+            <p class="text-gray-600">Récupération des données de l'abonnement</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</div>

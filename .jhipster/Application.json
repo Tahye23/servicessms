@@ -1,0 +1,50 @@
+{
+  "annotations": {
+    "changelogDate": "20240306150839"
+  },
+  "applications": ["RichattServices"],
+  "entityTableName": "application",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "userId",
+      "fieldType": "Integer"
+    }
+  ],
+  "name": "Application",
+  "relationships": [
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "api",
+      "relationshipName": "api",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "planabonnement",
+      "relationshipName": "planabonnement",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "extendedUser",
+      "relationshipName": "utilisateur",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no"
+}

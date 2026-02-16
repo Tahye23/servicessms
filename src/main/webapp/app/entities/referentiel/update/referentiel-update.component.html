@@ -1,0 +1,107 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-referentiel-heading"
+        data-cy="ReferentielCreateUpdateHeading"
+        jhiTranslate="migrationApp.referentiel.home.createOrEditLabel"
+      >
+        Créer ou éditer un Referentiel
+      </h2>
+
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="migrationApp.referentiel.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        <div class="mb-3">
+          <label class="form-label" for="field_refCode" jhiTranslate="migrationApp.referentiel.refCode">Ref Code</label>
+          <input type="text" class="form-control" name="refCode" id="field_refCode" data-cy="refCode" formControlName="refCode" />
+          @if (editForm.get('refCode')!.invalid && (editForm.get('refCode')!.dirty || editForm.get('refCode')!.touched)) {
+            <div>
+              @if (editForm.get('refCode')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_refRadical" jhiTranslate="migrationApp.referentiel.refRadical">Ref Radical</label>
+          <input
+            type="text"
+            class="form-control"
+            name="refRadical"
+            id="field_refRadical"
+            data-cy="refRadical"
+            formControlName="refRadical"
+          />
+          @if (editForm.get('refRadical')!.invalid && (editForm.get('refRadical')!.dirty || editForm.get('refRadical')!.touched)) {
+            <div>
+              @if (editForm.get('refRadical')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_refFrTitle" jhiTranslate="migrationApp.referentiel.refFrTitle">Ref Fr Title</label>
+          <input
+            type="text"
+            class="form-control"
+            name="refFrTitle"
+            id="field_refFrTitle"
+            data-cy="refFrTitle"
+            formControlName="refFrTitle"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_refArTitle" jhiTranslate="migrationApp.referentiel.refArTitle">Ref Ar Title</label>
+          <input
+            type="text"
+            class="form-control"
+            name="refArTitle"
+            id="field_refArTitle"
+            data-cy="refArTitle"
+            formControlName="refArTitle"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_refEnTitle" jhiTranslate="migrationApp.referentiel.refEnTitle">Ref En Title</label>
+          <input
+            type="text"
+            class="form-control"
+            name="refEnTitle"
+            id="field_refEnTitle"
+            data-cy="refEnTitle"
+            formControlName="refEnTitle"
+          />
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Sauvegarder</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

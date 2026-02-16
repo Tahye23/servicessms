@@ -1,0 +1,482 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="container mx-auto px-4 max-w-6xl">
+    <!-- En-tête avec animation et design moderne -->
+    <div
+      class="bg-white rounded-2xl shadow-lg p-6 mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 transition-all duration-300"
+    >
+      <!-- Titre principal -->
+      <h2 class="flex items-center text-3xl font-extrabold text-gray-800">
+        <span class="flex-shrink-0 bg-indigo-100 text-indigo-600 p-3 rounded-lg mr-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0
+                 012-2h5.586a1 1 0 01.707.293l5.414
+                 5.414a1 1 0 01.293.707V19a2 2 0
+                 01-2 2z"
+            />
+          </svg>
+        </span>
+        Liste des Modèles
+      </h2>
+
+      <!-- Boutons d’action -->
+      <div class="flex flex-col sm:flex-row gap-3">
+        <!-- Créer SMS -->
+        <button
+          *ngIf="permissions.canCreateSms && permissions.canCreate"
+          (click)="router.navigate(['/template/new'])"
+          class="flex items-center justify-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Nouveau Modèle SMS
+        </button>
+
+        <!-- Créer WhatsApp -->
+        <button
+          *ngIf="permissions.canCreateWhatsapp && permissions.canCreate"
+          (click)="router.navigate(['/send-whatsapp/new-template'])"
+          class="flex items-center justify-center gap-2 px-5 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Nouveau Modèle WhatsApp
+        </button>
+        <!-- Bouton Importer depuis Meta -->
+        <button
+          *ngIf="permissions.canCreateWhatsapp && permissions.canCreate"
+          (click)="openImportModal()"
+          class="flex items-center justify-center gap-2 px-5 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+            />
+          </svg>
+          Importer depuis Meta
+        </button>
+      </div>
+    </div>
+
+    <!-- Zone de filtres et recherche améliorée -->
+    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+        <!-- Navigation par onglets avec design moderne -->
+        <div class="w-full lg:w-auto">
+          <div class="flex p-1 bg-gray-100 rounded-xl">
+            <button
+              (click)="onTabChange('APPROVED')"
+              [ngClass]="
+                activeTab === 'APPROVED'
+                  ? 'bg-white text-indigo-700 shadow-sm'
+                  : 'bg-transparent text-gray-600 hover:bg-gray-200 hover:text-gray-800'
+              "
+              class="flex-1 lg:flex-none flex items-center justify-center px-6 py-2.5 rounded-lg transition-all duration-200 focus:outline-none font-medium"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                [ngClass]="activeTab === 'APPROVED' ? 'text-indigo-600' : 'text-gray-500'"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              Approuvés
+            </button>
+            <button
+              (click)="onTabChange('PENDING')"
+              [ngClass]="
+                activeTab === 'PENDING'
+                  ? 'bg-white text-indigo-700 shadow-sm'
+                  : 'bg-transparent text-gray-600 hover:bg-gray-200 hover:text-gray-800'
+              "
+              class="flex-1 lg:flex-none flex items-center justify-center px-6 py-2.5 rounded-lg transition-all duration-200 focus:outline-none font-medium"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                [ngClass]="activeTab === 'PENDING' ? 'text-indigo-600' : 'text-gray-500'"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              En attente
+            </button>
+            <button
+              (click)="onTabChange('REJECTED')"
+              [ngClass]="
+                activeTab === 'REJECTED'
+                  ? 'bg-white text-indigo-700 shadow-sm'
+                  : 'bg-transparent text-gray-600 hover:bg-gray-200 hover:text-gray-800'
+              "
+              class="flex-1 lg:flex-none flex items-center justify-center px-6 py-2.5 rounded-lg transition-all duration-200 focus:outline-none font-medium"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                [ngClass]="activeTab === 'REJECTED' ? 'text-indigo-600' : 'text-gray-500'"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Rejeté
+            </button>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+          <!-- Bouton d'actualisation avec effet -->
+          <button
+            (click)="onRefresh()"
+            class="flex items-center justify-center px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium shadow-sm hover:shadow group"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 mr-2 group-hover:rotate-180 transition-transform duration-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            Actualiser
+          </button>
+
+          <!-- Barre de recherche améliorée -->
+          <div class="relative w-full sm:max-w-md flex-grow">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+
+            <input
+              type="text"
+              [(ngModel)]="searchTerm"
+              placeholder="Rechercher..."
+              class="block w-full pl-11 pr-20 py-2.5 border border-gray-200 rounded-xl bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+              (keyup.enter)="onSearch()"
+            />
+
+            <button
+              (click)="onSearch()"
+              class="absolute inset-y-0 right-0 flex items-center px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-r-xl transition-all duration-200"
+            >
+              <span class="hidden sm:inline">Rechercher</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Design par cartes au lieu de tableau -->
+    <div class="relative">
+      <div *ngIf="loading" class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-20">
+        <!-- un simple spinner SVG, animé grâce à animate-spin -->
+        <svg class="w-12 h-12 text-indigo-600 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+        </svg>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div
+          *ngFor="let template of templates"
+          class="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden"
+        >
+          <div class="p-6">
+            <div class="flex justify-between items-start mb-4">
+              <svg *ngIf="template.templateId" xmlns="http://www.w3.org/2000/svg" height="32" width="28" viewBox="0 0 448 512">
+                <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
+                <path
+                  fill="#22c55e"
+                  d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7 .9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"
+                />
+              </svg>
+              <h3 class="text-xl font-semibold text-gray-800 truncate">{{ template.name }}</h3>
+              <span *ngIf="template.status == 'APPROVED'" class="px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
+                Approuvé
+              </span>
+              <span *ngIf="template.status == 'PENDING'" class="px-2 py-1 bg-amber-100 text-amber-800 text-xs font-semibold rounded-full">
+                En attente
+              </span>
+              <span *ngIf="template.status == 'REJECTED'" class="px-2 py-1 bg-red-100 text-amber-800 text-xs font-semibold rounded-full">
+                Rejeté
+              </span>
+            </div>
+
+            <div *ngIf="isAdmin()" class="text-sm text-gray-500 mb-4">
+              <span class="font-medium">Créé :</span> {{ template.created_at | date }}
+            </div>
+
+            <div class="flex justify-end space-x-1 pt-4 border-t border-gray-100">
+              <!-- Bouton d'approbation -->
+              <button
+                *ngIf="isAdmin() && !template.approved && permissions.canApprove"
+                (click)="approveTemplate(template)"
+                class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors duration-200"
+                aria-label="Approuver"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+              </button>
+
+              <!-- Bouton pour afficher le template -->
+              <button
+                *ngIf="permissions.canView"
+                (click)="viewTemplate(template.id)"
+                class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                aria-label="Voir"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                  />
+                </svg>
+              </button>
+
+              <!-- Bouton d'édition -->
+              <button
+                *ngIf="!template.approved && !template.templateId && permissions.canEdit"
+                (click)="editTemplate(template.id)"
+                class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors duration-200"
+                aria-label="Éditer"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
+                </svg>
+              </button>
+
+              <!-- Bouton de suppression -->
+              <button
+                *ngIf="!template.approved && !template.templateId && permissions.canDelete"
+                (click)="deleteTemplate(template.id)"
+                class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                aria-label="Supprimer"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message si aucun résultat -->
+    <div *ngIf="templates.length === 0 && !loading" class="bg-white rounded-xl shadow-md p-8 text-center">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-16 w-16 mx-auto text-gray-400 mb-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+        />
+      </svg>
+      <h3 class="text-xl font-medium text-gray-700 mb-2">Aucun modèle trouvé</h3>
+      <p class="text-gray-500">Essayez de modifier vos critères de recherche ou créez un nouveau modèle.</p>
+    </div>
+
+    <!-- Contrôles de Pagination modernisés -->
+    <div
+      *ngIf="totalElements > itemsPerPage"
+      class="bg-white shadow-md rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-6"
+    >
+      <!-- Information du total des éléments avec badge -->
+      <div class="bg-white px-4 py-2 rounded-full flex items-center">
+        <span class="text-indigo-600 font-semibold mr-2">Total:</span>
+        <span class="bg-indigo-600 text-white font-bold px-3 py-1 rounded-full text-sm">{{ totalElements }}</span>
+      </div>
+
+      <!-- Navigation Pagination -->
+      <div class="flex items-center gap-3 bg-white p-1 rounded-full">
+        <button
+          (click)="prevPage()"
+          [disabled]="currentPage === 1"
+          [ngClass]="currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-100'"
+          class="flex items-center px-4 py-2 text-indigo-700 font-medium rounded-full transition-all duration-300"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+          <span class="hidden sm:inline">Précédent</span>
+        </button>
+
+        <div class="bg-indigo-600 px-4 py-2 rounded-full text-white font-bold shadow-md">{{ currentPage }} / {{ totalPages }}</div>
+
+        <button
+          (click)="nextPage()"
+          [disabled]="currentPage === totalPages"
+          [ngClass]="currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-100'"
+          class="flex items-center px-4 py-2 text-indigo-700 font-medium rounded-full transition-all duration-300"
+        >
+          <span class="hidden sm:inline">Suivant</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Sélecteur du nombre d'éléments par page -->
+      <div class="flex items-center bg-white px-4 py-2 rounded-full">
+        <label for="itemsPerPageSelect" class="text-indigo-700 font-medium mr-2">Afficher</label>
+        <select
+          id="itemsPerPageSelect"
+          [(ngModel)]="itemsPerPage"
+          (change)="changeItemsPerPage()"
+          class="bg-indigo-50 border-none rounded-full px-3 py-1 font-medium text-indigo-700 focus:ring-2 focus:ring-indigo-300 focus:outline-none appearance-none cursor-pointer"
+        >
+          <option *ngFor="let option of itemsPerPageOptions" [value]="option">{{ option }}</option>
+        </select>
+        <span class="text-indigo-700 font-medium ml-2">par page</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de confirmation modernisée -->
+  <div *ngIf="showModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 transition-opacity duration-300">
+    <div class="bg-white rounded-xl p-6 shadow-xl w-96 transform transition-all duration-300">
+      <div class="mb-4">
+        <div
+          class="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full"
+          [ngClass]="action === 'delete' ? 'bg-red-100' : 'bg-green-100'"
+        >
+          <svg
+            *ngIf="action === 'delete'"
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6 text-red-600"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22"
+            />
+          </svg>
+          <svg
+            *ngIf="action === 'approve'"
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6 text-green-600"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-center mb-1">Confirmation</h2>
+        <p class="text-gray-500 text-center">
+          Êtes-vous sûr de vouloir {{ action === 'delete' ? 'supprimer' : 'approuver' }} ce template ?
+        </p>
+      </div>
+      <div class="flex justify-center gap-3 mt-6">
+        <button
+          (click)="cancelAction()"
+          class="px-5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
+        >
+          Annuler
+        </button>
+        <button
+          (click)="confirmAction()"
+          [ngClass]="action === 'delete' ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'"
+          class="px-5 py-2 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+        >
+          Confirmer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<app-toast #toast></app-toast>
+<!-- Modal d'importation -->
+<div
+  *ngIf="showImportModal"
+  class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 transition-opacity duration-300"
+>
+  <div class="bg-white rounded-xl p-6 shadow-xl w-96 transform transition-all duration-300">
+    <div class="mb-4">
+      <div class="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-purple-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+          />
+        </svg>
+      </div>
+      <h2 class="text-2xl font-bold text-center mb-1">Importer un template</h2>
+      <p class="text-gray-500 text-center mb-4">Entrez le nom du template Meta à importer</p>
+
+      <input
+        type="text"
+        [(ngModel)]="importTemplateName"
+        placeholder="Nom du template dans Meta"
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+        (keyup.enter)="confirmImport()"
+      />
+    </div>
+
+    <div class="flex justify-center gap-3 mt-6">
+      <button
+        (click)="cancelImport()"
+        class="px-5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
+      >
+        Annuler
+      </button>
+      <button
+        (click)="confirmImport()"
+        [disabled]="!importTemplateName || importTemplateName.trim() === ''"
+        class="px-5 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+      >
+        Importer
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="20260126_11" author="jhipster">
+
+        <createSequence sequenceName="sequenceGenerator" startValue="1"/>
+
+        <createTable tableName="channel_configuration">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="user_login" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="channel_type" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="host" type="VARCHAR(255)"/>
+            <column name="port" type="INT"/>
+            <column name="username" type="VARCHAR(255)"/>
+            <column name="password" type="VARCHAR(255)"/>
+            <column name="extra_config_json" type="TEXT"/>
+            <column name="verified" type="BOOLEAN" defaultValueBoolean="false"/>
+        </createTable>
+
+        <addDefaultValue
+            tableName="channel_configuration"
+            columnName="id"
+            defaultValueSequenceNext="sequenceGenerator"/>
+
+    </changeSet>
+
+
+</databaseChangeLog>

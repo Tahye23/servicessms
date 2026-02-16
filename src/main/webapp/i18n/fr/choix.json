@@ -1,0 +1,26 @@
+{
+  "migrationApp": {
+    "choix": {
+      "home": {
+        "title": "Choixes",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Choix",
+        "createOrEditLabel": "Créer ou éditer un Choix",
+        "notFound": "Aucun Choix trouvé"
+      },
+      "created": "Un nouveau Choix a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Choix avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Choix avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Choix {{ id }} ?"
+      },
+      "detail": {
+        "title": "Choix"
+      },
+      "id": "ID",
+      "chovaleur": "Chovaleur",
+      "choquestion": "Choquestion",
+      "choquestionSuivante": "Choquestion Suivante"
+    }
+  }
+}

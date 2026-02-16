@@ -1,0 +1,893 @@
+<div class="min-h-screen bg-gray-50 py-10 px-4 sm:px-6">
+  <div class="max-w-5xl mx-auto space-y-6">
+    <!-- En-tête -->
+    <header class="text-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-800">Gestion des Groupes</h1>
+      <p class="text-gray-500 mt-2">Gérez vos contacts et groupes de destinataires</p>
+    </header>
+
+    <!-- Détail du groupe -->
+    <section class="bg-white border border-gray-200 shadow-md rounded-lg overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-blue-100 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              />
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-gray-800">Détail du Groupe</h2>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <!-- 🚀 NOUVEAU : Créer campagne -->
+          <button
+            (click)="createCampaign()"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              />
+            </svg>
+            Créer Campagne WTSP
+          </button>
+
+          <button
+            (click)="createCampaignSms()"
+            class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Créer Campagne SMS
+          </button>
+
+          <button
+            [routerLink]="['/groupe', groupe()!.id, 'edit']"
+            class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              />
+            </svg>
+            Modifier
+          </button>
+
+          <button
+            (click)="previousState()"
+            class="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Retour
+          </button>
+          <button
+            (click)="openCampaignsModal()"
+            class="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors text-sm"
+            title="Voir les campagnes liées à ce groupe"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18" />
+            </svg>
+            Campagnes du groupe
+          </button>
+        </div>
+      </div>
+
+      <!-- Infos du groupe -->
+      <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <div class="text-sm text-gray-500 mb-1">Identifiant</div>
+          <div class="text-gray-800 font-medium">{{ groupe()!.id }}</div>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <div class="text-sm text-gray-500 mb-1">Titre du groupe</div>
+          <div class="text-gray-800 font-medium">{{ groupe()!.grotitre }}</div>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <div class="text-sm text-gray-500 mb-1">Type</div>
+          <div
+            class="text-gray-800 font-medium text-sm"
+            [ngClass]="{ 'text-yellow-600': isTestGroup(groupe()!), 'text-green-600': !isTestGroup(groupe()!) }"
+          >
+            {{ isTestGroup(groupe()!) ? 'Test' : 'Production' }}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contacts du groupe -->
+    <section class="bg-white border border-gray-200 shadow-md rounded-lg overflow-hidden mt-6">
+      <div class="flex justify-between items-center px-6 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-blue-100 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+              />
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-gray-800">
+            Contacts
+            <span *ngIf="hasActiveFilters()" class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full ml-2">
+              {{ getFilteredContactsCount() }} filtrés
+            </span>
+          </h2>
+        </div>
+        <div class="flex items-center gap-2">
+          <!-- 🚀 NOUVEAU : Bouton Filtres avancés -->
+          <button
+            *ngIf="somePageSelected || selectAllAcrossPages"
+            (click)="removeSelectedContacts()"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
+            title="Retirer les contacts sélectionnés de ce groupe"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              />
+            </svg>
+            Retirer du groupe
+            <span class="bg-white text-red-600 rounded-full px-2 py-0.5 text-xs font-bold">
+              {{ getSelectedContactsCount() }}
+            </span>
+          </button>
+          <button
+            (click)="toggleAdvancedFilters()"
+            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border transition-colors"
+            [class]="
+              hasActiveFilters() ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+            "
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.707A1 1 0 013 7V4z"
+              />
+            </svg>
+            Filtres
+            <span *ngIf="hasActiveFilters()" class="w-2 h-2 bg-blue-500 rounded-full"></span>
+          </button>
+
+          <!-- 🚀 NOUVEAU : Créer groupe à partir des filtres -->
+          <button
+            *ngIf="hasActiveFilters() && getFilteredContactsCount() > 0"
+            (click)="createGroupFromFilter()"
+            [disabled]="isCreatingGroup"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition-colors disabled:bg-gray-400"
+          >
+            <svg
+              *ngIf="!isCreatingGroup"
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857"
+              />
+            </svg>
+            <svg *ngIf="isCreatingGroup" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+            {{ isCreatingGroup ? 'Création...' : 'Nouveau Groupe' }}
+          </button>
+
+          <button
+            (click)="showFileUpload = true"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12"
+              />
+            </svg>
+            Importer
+          </button>
+          <button
+            (click)="showDialog()"
+            class="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Ajouter des contacts
+          </button>
+        </div>
+      </div>
+
+      <div class="p-6">
+        <!-- 🚀 NOUVEAU : Filtres avancés -->
+        <!-- Section Filtres Avancés Simplifiée -->
+        <div *ngIf="showAdvancedFilters" class="mb-6 p-6 rounded-xl border border-blue-200 shadow-sm">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.707A1 1 0 013 7V4z"
+                ></path>
+              </svg>
+              Filtres avancés
+            </h3>
+            <span class="text-sm text-blue-600 bg-blue-100 px-3 py-1 rounded-full"> {{ getFilteredContactsCount() }} résultat(s) </span>
+          </div>
+
+          <!-- Filtres Texte -->
+          <div class="mb-6">
+            <h4 class="text-md font-medium text-gray-700 mb-3 border-b border-gray-200 pb-2">🔍 Recherche textuelle</h4>
+
+            <!-- 1 colonne sur mobile, 3 colonnes dès md -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+              <!-- Nom -->
+              <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Nom</label>
+                <!-- colonne sur mobile, rangée dès sm -->
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+                  <select
+                    [(ngModel)]="advancedFilters.nomFilterType"
+                    class="w-full sm:w-40 md:w-44 px-2 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option [ngValue]="FilterType.CONTAINS">Contient</option>
+                    <option [ngValue]="FilterType.STARTS_WITH">Commence par</option>
+                    <option [ngValue]="FilterType.ENDS_WITH">Finit par</option>
+                    <option [ngValue]="FilterType.EXACT">Exact</option>
+                    <option [ngValue]="FilterType.NOT_CONTAINS">Ne contient pas</option>
+                    <option [ngValue]="FilterType.NOT_STARTS_WITH">Ne commence pas par</option>
+                    <option [ngValue]="FilterType.NOT_ENDS_WITH">Ne finit pas par</option>
+                    <option [ngValue]="FilterType.NOT_EXACT">Différent de (≠ exact)</option>
+                  </select>
+
+                  <input
+                    type="text"
+                    [(ngModel)]="advancedFilters.nom"
+                    (input)="applyAdvancedFilters()"
+                    placeholder="Nom..."
+                    class="w-full sm:flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                </div>
+              </div>
+
+              <!-- Prénom -->
+              <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Prénom</label>
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+                  <select
+                    [(ngModel)]="advancedFilters.prenomFilterType"
+                    class="w-full sm:w-40 md:w-44 px-2 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option [ngValue]="FilterType.CONTAINS">Contient</option>
+                    <option [ngValue]="FilterType.STARTS_WITH">Commence par</option>
+                    <option [ngValue]="FilterType.ENDS_WITH">Finit par</option>
+                    <option [ngValue]="FilterType.EXACT">Exact</option>
+                    <option [ngValue]="FilterType.NOT_CONTAINS">Ne contient pas</option>
+                    <option [ngValue]="FilterType.NOT_STARTS_WITH">Ne commence pas par</option>
+                    <option [ngValue]="FilterType.NOT_ENDS_WITH">Ne finit pas par</option>
+                    <option [ngValue]="FilterType.NOT_EXACT">Différent de (≠ exact)</option>
+                  </select>
+
+                  <input
+                    type="text"
+                    [(ngModel)]="advancedFilters.prenom"
+                    (input)="applyAdvancedFilters()"
+                    placeholder="Prénom..."
+                    class="w-full sm:flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                </div>
+              </div>
+
+              <!-- Téléphone -->
+              <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Téléphone</label>
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+                  <select
+                    [(ngModel)]="advancedFilters.telephoneFilterType"
+                    class="w-full sm:w-40 md:w-44 px-2 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option [ngValue]="FilterType.CONTAINS">Contient</option>
+                    <option [ngValue]="FilterType.STARTS_WITH">Commence par</option>
+                    <option [ngValue]="FilterType.ENDS_WITH">Finit par</option>
+                    <option [ngValue]="FilterType.EXACT">Exact</option>
+                    <option [ngValue]="FilterType.NOT_CONTAINS">Ne contient pas</option>
+                    <option [ngValue]="FilterType.NOT_STARTS_WITH">Ne commence pas par</option>
+                    <option [ngValue]="FilterType.NOT_ENDS_WITH">Ne finit pas par</option>
+                    <option [ngValue]="FilterType.NOT_EXACT">Différent de (≠ exact)</option>
+                  </select>
+                  <input
+                    type="text"
+                    [(ngModel)]="advancedFilters.telephone"
+                    (input)="applyAdvancedFilters()"
+                    placeholder="Ex: +222, 44..."
+                    class="w-full sm:flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filtres Statut et WhatsApp -->
+          <div class="mb-6">
+            <h4 class="text-md font-medium text-gray-700 mb-3 border-b border-gray-200 pb-2">📊 Statuts</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Statut de traitement -->
+              <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Statut de traitement</label>
+                <select
+                  [(ngModel)]="advancedFilters.statut"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                >
+                  <option value="">Tous les statuts</option>
+                  <!--<option value="1">✅ Valides</option>
+                  <option value="3">⚠️ Doublons</option>
+                  <option value="0">❌ Invalides</option>-->
+                </select>
+              </div>
+
+              <!-- WhatsApp -->
+              <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">WhatsApp</label>
+                <select
+                  [(ngModel)]="advancedFilters.hasWhatsapp"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                >
+                  <option value="">Tous</option>
+                  <option value="true">✅ Avec WhatsApp</option>
+                  <option value="false">❌ Sans WhatsApp</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filtres Messages - Section Principale -->
+          <div class="mb-6">
+            <h4 class="text-md font-medium text-gray-700 mb-3 border-b border-gray-200 pb-2">💬 Statistiques de Messages</h4>
+
+            <!-- Filtres SMS-->
+            <div class="mb-4">
+              <h5 class="text-sm font-medium text-gray-600 mb-2">📱 Messages SMS</h5>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                  <label class="block text-xs font-medium text-gray-600">SMS envoyés (minimum)</label>
+                  <input
+                    type="number"
+                    [(ngModel)]="advancedFilters.minSmsSent"
+                    (input)="applyAdvancedFilters()"
+                    placeholder="0"
+                    min="0"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                </div>
+
+                <div class="space-y-2">
+                  <label class="block text-xs font-medium text-gray-600">SMS envoyés (maximum)</label>
+                  <input
+                    type="number"
+                    [(ngModel)]="advancedFilters.maxSmsSent"
+                    (input)="applyAdvancedFilters()"
+                    placeholder="999"
+                    min="0"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Filtres WhatsApp-->
+            <div class="mb-4">
+              <h5 class="text-sm font-medium text-gray-600 mb-2">💬 Messages WhatsApp</h5>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                  <label class="block text-xs font-medium text-gray-600">WhatsApp envoyés (minimum)</label>
+                  <input
+                    type="number"
+                    [(ngModel)]="advancedFilters.minWhatsappSent"
+                    (input)="applyAdvancedFilters()"
+                    placeholder="0"
+                    min="0"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                </div>
+
+                <div class="space-y-2">
+                  <label class="block text-xs font-medium text-gray-600">WhatsApp envoyés (maximum)</label>
+                  <input
+                    type="number"
+                    [(ngModel)]="advancedFilters.maxWhatsappSent"
+                    (input)="applyAdvancedFilters()"
+                    placeholder="999"
+                    min="0"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Filtre messages reçus -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">📤 A reçu des messages</label>
+              <select
+                [(ngModel)]="advancedFilters.hasReceivedMessages"
+                class="w-full md:w-64 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+              >
+                <option value="">Tous</option>
+                <option value="true">✅ A reçu des messages</option>
+                <option value="false">❌ N'a pas reçu de messages</option>
+              </select>
+            </div>
+            <!-- 🔗 Filtres Campagne / SMS -->
+            <div class="mb-6">
+              <h4 class="text-md font-medium text-gray-700 mb-3 border-b border-gray-200 pb-2">🔗 Filtres Campagne / SMS</h4>
+              <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- ID campagne -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">ID campagne</label>
+                  <input
+                    type="number"
+                    [(ngModel)]="advancedFilters.campaignId"
+                    (input)="applyAdvancedFilters()"
+                    placeholder="send_sms.id"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                </div>
+
+                <!-- sms.status -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">sms.status</label>
+                  <select
+                    [(ngModel)]="advancedFilters.smsStatus"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                  >
+                    <option value="">Tous</option>
+                    <option *ngFor="let s of smsStatusOptions" [value]="s">{{ s }}</option>
+                  </select>
+                </div>
+
+                <!-- delivery_status -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">delivery_status</label>
+                  <select
+                    [(ngModel)]="advancedFilters.deliveryStatus"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                  >
+                    <option value="">Tous</option>
+                    <option *ngFor="let d of deliveryStatusOptions" [value]="d">{{ d }}</option>
+                  </select>
+                </div>
+
+                <!-- last_error -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">last_error</label>
+                  <select
+                    [(ngModel)]="lastErrorSelection"
+                    (ngModelChange)="onLastErrorSelectChange($event)"
+                    class="w-full px-3 py-2 border rounded-lg text-sm"
+                  >
+                    <option *ngFor="let e of lastErrorOptions" [value]="e.value">{{ e.label }}</option>
+                  </select>
+
+                  <input
+                    *ngIf="lastErrorSelection === '__custom__'"
+                    type="text"
+                    [(ngModel)]="lastErrorCustom"
+                    placeholder="Saisir une erreur…"
+                    class="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions des filtres -->
+          <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+            <div class="flex items-center gap-3">
+              <button (click)="resetFilters()" class="px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                🗑️ Réinitialiser
+              </button>
+              <button (click)="onSearchClick()" class="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                🔎 Rechercher
+              </button>
+              <span *ngIf="hasActiveFilters()" class="ml-2 text-sm text-blue-600 font-medium">
+                {{ getFilteredContactsCount() }} contact(s) (après recherche)
+              </span>
+            </div>
+
+            <!-- (optionnel) création de groupe inchangée -->
+            <div *ngIf="hasActiveFilters() && getFilteredContactsCount() > 0" class="flex items-center gap-3">
+              <input
+                type="text"
+                [(ngModel)]="newGroupName"
+                placeholder="Nom du nouveau groupe..."
+                class="px-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                (click)="createGroupFromFilter()"
+                [disabled]="isCreatingGroup"
+                class="px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 disabled:bg-gray-400"
+              >
+                {{ isCreatingGroup ? '⏳ Création...' : '➕ Créer Groupe' }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table contacts avec statistiques de messages -->
+        <div *ngIf="contacts?.length" class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <div class="flex flex-col gap-1">
+                    <!-- Master checkbox = sélection de la page courante uniquement -->
+                    <label class="inline-flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        [checked]="allPageSelected"
+                        [indeterminate]="somePageSelected && !allPageSelected"
+                        (change)="onToggleMaster($any($event.target).checked)"
+                      />
+
+                      <span class="text-[11px] text-gray-600">Cette page</span>
+                    </label>
+
+                    <!-- Action "tout sélectionner" (tous les résultats filtrés côté backend) -->
+                    <div *ngIf="hasActiveFilters()" class="pl-6">
+                      <button
+                        *ngIf="!selectAllAcrossPages"
+                        type="button"
+                        (click)="onSelectAllAcrossPages()"
+                        class="text-[11px] text-blue-700 underline"
+                      >
+                        Sélectionner tous les résultats filtrés ({{ totalItems }})
+                      </button>
+
+                      <div *ngIf="selectAllAcrossPages" class="text-[11px] text-gray-600">
+                        Tous les {{ totalItems }} contacts filtrés seront inclus (pas seulement cette page).
+                        <button type="button" (click)="onCancelSelectAllAcrossPages()" class="ml-2 underline">Annuler</button>
+                      </div>
+                    </div>
+                  </div>
+                </th>
+
+                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ID</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">👤 Contact</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">📱 Téléphone</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">💬 WhatsApp</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">📊 Messages</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">✅ Taux réussite</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-100">
+              <tr
+                *ngFor="let contact of filteredContacts"
+                class="hover:bg-blue-50 transition-colors duration-150 cursor-pointer"
+                (click)="openContactDetail(contact)"
+              >
+                <!-- Checkbox -->
+                <td class="px-4 py-3 whitespace-nowrap" (click)="$event.stopPropagation()">
+                  <input
+                    type="checkbox"
+                    [(ngModel)]="contact.selected"
+                    (ngModelChange)="onRowToggle()"
+                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                </td>
+
+                <!-- ID -->
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 font-mono">#{{ contact.id }}</td>
+
+                <!-- Nom et Prénom -->
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <div class="flex flex-col">
+                    <span class="text-sm font-semibold text-gray-900">{{ contact.connom }}</span>
+                    <span class="text-xs text-gray-500">{{ contact.conprenom }}</span>
+                  </div>
+                </td>
+
+                <!-- Téléphone -->
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <div class="flex items-center text-sm">
+                    <svg class="w-4 h-4 mr-1 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                      ></path>
+                    </svg>
+                    <span class="font-mono">{{ contact.contelephone }}</span>
+                  </div>
+                </td>
+
+                <!-- WhatsApp -->
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span [class]="getWhatsAppClass(contact.hasWhatsapp)">
+                    {{ getWhatsAppIcon(contact.hasWhatsapp) }}
+                  </span>
+                </td>
+
+                <!-- Messages -->
+                <td class="px-4 py-3 whitespace-nowrap text-xs">
+                  <div class="space-y-1">
+                    <div class="text-gray-700 font-medium">{{ getMessageStats(contact) }}</div>
+                    <div *ngIf="(contact.totalSmsSent || 0) > 0 || (contact.totalWhatsappSent || 0) > 0" class="flex gap-2 flex-wrap">
+                      <span *ngIf="(contact.totalSmsSuccess || 0) > 0" class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">
+                        ✅ SMS: {{ contact.totalSmsSuccess }}
+                      </span>
+                      <span *ngIf="(contact.totalSmsFailed || 0) > 0" class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs">
+                        ❌ SMS: {{ contact.totalSmsFailed }}
+                      </span>
+                      <span *ngIf="(contact.totalWhatsappSuccess || 0) > 0" class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">
+                        ✅ WA: {{ contact.totalWhatsappSuccess }}
+                      </span>
+                      <span *ngIf="(contact.totalWhatsappFailed || 0) > 0" class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs">
+                        ❌ WA: {{ contact.totalWhatsappFailed }}
+                      </span>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Taux de réussite -->
+                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium" [class]="getSuccessRateClass(contact)">
+                  {{ getSuccessRate(contact) }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Message si aucun contact -->
+        <div *ngIf="!contacts?.length" class="py-16 text-center border border-gray-200 rounded-lg bg-gray-50">
+          <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+            ></path>
+          </svg>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun contact trouvé</h3>
+          <p class="text-gray-500">Essayez de modifier vos critères de recherche ou d'ajouter de nouveaux contacts.</p>
+        </div>
+        <!-- Recherche standard -->
+
+        <!-- Pagination simplifiée -->
+        <div *ngIf="totalItems > contactPageSize" class="flex justify-between items-center mt-4 pt-2">
+          <button
+            (click)="changeContactPage(contactPage - 1)"
+            [disabled]="contactPage <= 1"
+            class="px-3 py-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+          >
+            Précédent
+          </button>
+          <span class="text-sm text-gray-600"> Page {{ contactPage }} / {{ totalContactPages }} ({{ totalItems }} résultats) </span>
+          <button
+            (click)="changeContactPage(contactPage + 1)"
+            [disabled]="contactPage >= totalContactPages"
+            class="px-3 py-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+          >
+            Suivant
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 🚀 NOUVEAU : Composant d'import -->
+    <app-contact-import
+      [isVisible]="showFileUpload"
+      [selectedGroupInput]="groupe()"
+      (closeImport)="closeImport()"
+      (importCompleted)="onImportCompleted($event)"
+    >
+    </app-contact-import>
+
+    <!-- Modal multi-sélection contacts (reste inchangé) -->
+    <div *ngIf="visible" class="fixed inset-0 z-50 flex items-center justify-center">
+      <!-- Background overlay -->
+      <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" (click)="visible = false"></div>
+
+      <!-- Modal container -->
+      <div
+        class="relative bg-white rounded-lg shadow-lg w-full max-w-lg p-6 z-10 max-h-[80vh] overflow-y-auto"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+      >
+        <!-- Close button -->
+        <button
+          (click)="visible = false"
+          class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 focus:outline-none"
+          aria-label="Fermer la fenêtre modale"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        <!-- Modal Title -->
+        <h3 id="modal-title" class="text-lg font-semibold text-gray-800 mb-4">Ajouter des contacts au groupe</h3>
+
+        <!-- Recherche -->
+        <input
+          type="text"
+          [(ngModel)]="searchContactModal"
+          (input)="filterContactsModal()"
+          placeholder="Rechercher un contact..."
+          class="w-full mb-4 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          aria-label="Rechercher un contact"
+        />
+
+        <!-- Liste des contacts avec scroll et checkboxes -->
+        <div
+          class="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-2 space-y-2"
+          (scroll)="onModalScroll($event)"
+          role="list"
+          aria-label="Liste des contacts"
+        >
+          <div *ngFor="let c of filteredContactsModal" class="flex items-center gap-2 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              [(ngModel)]="c.selected"
+              class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              [id]="'contact-checkbox-' + c.id"
+              [attr.aria-checked]="c.selected"
+              role="checkbox"
+            />
+
+            <label [for]="'contact-checkbox-' + c.id" class="text-gray-700 select-none">
+              {{ c.connom }} {{ c.conprenom }} - {{ c.contelephone }}
+            </label>
+          </div>
+
+          <!-- Message "aucun contact" -->
+          <div *ngIf="!filteredContactsModal.length" class="text-gray-500 text-center py-4">Aucun contact trouvé.</div>
+
+          <!-- Loader lors du chargement -->
+          <div *ngIf="isLoadingModal" class="flex justify-center py-2">
+            <svg class="animate-spin h-6 w-6 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Boutons d'action -->
+        <div class="mt-4 flex justify-end gap-3">
+          <button
+            (click)="addSelectedContacts()"
+            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500"
+          >
+            Ajouter
+          </button>
+          <button
+            (click)="visible = false"
+            class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400"
+          >
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal campagnes du groupe -->
+<div *ngIf="campaignsVisible" class="fixed inset-0 z-50 flex items-center justify-center">
+  <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" (click)="campaignsVisible = false"></div>
+
+  <div
+    class="relative bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 z-10 max-h-[80vh] overflow-y-auto"
+    role="dialog"
+    aria-modal="true"
+  >
+    <button (click)="campaignsVisible = false" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600" aria-label="Fermer">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">Campagnes du groupe</h3>
+
+    <div class="flex items-center gap-3 mb-4">
+      <input
+        type="text"
+        [(ngModel)]="campaignSearch"
+        (input)="reloadCampaigns()"
+        placeholder="Rechercher par nom ou ID…"
+        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-sm"
+      />
+      <select [(ngModel)]="campaignPageSize" (change)="reloadCampaigns()" class="px-2 py-2 text-xs border border-gray-300 rounded-lg">
+        <option [ngValue]="5">5</option>
+        <option [ngValue]="10">10</option>
+        <option [ngValue]="20">20</option>
+      </select>
+    </div>
+
+    <div class="overflow-x-auto border border-gray-200 rounded-lg">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">ID</th>
+            <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase">Nom de la campagne</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-100">
+          <tr *ngFor="let c of campaigns" class="hover:bg-purple-50">
+            <td class="px-4 py-2 text-sm font-mono">#{{ c.id }}</td>
+            <td class="px-4 py-2 text-sm">{{ c.name }}</td>
+          </tr>
+          <tr *ngIf="!campaigns.length && !campaignsLoading">
+            <td colspan="2" class="px-4 py-6 text-center text-gray-500 text-sm">Aucune campagne trouvée.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="flex justify-between items-center mt-4">
+      <button
+        (click)="changeCampaignPage(campaignPage - 1)"
+        [disabled]="campaignPage <= 1 || campaignsLoading"
+        class="px-3 py-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50 text-sm"
+      >
+        Précédent
+      </button>
+      <span class="text-sm text-gray-600"> Page {{ campaignPage }} / {{ totalCampaignPages }} ({{ totalCampaigns }} résultats) </span>
+      <button
+        (click)="changeCampaignPage(campaignPage + 1)"
+        [disabled]="campaignPage >= totalCampaignPages || campaignsLoading"
+        class="px-3 py-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50 text-sm"
+      >
+        Suivant
+      </button>
+    </div>
+  </div>
+</div>
+<div
+  *ngIf="showContactModal && selectedContact"
+  class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+  (click)="closeContactModal()"
+>
+  <!-- Backdrop -->
+  <div class="fixed inset-0 bg-black/60 backdrop-blur-sm"></div>
+
+  <!-- Modal Container -->
+  <div
+    class="relative bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Body scrollable -->
+    <div class="overflow-y-auto p-6">
+      <jhi-contact-detail [contactInput]="selectedContact" [isModal]="true" (closeModalEvent)="closeContactModal()"></jhi-contact-detail>
+    </div>
+  </div>
+</div>
+<app-toast #toast></app-toast>

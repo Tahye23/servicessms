@@ -1,0 +1,203 @@
+<style>
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th,
+  td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 2px solid #ccc; /* La couleur et l'épaisseur de la barre */
+  }
+</style>
+
+<p-card
+  [style]="{
+    border: '2px solid white ',
+    borderRadius: '30px',
+    margin: '30px'
+  }"
+  header="Entite de Tests  "
+>
+  <h2 id="page-heading" data-cy="EntitedetestHeading">
+    <div class="d-flex justify-content-start">
+      <p-button
+        [style]="{
+          border: '2px solid ',
+          borderRadius: '10px',
+          width: '180px',
+          fontSize: '14px',
+          margin: '3px'
+        }"
+        pRipple
+        size="small"
+        styleClass="p-button-sm"
+        [outlined]="true"
+        severity="info"
+        (click)="load()"
+        [disabled]="isLoading"
+      >
+        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+        <span jhiTranslate="migrationApp.entitedetest.home.refreshListLabel">Actualiser la liste</span>
+      </p-button>
+
+      <p-button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        [style]="{
+          border: '2px solid ',
+          borderRadius: '10px',
+          width: '250px',
+          fontSize: '14px',
+          margin: '3px'
+        }"
+        styleClass="p-button-sm"
+        p-button-rounded
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        [outlined]="true"
+        severity="info"
+        [routerLink]="['/entitedetest/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="migrationApp.entitedetest.home.createLabel">Créer un nouveau Entitedetest</span>
+      </p-button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  @if (entitedetests?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="migrationApp.entitedetest.home.notFound">Aucun Entitedetest trouvé</span>
+    </div>
+  }
+
+  @if (entitedetests && entitedetests.length > 0) {
+    <div class="table-responsive table-entities" id="entities">
+      <p-table
+        [style]="{
+          fontSize: '14px',
+
+          border: '2px solid white ',
+          borderRadius: '30px',
+          margin: '30px'
+        }"
+        [value]="entitedetests"
+        [tableStyle]="{ 'min-width': '50rem' }"
+      >
+        <ng-template pTemplate="header">
+          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="global.field.id">ID</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="identite">
+              <div class="d-flex">
+                <span jhiTranslate="migrationApp.entitedetest.identite">Identite</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="nom">
+              <div class="d-flex">
+                <span jhiTranslate="migrationApp.entitedetest.nom">Nom</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="nombrec">
+              <div class="d-flex">
+                <span jhiTranslate="migrationApp.entitedetest.nombrec">Nombrec</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="chamb">
+              <div class="d-flex">
+                <span jhiTranslate="migrationApp.entitedetest.chamb">Chamb</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="champdate">
+              <div class="d-flex">
+                <span jhiTranslate="migrationApp.entitedetest.champdate">Champdate</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-entitedetest>
+          <tr data-cy="entityTable">
+            <td>
+              <a [routerLink]="['/entitedetest', entitedetest.id, 'view']">{{ entitedetest.id }}</a>
+            </td>
+            <td>{{ entitedetest.identite }}</td>
+            <td>{{ entitedetest.nom }}</td>
+            <td>{{ entitedetest.nombrec }}</td>
+            <td>{{ entitedetest.chamb }}</td>
+            <td>{{ entitedetest.champdate | formatMediumDatetime }}</td>
+            <td class="text-end">
+              <div class="btn-group">
+                <p-button
+                  icon="pi pi-eye"
+                  [rounded]="true"
+                  [text]="true"
+                  [routerLink]="['/entitedetest', entitedetest.id, 'view']"
+                  data-cy="entityDetailsButton"
+                >
+                </p-button>
+
+                <p-button
+                  [routerLink]="['/entitedetest', entitedetest.id, 'edit']"
+                  icon="pi pi-pencil"
+                  [rounded]="true"
+                  [text]="true"
+                  data-cy="entityEditButton"
+                >
+                </p-button>
+
+                <p-button
+                  type="submit"
+                  (click)="delete(entitedetest)"
+                  icon="pi pi-trash"
+                  [rounded]="true"
+                  [text]="true"
+                  data-cy="entityDeleteButton"
+                >
+                </p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  }
+  @if (entitedetests && entitedetests.length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page, totalItems: totalItems, itemsPerPage: itemsPerPage }"></jhi-item-count>
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <p-paginator
+          (onPageChange)="onPageChange2($event)"
+          [first]="first"
+          [rows]="itemsPerPage"
+          [totalRecords]="totalItems"
+          [rowsPerPageOptions]="[10, 20, 30]"
+        >
+        </p-paginator>
+      </div>
+    </div>
+  }
+</p-card>

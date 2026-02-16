@@ -1,0 +1,649 @@
+<div class="flex h-screen bg-gray-50 overflow-hidden">
+  <!-- Suggestion d'upgrade en haut de la page
+  <app-upgrade-suggestion *ngIf="account()"></app-upgrade-suggestion>-->
+
+  <!-- Sidebar -->
+  <aside
+    *ngIf="!hideSideBar"
+    class="bg-slate-800 text-white transition-all duration-300 ease-in-out z-50 shadow-lg flex flex-col h-screen"
+    [ngClass]="{ 'w-64': sidebarOpen, 'w-15': !sidebarOpen }"
+  >
+    <!-- Logo and sidebar header -->
+    <div class="flex items-center justify-between h-16 px-4 border-b border-slate-700">
+      <div class="flex items-center">
+        <img *ngIf="sidebarOpen" src="/content/images/richattlogo.png" alt="Richatt Logo" class="h-8 w-auto rounded-full transition-all" />
+        <span
+          class="ml-2 font-bold text-xl text-white transition-all duration-300"
+          [ngClass]="{ 'opacity-0 w-0': !sidebarOpen, 'opacity-100': sidebarOpen }"
+        >
+          Richatt
+        </span>
+      </div>
+
+      <!-- Toggle button -->
+      <button
+        (click)="toggleSidebar()"
+        class="p-2 bg-[#8244ed] text-white rounded-full shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 transition transform hover:scale-110"
+      >
+        <svg
+          [ngClass]="{ 'rotate-180': !sidebarOpen }"
+          class="w-4 h-4 transform transition-transform duration-300"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- ===== STATUT D'ABONNEMENT DANS LA SIDEBAR ===== -->
+    <div *ngIf="sidebarOpen && account() && subscriptionAccess.sidebarVisible" class="px-3 py-2 border-b border-slate-700">
+      <app-subscription-status></app-subscription-status>
+    </div>
+
+    <!-- Sidebar navigation -->
+    <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2 scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-transparent">
+      <!-- Menu ouvert -->
+      <ul *ngIf="sidebarOpen" class="space-y-2">
+        <ng-container *ngFor="let item of items(); let i = index">
+          <li *ngIf="item.visible === undefined || item.visible">
+            <!-- Menu item simple -->
+            <a
+              *ngIf="!item.items"
+              [routerLink]="item.routerLink"
+              [routerLinkActive]="
+                item.disabled ? '' : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg ring-2 ring-indigo-400/50'
+              "
+              class="group flex items-center py-3 px-4 rounded-xl hover:bg-slate-700/80 transition-all duration-300 relative overflow-hidden"
+              [ngClass]="{
+                'opacity-70 cursor-not-allowed': item.disabled,
+                'border-l-4 border-amber-400 bg-amber-500/10 hover:bg-amber-500/20': item.upgradeRequired && !item.disabled,
+                'border-l-4 border-red-400 bg-red-500/10 hover:bg-red-500/20': item.disabled
+              }"
+              [attr.title]="item.tooltip || ''"
+              (mouseenter)="setHoverItem(i)"
+              (mouseleave)="clearHoverItem()"
+              (click)="item.disabled ? navigateToUpgradeWithContext(item.feature, item.tooltip) : null"
+            >
+              <!-- Conteneur d'icône moderne avec glassmorphism -->
+              <div
+                class="relative w-8 h-8 rounded-xl flex items-center justify-center mr-3 transition-all duration-300 group-hover:scale-110 backdrop-blur-sm"
+                [ngClass]="{
+                  'bg-slate-600/50 group-hover:bg-slate-500/60 border border-slate-500/30':
+                    !item.disabled && !item.upgradeRequired && !isActiveRoute(item.routerLink),
+                  'bg-amber-500/20 border border-amber-400/40': item.upgradeRequired && !item.disabled,
+                  'bg-red-500/20 border border-red-400/40': item.disabled,
+                  'bg-white/20 border border-white/30': isActiveRoute(item.routerLink)
+                }"
+              >
+                <!-- Icône principale avec couleurs harmonieuses -->
+                <i
+                  *ngIf="item.icon"
+                  [class]="item.icon + ' text-lg transition-all duration-300 drop-shadow-sm'"
+                  [ngClass]="{
+                    'text-slate-200 group-hover:text-indigo-300':
+                      !item.disabled && !item.upgradeRequired && !isActiveRoute(item.routerLink),
+                    'text-white drop-shadow-md': isActiveRoute(item.routerLink),
+                    'text-amber-300': item.upgradeRequired && !item.disabled,
+                    'text-red-300': item.disabled
+                  }"
+                ></i>
+
+                <!-- Effet de lueur pour les items actifs -->
+                <div
+                  *ngIf="isActiveRoute(item.routerLink)"
+                  class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-xl animate-pulse"
+                ></div>
+              </div>
+
+              <!-- Section du label et badges -->
+              <div class="flex-1 min-w-0">
+                <span
+                  class="font-semibold text-slate-200 group-hover:text-white transition-colors block truncate text-sm"
+                  [ngClass]="{
+                    'text-white drop-shadow-sm': isActiveRoute(item.routerLink),
+                    'text-amber-200': item.upgradeRequired && !item.disabled,
+                    'text-red-200': item.disabled
+                  }"
+                >
+                  {{ item.label }}
+                </span>
+
+                <!-- Badge compteur moderne avec glassmorphism -->
+                <div *ngIf="item.badge" class="mt-2">
+                  <span
+                    class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold transition-all duration-300 backdrop-blur-sm border"
+                    [ngClass]="getBadgeClassForDarkSidebar(item.badgeStyleClass)"
+                  >
+                    {{ item.badge }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Icônes d'état à droite -->
+              <div class="flex items-center space-x-2 ml-3">
+                <!-- Icône upgrade requis -->
+                <div
+                  *ngIf="item.upgradeRequired"
+                  class="w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg animate-pulse ring-2 ring-amber-400/30"
+                >
+                  <i class="fas fa-star text-white text-xs drop-shadow-sm"></i>
+                </div>
+
+                <!-- Icône verrouillé -->
+                <div
+                  *ngIf="item.disabled"
+                  class="w-7 h-7 bg-gradient-to-br from-red-400 to-red-500 rounded-full flex items-center justify-center shadow-lg ring-2 ring-red-400/30"
+                >
+                  <i class="fas fa-lock text-white text-xs drop-shadow-sm"></i>
+                </div>
+
+                <!-- Flèche pour les items actifs -->
+                <div *ngIf="isActiveRoute(item.routerLink) && !item.disabled" class="w-6 h-6 flex items-center justify-center">
+                  <i class="fas fa-chevron-right text-white text-sm animate-pulse drop-shadow-sm"></i>
+                </div>
+              </div>
+
+              <!-- Effet de brillance au hover -->
+              <div
+                class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl"
+              ></div>
+            </a>
+
+            <!-- Menu avec sous-éléments -->
+            <div *ngIf="item.items" class="relative">
+              <button
+                (click)="toggleSubmenu(i)"
+                class="group w-full flex items-center py-3 px-4 rounded-xl hover:bg-slate-700/80 transition-all duration-300"
+                [ngClass]="{ 'bg-slate-700/60': submenuOpenIndex === i }"
+                (mouseenter)="setHoverItem(i)"
+                (mouseleave)="clearHoverItem()"
+              >
+                <!-- Icône du menu parent -->
+                <div
+                  class="w-8 h-8 rounded-xl bg-slate-600/50 border border-slate-500/30 flex items-center justify-center mr-3 group-hover:bg-slate-500/60 transition-all duration-300 group-hover:scale-105 backdrop-blur-sm"
+                >
+                  <i
+                    *ngIf="item.icon"
+                    [class]="item.icon + ' text-lg text-slate-200 group-hover:text-indigo-300 transition-colors drop-shadow-sm'"
+                  ></i>
+                </div>
+
+                <span class="flex-1 font-semibold text-slate-200 group-hover:text-white transition-colors text-left text-sm">
+                  {{ item.label }}
+                </span>
+
+                <!-- Flèche de déroulement -->
+                <svg
+                  [ngClass]="{ 'rotate-180': submenuOpenIndex === i }"
+                  class="w-5 h-5 text-slate-400 transition-all duration-300 group-hover:text-slate-200 drop-shadow-sm"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              <!-- Submenu animé -->
+              <div
+                class="overflow-hidden transition-all duration-300 ease-in-out"
+                [style.maxHeight]="submenuOpenIndex === i && sidebarOpen ? '400px' : '0px'"
+              >
+                <div class="ml-8 mt-2 space-y-1 border-l-2 border-slate-600/50 pl-4">
+                  <ng-container *ngFor="let group of item.items">
+                    <ng-container *ngFor="let subItem of group[0].items">
+                      <a
+                        [routerLink]="subItem.routerLink"
+                        routerLinkActive="bg-indigo-500/30 text-indigo-200 border-r-2 border-indigo-400"
+                        class="group flex items-center py-2.5 px-3 rounded-lg text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+                        [ngClass]="{
+                          'opacity-60 cursor-not-allowed': subItem.disabled,
+                          'border-l-2 border-amber-400 bg-amber-500/10': subItem.upgradeRequired
+                        }"
+                        [attr.title]="subItem.tooltip || ''"
+                      >
+                        <!-- Icône ou point de navigation -->
+                        <div class="w-5 h-5 flex items-center justify-center mr-3">
+                          <i
+                            *ngIf="subItem.icon"
+                            [class]="subItem.icon + ' text-xs text-slate-400 group-hover:text-indigo-300 transition-colors'"
+                          ></i>
+                          <div
+                            *ngIf="!subItem.icon"
+                            class="w-2 h-2 rounded-full bg-slate-500 group-hover:bg-indigo-400 transition-colors shadow-sm"
+                          ></div>
+                        </div>
+
+                        <span class="flex-1 font-medium">{{ subItem.label }}</span>
+
+                        <!-- Icônes d'état pour sous-items -->
+                        <div class="flex items-center space-x-1 ml-2">
+                          <i *ngIf="subItem.upgradeRequired" class="fas fa-star text-amber-400 text-xs animate-pulse"></i>
+                          <i *ngIf="subItem.disabled" class="fas fa-lock text-red-400 text-xs"></i>
+                        </div>
+                      </a>
+                    </ng-container>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ng-container>
+      </ul>
+
+      <!-- Menu réduit -->
+      <ul *ngIf="!sidebarOpen" class="space-y-3">
+        <ng-container *ngFor="let item of items(); let i = index">
+          <li *ngIf="item.visible === undefined || item.visible">
+            <div
+              class="group relative flex items-center justify-center w-10 h-10 rounded-xl hover:bg-slate-700/80 transition-all duration-300 cursor-pointer backdrop-blur-sm border border-slate-600/30"
+              [ngClass]="{
+                'bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-xl ring-2 ring-indigo-400/50 border-indigo-400/50':
+                  isActiveRoute(item.routerLink),
+                'bg-amber-500/20 border-amber-400/50': item.upgradeRequired && !isActiveRoute(item.routerLink),
+                'bg-red-500/20 border-red-400/50': item.disabled && !isActiveRoute(item.routerLink),
+                'bg-slate-700/40': !isActiveRoute(item.routerLink) && !item.upgradeRequired && !item.disabled
+              }"
+              (mouseenter)="setHoverItem(i)"
+              (mouseleave)="clearHoverItem()"
+              (click)="handleMenuClick(item)"
+            >
+              <i
+                *ngIf="item.icon"
+                [class]="item.icon + ' text-xl drop-shadow-sm'"
+                [ngClass]="{
+                  'text-white': isActiveRoute(item.routerLink),
+                  'text-slate-200 group-hover:text-indigo-300': !isActiveRoute(item.routerLink) && !item.disabled && !item.upgradeRequired,
+                  'text-amber-300': item.upgradeRequired && !isActiveRoute(item.routerLink),
+                  'text-red-300': item.disabled && !isActiveRoute(item.routerLink)
+                }"
+              ></i>
+
+              <!-- Badge pour menu réduit -->
+              <div
+                *ngIf="item.badge"
+                class="absolute -top-2 -right-2 min-w-[22px] h-6 rounded-full text-xs font-bold flex items-center justify-center px-1.5 backdrop-blur-sm border shadow-lg"
+                [ngClass]="getBadgeClassForDarkSidebar(item.badgeStyleClass)"
+              >
+                {{ item.badge }}
+              </div>
+
+              <!-- Indicateurs d'état -->
+              <div
+                *ngIf="item.upgradeRequired"
+                class="absolute -bottom-1.5 -right-1.5 w-5 h-5 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg ring-2 ring-amber-400/30"
+              >
+                <i class="fas fa-star text-white text-xs"></i>
+              </div>
+
+              <div
+                *ngIf="item.disabled"
+                class="absolute -bottom-1.5 -right-1.5 w-5 h-5 bg-gradient-to-br from-red-400 to-red-500 rounded-full flex items-center justify-center shadow-lg ring-2 ring-red-400/30"
+              >
+                <i class="fas fa-lock text-white text-xs"></i>
+              </div>
+
+              <!-- Tooltip enrichi pour menu réduit -->
+              <div
+                *ngIf="hoverItemIndex === i"
+                class="absolute left-20 bg-slate-900/95 backdrop-blur-xl text-white px-5 py-4 rounded-2xl shadow-2xl z-50 whitespace-nowrap min-w-max animate-fade-in border border-slate-700/50"
+              >
+                <!-- Header du tooltip -->
+                <div class="flex items-center space-x-3 mb-3">
+                  <div class="w-8 h-8 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center backdrop-blur-sm">
+                    <i *ngIf="item.icon" [class]="item.icon + ' text-white text-base drop-shadow-sm'"></i>
+                  </div>
+                  <div>
+                    <span class="font-bold text-white">{{ item.label }}</span>
+                    <span
+                      *ngIf="item.badge"
+                      class="ml-2 px-2.5 py-1 rounded-lg text-xs font-bold backdrop-blur-sm border"
+                      [ngClass]="getBadgeClassForDarkSidebar(item.badgeStyleClass)"
+                    >
+                      {{ item.badge }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Description du tooltip -->
+                <div *ngIf="item.tooltip" class="text-sm text-slate-300 leading-relaxed mb-3 max-w-xs">
+                  {{ item.tooltip }}
+                </div>
+
+                <!-- Sous-menu dans le tooltip -->
+                <div *ngIf="item.items" class="border-t border-slate-700 pt-3 mt-3">
+                  <p class="text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wide">Sous-sections</p>
+                  <ng-container *ngFor="let group of item.items">
+                    <ng-container *ngFor="let subItem of group[0].items">
+                      <a
+                        [routerLink]="subItem.routerLink"
+                        class="block px-3 py-2 hover:bg-slate-800/80 text-sm transition-colors rounded-lg text-left text-slate-200 hover:text-white"
+                      >
+                        <i *ngIf="subItem.icon" [class]="subItem.icon + ' text-xs mr-2'"></i>
+                        {{ subItem.label }}
+                      </a>
+                    </ng-container>
+                  </ng-container>
+                </div>
+
+                <!-- Badges d'état dans le tooltip -->
+                <div class="flex items-center space-x-2 mt-3" *ngIf="item.upgradeRequired || item.disabled">
+                  <span
+                    *ngIf="item.upgradeRequired"
+                    class="inline-flex items-center px-3 py-1.5 bg-amber-500/20 text-amber-300 rounded-lg text-xs font-semibold border border-amber-400/30"
+                  >
+                    <i class="fas fa-star mr-1.5 text-xs"></i>
+                    Premium
+                  </span>
+                  <span
+                    *ngIf="item.disabled"
+                    class="inline-flex items-center px-3 py-1.5 bg-red-500/20 text-red-300 rounded-lg text-xs font-semibold border border-red-400/30"
+                  >
+                    <i class="fas fa-lock mr-1.5 text-xs"></i>
+                    Verrouillé
+                  </span>
+                </div>
+
+                <!-- Flèche du tooltip -->
+                <div
+                  class="absolute left-0 top-6 transform -translate-x-1 w-3 h-3 bg-slate-900/95 border-l border-t border-slate-700/50 rotate-45"
+                ></div>
+              </div>
+
+              <!-- Effet de lueur au hover -->
+              <div
+                class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"
+              ></div>
+            </div>
+          </li>
+        </ng-container>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main content area -->
+  <div class="flex flex-col flex-1 overflow-hidden transition-all duration-300">
+    <header class="bg-white shadow-sm transition-all duration-300 z-40" [ngClass]="{ 'pl-64': sidebarOpen, 'pl-20': !sidebarOpen }">
+      <div class="flex flex-wrap md:flex-nowrap items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
+        <!-- Titre / breadcrumbs (placeholder) -->
+        <h1 class="flex-shrink-0 text-xl font-semibold text-gray-800 truncate max-w-xs sm:max-w-md">
+          <!-- Titre ou breadcrumb ici -->
+        </h1>
+
+        <!-- User area -->
+        <div class="flex flex-wrap items-center space-x-2 md:space-x-4">
+          <!-- Statut abonnement (visible sur medium et plus, mais ok sur mobile avec adaptabilité) -->
+          <div
+            *ngIf="account() && subscriptionAccess.needsUpgrade"
+            class="flex flex-wrap md:flex-nowrap items-center bg-gradient-to-r from-amber-50 to-orange-50 text-amber-800 px-3 sm:px-4 py-2 rounded-xl border border-amber-200 shadow-sm transition-all duration-300 max-w-full min-w-[220px] sm:min-w-[300px]"
+          >
+            <!-- Icône -->
+            <div
+              class="w-8 h-8 flex-shrink-0 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center mr-3 shadow-sm"
+            >
+              <i class="fas fa-star text-white text-sm"></i>
+            </div>
+
+            <!-- Texte -->
+            <div class="flex-1 min-w-0 mr-3">
+              <span class="font-semibold text-amber-800 text-sm sm:text-base block truncate"> Passez au premium </span>
+              <p class="text-xs sm:text-sm text-amber-700 mt-0.5 truncate">Débloquez toutes les fonctionnalités</p>
+            </div>
+
+            <!-- Bouton -->
+            <button
+              (click)="navigateToUpgradeWithContext()"
+              class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-semibold text-xs sm:text-sm transition-all duration-200 shadow-sm hover:shadow-md flex items-center space-x-1 sm:space-x-2 flex-shrink-0 whitespace-nowrap"
+            >
+              <span>Voir les plans</span>
+              <i class="fas fa-arrow-right text-xs"></i>
+            </button>
+          </div>
+
+          <!-- Menu utilisateur -->
+          <div class="relative" *ngIf="account()">
+            <button
+              (click)="toggleAccountMenu()"
+              class="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded-md transition-colors min-w-[120px]"
+            >
+              <div
+                class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white shadow-sm"
+              >
+                {{ account()?.lastName?.charAt(0) || 'U' }}
+              </div>
+              <span class="font-medium text-gray-700 truncate max-w-[70px] sm:max-w-xs" [title]="account()?.lastName">
+                {{ account()?.lastName }}
+              </span>
+
+              <!-- Indicateur alerte abonnement -->
+              <div *ngIf="subscriptionAccess.needsUpgrade" class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+
+              <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            <!-- Dropdown menu -->
+            <div
+              *ngIf="isAccountMenuOpen"
+              class="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden"
+            >
+              <div class="py-1">
+                <!-- Plan abonnement -->
+                <div *ngIf="account()" class="px-4 py-2 bg-gray-50 border-b">
+                  <div class="text-xs text-gray-500">Plan actuel</div>
+                  <div class="flex items-center justify-between">
+                    <span class="font-medium text-sm">{{ subscriptionAccess.subscriptionType }}</span>
+                    <span *ngIf="subscriptionAccess.needsUpgrade" class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs">
+                      Action requise
+                    </span>
+                  </div>
+
+                  <!-- Crédits restants -->
+                  <div class="mt-1 space-y-1">
+                    <div *ngIf="subscriptionAccess.canSendSMS" class="flex justify-between text-xs">
+                      <span>SMS:</span>
+                      <span
+                        [ngClass]="{
+                          'text-red-600': subscriptionAccess.smsRemaining <= 5,
+                          'text-orange-600': subscriptionAccess.smsRemaining <= 20,
+                          'text-green-600': subscriptionAccess.smsRemaining > 20
+                        }"
+                      >
+                        {{ subscriptionAccess.smsRemaining }}
+                      </span>
+                    </div>
+                    <div *ngIf="subscriptionAccess.canSendWhatsApp" class="flex justify-between text-xs">
+                      <span>WhatsApp:</span>
+                      <span
+                        [ngClass]="{
+                          'text-red-600': subscriptionAccess.whatsappRemaining <= 5,
+                          'text-orange-600': subscriptionAccess.whatsappRemaining <= 20,
+                          'text-green-600': subscriptionAccess.whatsappRemaining > 20
+                        }"
+                      >
+                        {{ subscriptionAccess.whatsappRemaining }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Menu items -->
+                <a (click)="goToRoute('/billing')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+                  <i class="pi pi-credit-card mr-2"></i>
+                  Mon abonnement
+                </a>
+
+                <a (click)="goToRoute('/config')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+                  <i class="pi pi-cog mr-2"></i>
+                  Paramètres
+                </a>
+
+                <a (click)="goToRoute('')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+                  <i class="pi pi-info-circle mr-2"></i>
+                  À propos
+                </a>
+
+                <!-- Bouton d'upgrade si nécessaire -->
+                <a
+                  *ngIf="subscriptionAccess.needsUpgrade"
+                  (click)="navigateToUpgradeWithContext()"
+                  class="block px-4 py-2 text-sm text-orange-600 hover:bg-orange-50 cursor-pointer font-medium border-t border-gray-100"
+                >
+                  <i class="pi pi-star mr-2"></i>
+                  Améliorer mon plan
+                </a>
+
+                <div class="border-t border-gray-100 my-1"></div>
+                <a (click)="logout(); toggleAccountMenu()" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 cursor-pointer">
+                  <i class="pi pi-sign-out mr-2"></i>
+                  Déconnexion
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bouton de connexion -->
+          <button
+            *ngIf="!account()"
+            (click)="login()"
+            class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2 rounded-md hover:from-blue-700 hover:to-blue-800 transition-colors shadow-sm whitespace-nowrap"
+          >
+            Connexion
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="flex-1 overflow-y-auto bg-gray-50 flex flex-col min-h-0">
+      <div class="flex-1 p-6">
+        <router-outlet></router-outlet>
+      </div>
+
+      <!-- Footer - not fixed, with proper spacing -->
+      <div *ngIf="isHomePage || hideSideBar" class="mt-auto">
+        <div class="bg-gray-800 text-white py-4 px-6 shadow-inner">
+          <jhi-footer></jhi-footer>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ===== STYLES CSS POUR LES NOUVELLES FONCTIONNALITÉS ===== -->
+<style>
+  /* Badges pour les compteurs */
+  .badge-success {
+    @apply bg-green-500 text-white;
+  }
+
+  .badge-warning {
+    @apply bg-orange-500 text-white;
+  }
+
+  .badge-danger {
+    @apply bg-red-500 text-white;
+  }
+
+  .badge-info {
+    @apply bg-blue-500 text-white;
+  }
+
+  .badge-disabled {
+    @apply bg-gray-400 text-white;
+  }
+
+  /* Animation pour les éléments qui nécessitent une upgrade */
+  .upgrade-required {
+    @apply border-l-4 border-orange-400;
+    animation: pulse-upgrade 2s infinite;
+  }
+
+  @keyframes pulse-upgrade {
+    0%,
+    100% {
+      border-color: #f59e0b;
+    }
+    50% {
+      border-color: #fbbf24;
+    }
+  }
+
+  /* Scrollbar personnalisée */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  /* États des éléments de menu */
+  .menu-item-disabled {
+    @apply opacity-60 cursor-not-allowed;
+  }
+
+  .menu-item-upgrade-required {
+    @apply border-l-4 border-orange-400;
+  }
+
+  .menu-item-blocked {
+    @apply border-l-4 border-red-400;
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateX(-10px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+
+  /* Scrollbar pour sidebar sombre */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(71, 85, 105, 0.6);
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgba(71, 85, 105, 0.8);
+  }
+
+  /* Effet glassmorphism */
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .backdrop-blur-xl {
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+  }
+</style>

@@ -1,0 +1,157 @@
+# ===================================================================
+# Spring Boot configuration for the "prod" profile.
+# ===================================================================
+
+logging:
+  level:
+    ROOT: INFO
+    tech.jhipster: INFO
+    org.hibernate.SQL: DEBUG
+    com.example.myproject: INFO
+    org.springframework: INFO
+    org.springframework.aop: INFO
+    org.springframework.transaction: INFO
+    javax.management.remote.rmi: OFF
+    org.apache.camel: INFO
+
+management:
+  prometheus:
+    metrics:
+      export:
+        enabled: false
+
+spring:
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:postgresql://localhost:5432/migrationsms
+    username: backend
+    password: backend
+    hikari:
+      poolName: Hikari
+      auto-commit: false
+      maximum-pool-size: 40
+      minimum-idle: 15
+      connection-timeout: 10000
+      idle-timeout: 300000
+      max-lifetime: 600000
+      leak-detection-threshold: 60000
+  liquibase:
+    contexts: prod
+  mail:
+    host: smtp.hostinger.com
+    port: 465
+    username: contact@pay.richatt.com
+    password: Rich@ttPay2023!
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+  thymeleaf:
+    cache: true
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+server:
+  port: 8101
+  shutdown: graceful
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,application/javascript,application/json,image/svg+xml
+    min-response-size: 1024
+
+sendsms:
+  url: jdbc:postgresql://192.168.122.78:5432/kannel
+  username: backend
+  password: backend
+  smsc_id: http
+
+jhipster:
+  http:
+    cache:
+      timeToLiveInDays: 1461
+  cache:
+    ehcache:
+      time-to-live-seconds: 3600
+      max-entries: 1000
+  security:
+    authentication:
+      jwt:
+        base64-secret: NjA0MmUxNDQ3MWZmNGE0MzU5N2U4NGNhNjQ5ZGE3NjZmMWNlY2E4YmNiMDFkN2E0ZWY3MGE4ZjliODU2YTk5MDdmYWQ2ZGUwNzYzZmY5YTYwYmU5ZDllNzEzOGFhN2NiNTE1NzEwZDk0ZDlkYjlkZTUwZjIwZWZiYjhjMTMwMGI=
+        token-validity-in-seconds: 86400
+        token-validity-in-seconds-for-remember-me: 2592000
+  mail:
+    base-url: http://147.79.100.124:8101
+  logging:
+    use-json-format: false
+    logstash:
+      enabled: false
+      host: localhost
+      port: 5000
+      ring-buffer-size: 512
+
+sms:
+  fast-mode: true
+
+  query:
+    enabled: true
+    batch-size: 100
+
+  bulk:
+    target-rate: 9.5
+    parallel-workers: 8
+    batch-size: 500
+    update-interval-ms: 1000
+    update-batch-size: 200
+    burst-size: 50
+    burst-pause-ms: 500
+    send-timeout: 10
+
+  simulation-mode: false
+
+  dlr:
+    enabled: true
+
+dlr:
+  base-url: http://147.79.100.124:8101
+
+camel:
+  component:
+    smpp:
+      enabled: true
+      configuration:
+        host: 41.223.99.76
+        port: 2775
+        system-id: richatt
+        password: r1c2a3
+        system-type: ''
+        source-addr: '1234'
+        source-addr-ton: 5
+        source-addr-npi: 1
+        dest-addr-ton: 1
+        dest-addr-npi: 1
+        registered-delivery: 1
+        protocol-id: 0
+        priority-flag: 0
+        enquire-link-timer: 30000
+        transaction-timer: 10000
+
+whatsapp:
+  verify-token: HJSDHJSYYUHDJHJJH563265637276ghghghhg
+  bulk:
+    target-rate: 80.0
+    parallel-workers: 30
+    batch-size: 100
+    timeout-per-message: 20
+    max-retry: 3
+    circuit-breaker-threshold: 0.25
+    enable-campaign-batching: true
+    campaign-batch-size: 1000

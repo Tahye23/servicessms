@@ -1,0 +1,94 @@
+<div class="flex justify-center py-10">
+  <div class="w-full max-w-3xl bg-white p-8 rounded-xl shadow-md space-y-6">
+    @if (oTPStorage()) {
+      <!-- Titre -->
+      <h2 class="text-2xl font-bold text-gray-800 text-center mb-4">🧩 Détails OTP Storage</h2>
+
+      <hr class="border-gray-300 mb-4" />
+
+      <!-- Alertes -->
+      <jhi-alert-error></jhi-alert-error>
+      <jhi-alert></jhi-alert>
+
+      <!-- Détails OTP Storage -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-700">
+        <div>
+          <p class="font-semibold text-gray-600 mb-1">ID</p>
+          <p>{{ oTPStorage()!.id }}</p>
+        </div>
+        <div>
+          <p class="font-semibold text-gray-600 mb-1">Ots OTP</p>
+          <p>{{ oTPStorage()!.otsOTP }}</p>
+        </div>
+        <div>
+          <p class="font-semibold text-gray-600 mb-1">Phone Number</p>
+          <p>{{ oTPStorage()!.phoneNumber }}</p>
+        </div>
+        <div>
+          <p class="font-semibold text-gray-600 mb-1">Date d'expiration</p>
+          <p>{{ oTPStorage()!.otsdateexpir | formatMediumDatetime }}</p>
+        </div>
+        <div>
+          <p class="font-semibold text-gray-600 mb-1">OTP Utilisé</p>
+          <p>
+            <span [ngClass]="oTPStorage()!.isOtpUsed ? 'text-green-600' : 'text-red-600'">
+              {{ oTPStorage()!.isOtpUsed ? 'Oui' : 'Non' }}
+            </span>
+          </p>
+        </div>
+        <div>
+          <p class="font-semibold text-gray-600 mb-1">OTP Expiré</p>
+          <p>
+            <span [ngClass]="oTPStorage()!.isExpired ? 'text-red-600' : 'text-green-600'">
+              {{ oTPStorage()!.isExpired ? 'Oui' : 'Non' }}
+            </span>
+          </p>
+        </div>
+        <div class="md:col-span-2">
+          <p class="font-semibold text-gray-600 mb-1">Utilisateur associé</p>
+          @if (oTPStorage()!.user) {
+            <a [routerLink]="['/extended-user', oTPStorage()!.user?.id, 'view']" class="text-blue-600 hover:underline">
+              Voir l'utilisateur {{ oTPStorage()!.user?.id }}
+            </a>
+          } @else {
+            <p class="text-gray-500">Aucun utilisateur associé</p>
+          }
+        </div>
+      </div>
+
+      <!-- Boutons d'action -->
+      <div class="flex flex-wrap justify-center gap-4 mt-8">
+        <button
+          type="submit"
+          (click)="previousState()"
+          class="flex items-center gap-2 border border-gray-400 text-gray-700 rounded-lg px-6 py-2 hover:bg-gray-400 hover:text-white transition-colors duration-300"
+          data-cy="entityDetailsBackButton"
+        >
+          ⬅️ Retour
+        </button>
+
+        <button
+          type="button"
+          [routerLink]="['/otp-storage', oTPStorage()!.id, 'edit']"
+          class="flex items-center gap-2 border border-blue-600 bg-blue-600 text-white rounded-lg px-6 py-2 hover:bg-blue-700 transition-colors duration-300"
+        >
+          ✏️ Editer
+        </button>
+
+        <button
+          (click)="otpToBackend(id)"
+          class="flex items-center gap-2 border border-green-600 bg-green-600 text-white rounded-lg px-6 py-2 hover:bg-green-700 transition-colors duration-300"
+        >
+          🔐 Générer OTP
+        </button>
+
+        <button
+          (click)="otpsendToBackend(id)"
+          class="flex items-center gap-2 border border-yellow-500 bg-yellow-500 text-white rounded-lg px-6 py-2 hover:bg-yellow-600 transition-colors duration-300"
+        >
+          📩 Envoyer OTP par SMS
+        </button>
+      </div>
+    }
+  </div>
+</div>

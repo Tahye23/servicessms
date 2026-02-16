@@ -1,0 +1,50 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (referentiel()) {
+      <div>
+        <h2 data-cy="referentielDetailsHeading"><span jhiTranslate="migrationApp.referentiel.detail.title">Referentiel</span></h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ referentiel()!.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="migrationApp.referentiel.refCode">Ref Code</span></dt>
+          <dd>
+            <span>{{ referentiel()!.refCode }}</span>
+          </dd>
+          <dt><span jhiTranslate="migrationApp.referentiel.refRadical">Ref Radical</span></dt>
+          <dd>
+            <span>{{ referentiel()!.refRadical }}</span>
+          </dd>
+          <dt><span jhiTranslate="migrationApp.referentiel.refFrTitle">Ref Fr Title</span></dt>
+          <dd>
+            <span>{{ referentiel()!.refFrTitle }}</span>
+          </dd>
+          <dt><span jhiTranslate="migrationApp.referentiel.refArTitle">Ref Ar Title</span></dt>
+          <dd>
+            <span>{{ referentiel()!.refArTitle }}</span>
+          </dd>
+          <dt><span jhiTranslate="migrationApp.referentiel.refEnTitle">Ref En Title</span></dt>
+          <dd>
+            <span>{{ referentiel()!.refEnTitle }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+        </button>
+
+        <button type="button" [routerLink]="['/referentiel', referentiel()!.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editer</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

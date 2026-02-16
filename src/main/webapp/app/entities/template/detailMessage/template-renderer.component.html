@@ -1,0 +1,56 @@
+<!-- UNE BULLE globale pour tout le message -->
+<div *ngIf="contentData.components?.length" class="bg-white rounded-lg shadow-sm p-3 max-w-[80%] ml-2 relative mb-4">
+  <!-- Petit triangle à gauche -->
+  <div
+    class="absolute top-2 left-[-6px] w-0 h-0 border-t-[6px] border-t-transparent border-r-[6px] border-r-white border-b-[6px] border-b-transparent"
+  ></div>
+
+  <!-- Parcours ORDERNÉ des composants -->
+  <ng-container *ngFor="let comp of contentData.components">
+    <!-- HEADER (texte ou média) -->
+    <ng-container *ngIf="comp.type === 'HEADER'">
+      <!-- image / vidéo / document -->
+      <div *ngIf="comp.format === 'IMAGE'" class="mb-2 flex justify-center">
+        <img [src]="comp.mediaUrl" class="w-32 h-32 object-cover rounded-md" />
+      </div>
+      <div *ngIf="comp.format === 'VIDEO'" class="mb-2">
+        <video [src]="comp.mediaUrl" controls preload="metadata" class="w-full rounded-md"></video>
+      </div>
+      <!-- header texte -->
+      <div
+        *ngIf="comp.format === 'TEXT' && comp.text"
+        class="text-gray-800 whitespace-pre-wrap text-sm mb-2 break-words overflow-hidden"
+        [innerHTML]="comp.text"
+      ></div>
+    </ng-container>
+
+    <!-- BODY -->
+    <div
+      *ngIf="comp.type === 'BODY' && comp.text"
+      class="text-gray-800 whitespace-pre-wrap text-sm mb-2 break-words overflow-hidden"
+      [innerHTML]="comp.text"
+    ></div>
+
+    <!-- FOOTER (texte ou boutons) -->
+    <ng-container *ngIf="comp.type === 'FOOTER'">
+      <!-- footer texte -->
+      <div
+        *ngIf="comp.text"
+        class="text-gray-800 whitespace-pre-wrap text-sm mb-2 break-words overflow-hidden"
+        [innerHTML]="comp.text"
+      ></div>
+      <!-- boutons -->
+    </ng-container>
+    <div *ngIf="comp.buttons?.length" class="flex space-x-2">
+      <button
+        *ngFor="let btn of comp.buttons"
+        class="flex-1 py-2 bg-green-50 hover:bg-green-100 text-green-700 font-medium rounded-md text-sm border border-green-200 transition"
+      >
+        {{ btn.text }}
+      </button>
+    </div>
+  </ng-container>
+
+  <!-- Timestamp ou type en bas à droite -->
+  <div class="text-right text-xs text-gray-500 mt-3"></div>
+</div>

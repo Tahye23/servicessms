@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+      http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20250624-abonnement-full" author="auto-generated">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <not>
+                <tableExists tableName="abonnement"/>
+            </not>
+        </preConditions>
+        <createTable tableName="abonnement">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="plan_id" type="bigint">
+            </column>
+
+            <column name="status" type="varchar(30)" defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="start_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date" type="date"/>
+
+            <column name="created_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="sms_used" type="integer" defaultValueNumeric="0" />
+            <column name="whatsapp_used" type="integer" defaultValueNumeric="0" />
+            <column name="api_calls_today" type="integer" defaultValueNumeric="0" />
+            <column name="storage_used_mb" type="integer" defaultValueNumeric="0" />
+            <column name="last_api_call_date" type="date" />
+
+            <column name="payment_method" type="varchar(50)" />
+            <column name="transaction_id" type="varchar(255)" />
+            <column name="auto_renew" type="boolean" defaultValueBoolean="true" />
+
+            <column name="trial_end_date" type="date" />
+            <column name="is_trial" type="boolean" defaultValueBoolean="false" />
+
+            <!-- Champs personnalisés -->
+            <column name="is_custom_plan" type="boolean" defaultValueBoolean="false" />
+            <column name="custom_price" type="decimal(10,2)" />
+            <column name="custom_period" type="varchar(20)" />
+            <column name="custom_name" type="varchar(255)" />
+            <column name="custom_description" type="varchar(1000)" />
+
+            <column name="custom_sms_limit" type="integer" />
+            <column name="custom_whatsapp_limit" type="integer" />
+            <column name="custom_users_limit" type="integer" />
+            <column name="custom_templates_limit" type="integer" />
+            <column name="custom_api_calls_limit" type="integer" />
+            <column name="custom_storage_limit_mb" type="integer" />
+
+            <column name="custom_can_manage_users" type="boolean" defaultValueBoolean="false" />
+            <column name="custom_can_manage_templates" type="boolean" defaultValueBoolean="false" />
+            <column name="custom_can_view_conversations" type="boolean" defaultValueBoolean="false" />
+            <column name="custom_can_view_analytics" type="boolean" defaultValueBoolean="false" />
+            <column name="custom_priority_support" type="boolean" defaultValueBoolean="false" />
+
+            <column name="bonus_sms_enabled" type="boolean" defaultValueBoolean="false" />
+            <column name="bonus_sms_amount" type="integer" />
+            <column name="bonus_whatsapp_enabled" type="boolean" defaultValueBoolean="false" />
+            <column name="bonus_whatsapp_amount" type="integer" />
+            <column name="sidebar_visible" type="boolean" defaultValueBoolean="true" />
+            <column name="allow_sms_carryover" type="boolean" defaultValueBoolean="false" />
+            <column name="allow_whatsapp_carryover" type="boolean" defaultValueBoolean="false" />
+            <column name="carried_over_sms" type="integer" />
+            <column name="carried_over_whatsapp" type="integer" />
+        </createTable>
+
+
+
+
+
+
+    </changeSet>
+</databaseChangeLog>

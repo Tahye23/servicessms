@@ -1,0 +1,11 @@
+{
+  "migrationApp": {
+    "type": {
+      "null": "",
+      "OUINON": "OUINON",
+      "NOTE": "NOTE",
+      "MULTICHOIX": "MULTICHOIX",
+      "QOUVERTE": "QOUVERTE"
+    }
+  }
+}

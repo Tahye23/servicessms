@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <!--
+        Added the constraints for entity Conversation.
+    -->
+    <changeSet id="20240722133140-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="contact_id"
+                                 baseTableName="conversation"
+                                 constraintName="fk_conversation__contact_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="contact"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="question_id"
+                                 baseTableName="conversation"
+                                 constraintName="fk_conversation__question_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="question"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="covenquette_id"
+                                 baseTableName="conversation"
+                                 constraintName="fk_conversation__covenquette_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="company"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="covstate_id"
+                                 baseTableName="conversation"
+                                 constraintName="fk_conversation__covstate_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="referentiel"
+                                 />
+    </changeSet>
+</databaseChangeLog>

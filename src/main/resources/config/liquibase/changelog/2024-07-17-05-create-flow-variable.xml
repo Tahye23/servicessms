@@ -1,0 +1,40 @@
+
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+      http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="2024-07-17-05-create-flow-variable" author="saadna">
+        <createTable tableName="flow_variable">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="default_value" type="VARCHAR(255)"/>
+            <column name="variable_type" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(200)"/>
+            <column name="is_system" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="flow_id" type="BIGINT"/>
+            <!-- Audit fields (hérités de AbstractAuditingEntity) -->
+            <column name="created_by" type="VARCHAR(50)"/>
+            <column name="created_date" type="TIMESTAMP"/>
+            <column name="last_modified_by" type="VARCHAR(50)"/>
+            <column name="last_modified_date" type="TIMESTAMP"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="flow_variable"
+            baseColumnNames="flow_id"
+            referencedTableName="chatbot_flow"
+            referencedColumnNames="id"
+            constraintName="fk_flow_variable_flow"/>
+
+        <createSequence sequenceName="sequenceGenerator" startValue="1"/>
+    </changeSet>
+</databaseChangeLog>

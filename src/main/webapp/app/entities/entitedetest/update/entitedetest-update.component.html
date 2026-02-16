@@ -1,0 +1,75 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-entitedetest-heading"
+        data-cy="EntitedetestCreateUpdateHeading"
+        jhiTranslate="migrationApp.entitedetest.home.createOrEditLabel"
+      >
+        Créer ou éditer un Entitedetest
+      </h2>
+
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="migrationApp.entitedetest.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        <div class="mb-3">
+          <label class="form-label" for="field_identite" jhiTranslate="migrationApp.entitedetest.identite">Identite</label>
+          <input type="number" class="form-control" name="identite" id="field_identite" data-cy="identite" formControlName="identite" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_nom" jhiTranslate="migrationApp.entitedetest.nom">Nom</label>
+          <input type="text" class="form-control" name="nom" id="field_nom" data-cy="nom" formControlName="nom" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_nombrec" jhiTranslate="migrationApp.entitedetest.nombrec">Nombrec</label>
+          <input type="number" class="form-control" name="nombrec" id="field_nombrec" data-cy="nombrec" formControlName="nombrec" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_chamb" jhiTranslate="migrationApp.entitedetest.chamb">Chamb</label>
+          <input type="checkbox" class="form-check" name="chamb" id="field_chamb" data-cy="chamb" formControlName="chamb" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_champdate" jhiTranslate="migrationApp.entitedetest.champdate">Champdate</label>
+          <div class="d-flex">
+            <input
+              id="field_champdate"
+              data-cy="champdate"
+              type="datetime-local"
+              class="form-control"
+              name="champdate"
+              formControlName="champdate"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Sauvegarder</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,41 @@
+{
+  "annotations": {
+    "changelogDate": "20240729123301"
+  },
+  "fields": [
+    {
+      "fieldName": "servNom",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "servDescription",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "nbrusage",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "montant",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "statut",
+      "fieldType": "Boolean"
+    }
+  ],
+  "name": "Service",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "referentiel",
+      "relationshipName": "accessType",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "no"
+}

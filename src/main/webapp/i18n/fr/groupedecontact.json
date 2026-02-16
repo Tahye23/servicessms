@@ -1,0 +1,25 @@
+{
+  "migrationApp": {
+    "groupedecontact": {
+      "home": {
+        "title": "Groupedecontacts",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Groupedecontact",
+        "createOrEditLabel": "Créer ou éditer un Groupedecontact",
+        "notFound": "Aucun Groupedecontact trouvé"
+      },
+      "created": "Un nouveau Groupedecontact a été créé avec l'identifiant {{ param }}",
+      "updated": "Le Groupedecontact avec l'identifiant {{ param }} a été mis à jour",
+      "deleted": "Le Groupedecontact avec l'identifiant {{ param }} a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Groupedecontact {{ id }} ?"
+      },
+      "detail": {
+        "title": "Groupedecontact"
+      },
+      "id": "ID",
+      "cgrgroupe": "Cgrgroupe",
+      "contact": "Contact"
+    }
+  }
+}

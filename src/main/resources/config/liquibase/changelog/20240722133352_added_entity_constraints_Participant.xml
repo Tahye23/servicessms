@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <!--
+        Added the constraints for entity Participant.
+    -->
+    <changeSet id="20240722133352-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="patcontact_id"
+                                 baseTableName="participant"
+                                 constraintName="fk_participant__patcontact_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="contact"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="patenquette_id"
+                                 baseTableName="participant"
+                                 constraintName="fk_participant__patenquette_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="company"
+                                 />
+    </changeSet>
+</databaseChangeLog>

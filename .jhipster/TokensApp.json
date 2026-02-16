@@ -1,0 +1,28 @@
+{
+  "annotations": {
+    "changelogDate": "20240306150840"
+  },
+  "applications": ["RichattServices"],
+  "entityTableName": "tokens_app",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "dateExpiration",
+      "fieldType": "ZonedDateTime"
+    },
+    {
+      "fieldName": "isExpired",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "token",
+      "fieldType": "String"
+    }
+  ],
+  "name": "TokensApp",
+  "relationships": [],
+  "searchEngine": "no"
+}

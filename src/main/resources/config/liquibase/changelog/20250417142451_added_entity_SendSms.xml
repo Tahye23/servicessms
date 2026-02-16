@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity Contact.
+    -->
+    <changeSet id="20250417111351-1" author="jhipster">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <not>
+                <columnExists tableName="send_sms" columnName="template_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="send_sms">
+
+             <column name="template_id" type="BIGINT" >
+              </column>
+              <column name="total_message" type="integer" >
+              </column>
+            <column name="total_recipients" type="integer" >
+            </column>
+
+              <column name="bulk_id" type="varchar(255)">
+                  <constraints nullable="true"/>
+              </column>
+              <column name="bulk_status" type="varchar(255)">
+                  <constraints nullable="true"/>
+              </column>
+              <column name="bulk_created_at" type="timestamp">
+                  <constraints nullable="true"/>
+              </column>
+
+
+        </addColumn>
+    </changeSet>
+    <changeSet id="20250927204900-1" author="sadna">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <not>
+                <columnExists tableName="send_sms" columnName="retry_count"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="send_sms">
+
+            <column name="retry_count" type="integer" >
+            </column>
+            <column name="last_retry_date" type="${datetimeType}" >
+            </column>
+
+
+        </addColumn>
+    </changeSet>
+
+
+</databaseChangeLog>

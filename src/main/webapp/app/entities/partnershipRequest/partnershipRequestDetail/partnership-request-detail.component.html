@@ -1,0 +1,490 @@
+<!-- En-tête -->
+<div class="bg-gradient-to-r from-slate-900 via-blue-900 to-purple-900 text-white shadow-2xl">
+  <div class="max-w-7xl mx-auto px-6 py-8">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-6">
+        <button
+          (click)="goBack()"
+          class="p-3 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+
+        <div>
+          <h1 class="text-3xl font-bold text-white mb-2">Demande de Partenariat #{{ partnershipRequest()?.id }}</h1>
+          <div class="flex items-center space-x-4">
+            <span
+              class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold border"
+              [ngClass]="getStatusClasses(partnershipRequest()?.status)"
+            >
+              {{ getStatusLabel(partnershipRequest()?.status) }}
+            </span>
+            <span class="text-blue-100"> Créée le {{ formatDate(partnershipRequest()?.createdDate) }} </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <button
+          (click)="sendEmail()"
+          [disabled]="!partnershipRequest()?.email"
+          class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-xl shadow-lg hover:shadow-xl hover:from-emerald-600 hover:to-cyan-600 transition-all duration-300 disabled:opacity-50"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+            ></path>
+          </svg>
+          Envoyer Email
+        </button>
+
+        <button
+          (click)="downloadPDF()"
+          class="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm text-white rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            ></path>
+          </svg>
+          Télécharger PDF
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Contenu principal -->
+<div class="min-h-screen" *ngIf="!loading(); else loadingTemplate">
+  <div class="max-w-7xl mx-auto px-6 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Colonne principale - Informations de la demande -->
+      <div class="lg:col-span-2 space-y-8">
+        <!-- Informations du demandeur -->
+        <div class="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
+          <div class="bg-gradient-to-r from-blue-500 to-purple-500 p-6 text-white">
+            <div class="flex items-center space-x-6">
+              <div
+                class="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-white font-bold text-2xl border-2 border-white/30"
+              >
+                {{ getInitials(partnershipRequest()) }}
+              </div>
+              <div>
+                <h2 class="text-2xl font-bold text-white mb-2">
+                  {{ getFullName(partnershipRequest()) }}
+                </h2>
+                <p class="text-blue-100">{{ partnershipRequest()?.companyName }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-8 space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="space-y-4">
+                <div class="flex items-center space-x-3 p-4 bg-slate-50 rounded-2xl">
+                  <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      ></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="text-sm text-slate-500 font-medium">Email</div>
+                    <a href="mailto:{{ partnershipRequest()?.email }}" class="text-blue-600 hover:text-blue-800 font-semibold">
+                      {{ partnershipRequest()?.email }}
+                    </a>
+                  </div>
+                </div>
+
+                <div class="flex items-center space-x-3 p-4 bg-slate-50 rounded-2xl">
+                  <div class="w-10 h-10 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-xl flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                      ></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="text-sm text-slate-500 font-medium">Téléphone</div>
+                    <span class="text-slate-900 font-semibold">{{ partnershipRequest()?.phone }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="space-y-4">
+                <div class="flex items-center space-x-3 p-4 bg-slate-50 rounded-2xl">
+                  <div class="w-10 h-10 bg-gradient-to-r from-pink-500 to-rose-500 rounded-xl flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0h3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                      ></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="text-sm text-slate-500 font-medium">Secteur d'activité</div>
+                    <span class="text-slate-900 font-semibold">{{ getIndustryLabel(partnershipRequest()?.industry) }}</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center space-x-3 p-4 bg-slate-50 rounded-2xl">
+                  <div class="w-10 h-10 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                      ></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="text-sm text-slate-500 font-medium">Plan sélectionné</div>
+                    <span class="text-slate-900 font-semibold">{{ partnershipRequest()?.selectedPlanName || 'Non spécifié' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description du projet -->
+        <div class="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-8">
+          <h3 class="text-2xl font-bold text-slate-900 mb-6 flex items-center">
+            <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mr-3">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                ></path>
+              </svg>
+            </div>
+            Description du projet
+          </h3>
+
+          <div class="bg-gradient-to-r from-slate-50 to-blue-50 rounded-2xl p-6">
+            <p class="text-slate-700 leading-relaxed text-lg">
+              {{ partnershipRequest()?.projectDescription || 'Aucune description fournie.' }}
+            </p>
+          </div>
+
+          <!-- Informations supplémentaires -->
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8"
+            *ngIf="partnershipRequest()?.monthlyVolume || partnershipRequest()?.launchDate"
+          >
+            <div class="bg-slate-50 rounded-2xl p-6" *ngIf="partnershipRequest()?.monthlyVolume">
+              <h4 class="text-lg font-semibold text-slate-900 mb-2">Volume mensuel estimé</h4>
+              <p class="text-slate-600">{{ partnershipRequest()?.monthlyVolume }}</p>
+            </div>
+
+            <div class="bg-slate-50 rounded-2xl p-6" *ngIf="partnershipRequest()?.launchDate">
+              <h4 class="text-lg font-semibold text-slate-900 mb-2">Date de lancement prévue</h4>
+              <p class="text-slate-600">{{ formatDateShort(partnershipRequest()?.launchDate) }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Historique des actions -->
+        <div class="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
+          <div class="flex items-center justify-between p-6 border-b border-slate-200">
+            <h3 class="text-xl font-bold text-slate-900 flex items-center">
+              <div class="w-8 h-8 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-xl flex items-center justify-center mr-3">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
+              </div>
+              Historique des actions
+            </h3>
+            <button
+              (click)="toggleHistory()"
+              class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all duration-200"
+            >
+              <svg
+                class="w-5 h-5 transition-transform duration-200"
+                [class.rotate-180]="showHistory()"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="p-6" [class.hidden]="!showHistory()" *ngIf="showHistory()">
+            <div class="space-y-4">
+              <div
+                *ngFor="let action of actionHistory(); trackBy: trackByActionId"
+                class="flex items-start space-x-4 p-4 bg-slate-50 rounded-2xl"
+              >
+                <div
+                  class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0"
+                >
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between">
+                    <h4 class="text-sm font-semibold text-slate-900">{{ action.action }}</h4>
+                    <span class="text-xs text-slate-500">{{ getRelativeTime(action.timestamp) }}</span>
+                  </div>
+                  <p class="text-sm text-slate-600 mt-1">Par {{ action.adminName }}</p>
+                  <p class="text-xs text-slate-500 mt-1">{{ formatDate(action.timestamp) }}</p>
+                  <p *ngIf="action.notes" class="text-sm text-slate-700 mt-2 italic">{{ action.notes }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Colonne droite - Panel administratif -->
+      <div class="space-y-8">
+        <!-- Actions rapides -->
+        <div class="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-6">
+          <h3 class="text-xl font-bold text-slate-900 mb-6">Actions rapides</h3>
+
+          <div class="space-y-4">
+            <button
+              (click)="approveRequest()"
+              [disabled]="!canApprove() || processing()"
+              class="w-full flex items-center justify-center px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-500 text-white rounded-xl shadow-lg hover:shadow-xl hover:from-emerald-600 hover:to-green-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              {{ processing() ? 'Traitement...' : 'Approuver' }}
+            </button>
+
+            <button
+              (click)="rejectRequest()"
+              [disabled]="!canReject() || processing()"
+              class="w-full flex items-center justify-center px-6 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl shadow-lg hover:shadow-xl hover:from-red-600 hover:to-pink-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+              {{ processing() ? 'Traitement...' : 'Rejeter' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Mise à jour du statut -->
+        <div class="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-6">
+          <h3 class="text-xl font-bold text-slate-900 mb-6">Mise à jour du statut</h3>
+
+          <form [formGroup]="statusUpdateForm" (ngSubmit)="updateStatus()">
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Statut</label>
+                <select
+                  formControlName="status"
+                  class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 focus:outline-none"
+                >
+                  <option *ngFor="let status of statusOptions" [value]="status.value">
+                    {{ status.label }}
+                  </option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Notes administratives</label>
+                <textarea
+                  formControlName="adminNotes"
+                  rows="3"
+                  placeholder="Ajoutez des notes sur cette mise à jour..."
+                  class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 focus:outline-none resize-none"
+                ></textarea>
+              </div>
+
+              <button
+                type="submit"
+                [disabled]="!statusUpdateForm.valid || processing()"
+                class="w-full flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl shadow-lg hover:shadow-xl hover:from-blue-600 hover:to-purple-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                  ></path>
+                </svg>
+                Mettre à jour
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Notes administratives -->
+        <div class="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
+          <div class="flex items-center justify-between p-6 border-b border-slate-200">
+            <h3 class="text-xl font-bold text-slate-900">Notes administratives</h3>
+            <button
+              (click)="toggleNotes()"
+              class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all duration-200"
+            >
+              <svg
+                class="w-5 h-5 transition-transform duration-200"
+                [class.rotate-180]="showNotes()"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="p-6" [class.hidden]="!showNotes()" *ngIf="showNotes()">
+            <!-- Formulaire d'ajout de note -->
+            <form [formGroup]="adminNotesForm" (ngSubmit)="addAdminNote()" class="mb-6">
+              <div class="space-y-4">
+                <textarea
+                  formControlName="note"
+                  rows="3"
+                  placeholder="Ajoutez une note administrative..."
+                  class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 focus:outline-none resize-none"
+                ></textarea>
+
+                <button
+                  type="submit"
+                  [disabled]="!adminNotesForm.valid"
+                  class="w-full flex items-center justify-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-xl shadow-lg hover:shadow-xl hover:from-emerald-600 hover:to-cyan-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                  </svg>
+                  Ajouter note
+                </button>
+              </div>
+            </form>
+
+            <!-- Liste des notes -->
+            <div class="space-y-4 max-h-96 overflow-y-auto">
+              <div
+                *ngFor="let note of adminNotes(); trackBy: trackByNoteId"
+                class="p-4 bg-slate-50 rounded-2xl border-l-4"
+                [ngClass]="{
+                  'border-green-400': note.action === 'approve',
+                  'border-red-400': note.action === 'reject',
+                  'border-blue-400': note.action === 'comment'
+                }"
+              >
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-sm font-semibold text-slate-900">{{ note.adminName }}</span>
+                  <span class="text-xs text-slate-500">{{ getRelativeTime(note.createdDate) }}</span>
+                </div>
+                <p class="text-sm text-slate-700 leading-relaxed">{{ note.note }}</p>
+                <div class="text-xs text-slate-500 mt-2">{{ formatDate(note.createdDate) }}</div>
+              </div>
+
+              <div *ngIf="adminNotes().length === 0" class="text-center py-8">
+                <svg class="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  ></path>
+                </svg>
+                <p class="text-slate-500">Aucune note administrative</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Informations système -->
+        <div class="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-6">
+          <h3 class="text-xl font-bold text-slate-900 mb-6">Informations système</h3>
+
+          <div class="space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-slate-600">ID de la demande</span>
+              <span class="text-sm font-semibold text-slate-900">#{{ partnershipRequest()?.id }}</span>
+            </div>
+
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-slate-600">Date de création</span>
+              <span class="text-sm font-semibold text-slate-900">{{ formatDateShort(partnershipRequest()?.createdDate) }}</span>
+            </div>
+
+            <div class="flex justify-between items-center" *ngIf="partnershipRequest()?.processedDate">
+              <span class="text-sm text-slate-600">Date de traitement</span>
+              <span class="text-sm font-semibold text-slate-900">{{ formatDateShort(partnershipRequest()?.processedDate) }}</span>
+            </div>
+
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-slate-600">Statut actuel</span>
+              <span
+                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold"
+                [ngClass]="getStatusClasses(partnershipRequest()?.status)"
+              >
+                {{ getStatusLabel(partnershipRequest()?.status) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Template de chargement -->
+<ng-template #loadingTemplate>
+  <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+    <div class="text-center">
+      <div class="relative">
+        <div class="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
+        </div>
+      </div>
+      <p class="text-slate-600 mt-6 font-medium">Chargement des détails...</p>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Bouton d'action flottant -->
+<div class="fixed bottom-8 right-8 z-50">
+  <button
+    (click)="toggleAdminPanel()"
+    class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 flex items-center justify-center"
+  >
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+      ></path>
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+    </svg>
+  </button>
+</div>

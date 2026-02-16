@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!-- ========================================== -->
+    <!-- NOUVEAU PLAN ABONNEMENT V2 - 2025-06-24  -->
+    <!-- Clean implementation - Suppression et recréation -->
+    <!-- ========================================== -->
+
+
+
+    <!-- ÉTAPE 2: Création de la nouvelle table plan_abonnement -->
+    <changeSet id="20250624-clean-02-create-plan-abonnement" author="clean-migration">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <not>
+                <tableExists tableName="plan_abonnement"/>
+            </not>
+        </preConditions>
+        <comment>Création de la nouvelle table plan_abonnement avec le modèle v2</comment>
+
+        <createTable tableName="plan_abonnement">
+            <!-- Clé primaire -->
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <!-- Champs de base obligatoires -->
+            <column name="abp_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="abp_description" type="text"/>
+
+            <!-- Prix optionnel (pour les plans gratuits) -->
+            <column name="abp_price" type="decimal(21,2)"/>
+
+            <column name="abp_currency" type="varchar(3)" defaultValue="MRU">
+                <constraints nullable="false"/>
+            </column>
+            <column name="abp_period" type="varchar(20)"/>
+
+            <!-- Features sous forme de texte simple (séparées par virgules) -->
+            <column name="abp_features" type="text"/>
+
+            <!-- Champs d'affichage et UI -->
+            <column name="abp_button_text" type="varchar(255)"/>
+            <column name="button_class" type="varchar(100)"/>
+            <column name="abp_popular" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="custom_plan" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Champs de traçabilité -->
+            <column name="created_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Correction : renommage en 'active' pour correspondre au modèle -->
+            <column name="active" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Type de plan (ENUM) - OBLIGATOIRE -->
+            <column name="plan_type" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Limites des services (support des valeurs négatives pour illimité) -->
+            <column name="sms_limit" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="whatsapp_limit" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="users_limit" type="integer" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="templates_limit" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Permissions fonctionnelles -->
+            <column name="can_manage_users" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="can_manage_templates" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="can_view_conversations" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="can_view_analytics" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="priority_support" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Limites techniques -->
+            <column name="max_api_calls_per_day" type="integer" defaultValueNumeric="100">
+                <constraints nullable="false"/>
+            </column>
+            <column name="storage_limit_mb" type="integer" defaultValueNumeric="100">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Ordre d'affichage -->
+            <column name="sort_order" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- ÉTAPE 3: Ajout des contraintes de validation -->
+    <changeSet id="20250624-clean-03-add-constraints" author="clean-migration">
+        <comment>Ajout des contraintes de validation métier</comment>
+
+
+
+        <!-- Contrainte unique sur le nom du plan -->
+        <addUniqueConstraint
+            tableName="plan_abonnement"
+            columnNames="abp_name"
+            constraintName="uk_plan_abonnement_name"/>
+    </changeSet>
+
+
+
+
+</databaseChangeLog>

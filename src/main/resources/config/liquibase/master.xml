@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="floatType" value="float4" dbms="postgresql"/>
+    <property name="clobType" value="clob" dbms="postgresql"/>
+    <property name="blobType" value="blob" dbms="postgresql"/>
+    <property name="uuidType" value="uuid" dbms="postgresql"/>
+    <property name="datetimeType" value="datetime" dbms="postgresql"/>
+
+    <include file="config/liquibase/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240109101405_added_entity_Entitedetest.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240305142411_added_entity_SendSms.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240306150839_added_entity_Application.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240306150840_added_entity_TokensApp.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240315152409_added_entity_Company.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240719140754_added_entity_Dialogue.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240722111345_added_entity_Contact.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240722114025_added_entity_Api.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240722125756_added_entity_Groupe.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240722130228_added_entity_Groupedecontact.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240722130550_added_entity_UserService.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240722132229_added_entity_UserTokenApi.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240722133140_added_entity_Conversation.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240722133352_added_entity_Participant.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240722133531_added_entity_Choix.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240722133952_added_entity_Question.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240722134201_added_entity_Reponse.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240722134358_added_entity_OTPStorage.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240722134701_added_entity_Abonnement.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240723152853_added_entity_ExtendedUser.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240729123301_added_entity_Service.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240806115914_added_entity_Fileextrait.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240806160007_added_entity_Customer.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240906141054_added_entity_Referentiel.xml" relativeToChangelogFile="false"/>
+    <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
+    <!--include file="config/liquibase/changelog/20240306150839_added_entity_constraints_Application.xml" relativeToChangelogFile="false"/>
+
+    <include file="config/liquibase/changelog/20240306150841_added_entity_constraints_Services.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240305142411_added_entity_constraints_Sms.xml" relativeToChangelogFile="false"/
+    <include file="config/liquibase/changelog/20240722125756_added_entity_constraints_Groupe.xml" relativeToChangelogFile="false"/>-->
+    <!--<include file="config/liquibase/changelog/20240722130228_added_entity_constraints_Groupedecontact.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240306150839_added_entity_constraints_Application.xml" relativeToChangelogFile="false"/>
+    include file="config/liquibase/changelog/20240722130550_added_entity_constraints_UserService.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240722133140_added_entity_constraints_Conversation.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240722133352_added_entity_constraints_Participant.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240722133531_added_entity_constraints_Choix.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240722134201_added_entity_constraints_Reponse.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240722134358_added_entity_constraints_OTPStorage.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240722132229_added_entity_constraints_UserTokenApi.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240722130550_added_entity_constraints_UserService.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240315152409_added_entity_constraints_Company.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240722133952_added_entity_constraints_Question.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240306150840_added_entity_constraints_TokensApp.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240305142411_added_entity_constraints_SendSms.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240729123301_added_entity_constraints_Service.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240722111345_added_entity_constraints_Contact.xml" relativeToChangelogFile="false"/>-->
+    <include file="config/liquibase/changelog/addfieldtocontact.xml" relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/20250407101409_added_entity_template.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/00000000000000_initial_schema4.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/00000000000000_initial_schema5.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/00000000000000_initial_schema6.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250409111346_added_entity_Contact.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250409111346_added_entity_Group.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250410142451_added_entity_SendSms.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250410142412_added_entity_SendSms.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250412111346_added_entity_Contact.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250417142451_added_entity_SendSms.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250418142451_added_entity_Sms.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250422101409_added_entity_template.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250422142451_added_entity_SendSms.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/202504232058_send_whatsapp.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250427111345_added_entity_Contact.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250427142451_added_entity_SendSms.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250430142451_added_entity_import_history.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250502142452_added_entity_SendSms.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250502142452_added_entity_template.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250505142452_added_entity_template.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250512142459_added_entity_Sms.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250511142454_added_entity_SendSms.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250511142457_added_entity_Sms.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250513142459_added_entity_configuration.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250514142456_added_entity_Sms.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250514152556_added_entity_Sms.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250514152550_added_entity_Chat.xml" relativeToChangelogFile="false"/>
+     <include file="/config/liquibase/changelog/20250527142456_added_entity_Sms.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250530_added_entity_message_delivery.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250528142456_added_entity_Sms.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250528142454_added_entity_SendSms.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250602142456_added_entity_SendSms.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250602142456_added_entity_Sms.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250604142456_added_entity_SendSms.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250613142459_added_entity_configuration.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20250613142459_added_entity_configuration2.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20240619_add_columns_planabonnement.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/20062025_partnership_request.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/Vxxx__add_dashboard_api_permissions.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250115120000_added_entity_ChatbotFlow.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250115130000_added_entity_ChatbotSession.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/2024-07-17-04-create-flow-node.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250115130000_added_entity_Condtionnel.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/2024-07-17-05-create-flow-variable.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/2024-07-17-06-create-node-button.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/2024-07-17-07-create-node-list-item.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/add_send_sms_history_table.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/271120251129_add_dlr_table.xml" relativeToChangelogFile="false"/>
+    <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
+    <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
+    <include file="config/liquibase/changelog/2026-01-13_add_application_allowed_services.xml" relativeToChangelogFile="false"/>
+
+    <include file="config/liquibase/changelog/2026-01-14-add-tokens_app_to-application.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260126_add_channel_configuration.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/2026-01-29-add-smsOperator_to-channel_config.xml" relativeToChangelogFile="false"/>
+
+</databaseChangeLog>
