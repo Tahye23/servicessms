@@ -14,7 +14,7 @@
     <include file="config/liquibase/changelog/20240109101405_added_entity_Entitedetest.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240305142411_added_entity_SendSms.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240306150839_added_entity_Application.xml" relativeToChangelogFile="false"/>
-     <include file="config/liquibase/changelog/20240306150840_added_entity_TokensApp.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20240306150840_added_entity_TokensApp.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240315152409_added_entity_Company.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240719140754_added_entity_Dialogue.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240722111345_added_entity_Contact.xml" relativeToChangelogFile="false"/>
@@ -60,9 +60,7 @@
     <include file="config/liquibase/changelog/addfieldtocontact.xml" relativeToChangelogFile="false"/>
 
     <include file="/config/liquibase/changelog/20250407101409_added_entity_template.xml" relativeToChangelogFile="false"/>
-    <include file="/config/liquibase/changelog/00000000000000_initial_schema4.xml" relativeToChangelogFile="false"/>
-    <include file="/config/liquibase/changelog/00000000000000_initial_schema5.xml" relativeToChangelogFile="false"/>
-    <include file="/config/liquibase/changelog/00000000000000_initial_schema6.xml" relativeToChangelogFile="false"/>
+    
     <include file="/config/liquibase/changelog/20250409111346_added_entity_Contact.xml" relativeToChangelogFile="false"/>
     <include file="/config/liquibase/changelog/20250409111346_added_entity_Group.xml" relativeToChangelogFile="false"/>
     <include file="/config/liquibase/changelog/20250410142451_added_entity_SendSms.xml" relativeToChangelogFile="false"/>
@@ -114,5 +112,7 @@
     <include file="config/liquibase/changelog/2026-01-14-add-tokens_app_to-application.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260126_add_channel_configuration.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/2026-01-29-add-smsOperator_to-channel_config.xml" relativeToChangelogFile="false"/>
-
+    <include file="/config/liquibase/changelog/00000000000000_initial_schema4.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/00000000000000_initial_schema5.xml" relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/00000000000000_initial_schema6.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>
