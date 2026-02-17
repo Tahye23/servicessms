@@ -8,13 +8,17 @@
  
     <!-- ChangeSet 1: Supprimer la colonne api_token -->
     <changeSet id="20260114-1" author="jhipster">
-        <comment>Drop deprecated api_token column from application table</comment>
+        <preConditions onFail="MARK_RAN">
+           <columnExists tableName="application" columnName="api_token"/>
+        </preConditions>
         <dropColumn columnName="api_token" tableName="application"/>
     </changeSet>
  
     <!-- ChangeSet 2: Supprimer la colonne last_token_refresh -->
     <changeSet id="20250114-refactor-02-drop-last-token-refresh" author="jhipster">
-        <comment>Drop deprecated last_token_refresh column from application table</comment>
+        <preConditions onFail="MARK_RAN">
+           <columnExists tableName="application" columnName="last_token_refresh"/>
+        </preConditions>
         <dropColumn columnName="last_token_refresh" tableName="application"/>
     </changeSet>
  
