@@ -1,6 +1,7 @@
 package com.example.myproject.domain;
 
 import com.example.myproject.domain.enumeration.Channel;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.io.Serializable;
 
@@ -19,6 +20,7 @@ public class ChannelConfiguration implements Serializable {
 
     @Column(name = "channel_type", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
+    // @JsonProperty("channel_type")
     private Channel channelType;
 
     @Column(name = "host", length = 255)
@@ -48,6 +50,7 @@ public class ChannelConfiguration implements Serializable {
     }
 
     @Column(name = "sms_operator", length = 50)
+    //@JsonProperty("sms_operator")
     private String smsOperator;
 
     // ============================================

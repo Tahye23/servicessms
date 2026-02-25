@@ -131,10 +131,8 @@ public class SMSService {
 
     public SendResult goforSendFastResult(String sourceAddress, String destinationAddress, String message) {
         try {
-            // 🔐 1️⃣ Récupérer l'utilisateur connecté
             String login = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new RuntimeException("User not authenticated"));
 
-            // 📦 2️⃣ Charger configuration SMS depuis DB
             ChannelConfiguration cfg = channelConfigurationRepository
                 .findByUserLoginAndChannelType(login, Channel.SMS)
                 .orElseThrow(() -> new RuntimeException("No SMS configuration found for user"));
@@ -143,10 +141,8 @@ public class SMSService {
                 return SendResult.fail("SMS configuration not verified", null);
             }
 
-            // 🔓 3️⃣ Déchiffrer mot de passe
             String decryptedPassword = channelConfigurationService.decryptPassword(cfg);
 
-            // 🔗 4️⃣ Construire URI SMPP dynamiquement
             String smppUri = String.format(
                 "smpp://%s:%d?systemId=%s&password=%s&enquireLinkTimer=5000&transactionTimer=10000",
                 cfg.getHost(),
@@ -157,7 +153,6 @@ public class SMSService {
 
             log.debug("Using SMPP host {}:{} for user {}", cfg.getHost(), cfg.getPort(), login);
 
-            // 📞 5️⃣ Format numéros
             String dlrUrl = buildDlrCallbackUrl();
 
             String formattedSource = formatPhoneNumber(sourceAddress);

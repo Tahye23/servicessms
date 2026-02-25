@@ -1,10 +1,16 @@
 package com.example.myproject.web.rest;
 
 import com.example.myproject.domain.ChannelConfiguration;
+import com.example.myproject.domain.enumeration.Channel;
 import com.example.myproject.service.ChannelConfigurationService;
 import com.example.myproject.service.EmailSenderService;
 import com.example.myproject.service.SmsSenderService;
+import jakarta.validation.Valid;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/channels")
@@ -24,41 +30,75 @@ public class ChannelConfigurationResource {
         this.smsSenderService = smsSenderService;
     }
 
-    // Sauvegarde de la configuration (avec chiffrement)
+    /**
+     * Sauvegarde propre avec gestion d’erreur claire
+     */
     @PostMapping
-    public ChannelConfiguration save(@RequestBody ChannelConfiguration cfg, @RequestParam String password) {
-        return service.save(cfg, password);
-    }
-
-    // Test SMTP (sans sauvegarder)
-    @PostMapping("/test-email")
-    public String testEmail(@RequestBody ChannelConfiguration cfg, @RequestParam String password) {
+    public ResponseEntity<?> saveOrUpdate(@RequestBody ChannelConfiguration cfg, @RequestParam String password) {
         try {
-            // chiffrer puis déchiffrer (simulation réelle)
-            cfg.setEncryptedPassword(service.save(cfg, password).getEncryptedPassword());
-            String decrypted = service.decryptPassword(cfg);
-
-            emailSenderService.sendTestEmail(cfg, decrypted);
-            return "Email envoyé avec succès";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Erreur SMTP : " + e.getMessage();
+            ChannelConfiguration saved = service.saveOrUpdate(cfg, password);
+            return ResponseEntity.ok(saved);
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         }
     }
 
-    // 🔥 TEST SMS
-    @PostMapping("/test-sms")
-    public String testSms(@RequestBody ChannelConfiguration cfg, @RequestParam String password) {
+    @PutMapping(value = "/{id}", consumes = "application/json")
+    public ResponseEntity<?> update(
+        @PathVariable Long id,
+        @Valid @RequestBody ChannelConfiguration cfg,
+        @RequestParam(required = false) String password
+    ) {
         try {
-            // chiffrer le password comme en prod
-            cfg.setEncryptedPassword(service.save(cfg, password).getEncryptedPassword());
+            ChannelConfiguration updated = service.update(id, cfg, password);
+            return ResponseEntity.ok(updated);
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        try {
+            service.delete(id);
+            return ResponseEntity.ok("Configuration supprimée avec succès");
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        }
+    }
+
+    /**
+     * Test EMAIL sans sauvegarder
+     */
+    @PostMapping("/test-email")
+    public ResponseEntity<?> testEmail(@RequestBody ChannelConfiguration cfg, @RequestParam String password) {
+        try {
+            String encrypted = service.encryptPassword(password);
+            cfg.setEncryptedPassword(encrypted);
+
+            String decrypted = service.decryptPassword(cfg);
+            emailSenderService.sendTestEmail(cfg, decrypted);
+
+            return ResponseEntity.ok("Email envoyé avec succès");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Erreur SMTP : " + e.getMessage());
+        }
+    }
+
+    /**
+     * Test SMS sans sauvegarder
+     */
+    @PostMapping("/test-sms")
+    public ResponseEntity<?> testSms(@RequestBody ChannelConfiguration cfg, @RequestParam String password) {
+        try {
+            String encrypted = service.encryptPassword(password);
+            cfg.setEncryptedPassword(encrypted);
 
             smsSenderService.test(cfg);
 
-            return "SMS envoyé  avec succès";
+            return ResponseEntity.ok("SMS envoyé avec succès");
         } catch (Exception e) {
-            e.printStackTrace();
-            return "Erreur SMS : " + e.getMessage();
+            return ResponseEntity.badRequest().body("Erreur SMS : " + e.getMessage());
         }
     }
 }

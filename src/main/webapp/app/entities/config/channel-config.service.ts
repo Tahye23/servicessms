@@ -46,4 +46,13 @@ export class ChannelConfigService {
   getConfig(channelType: 'WHATSAPP' | 'SMS' | 'EMAIL'): Observable<ChannelConfigurationDTO> {
     return this.http.get<ChannelConfigurationDTO>(`${this.apiUrl}/${channelType.toLowerCase()}`);
   }
+  updateConfig(id: number, cfg: ChannelConfigurationDTO, password?: string): Observable<ChannelConfigurationDTO> {
+    const url = password ? `${this.apiUrl}/${id}?password=${password}` : `${this.apiUrl}/${id}`;
+    return this.http.put<ChannelConfigurationDTO>(url, cfg);
+  }
+
+  //  Delete
+  deleteConfig(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 }
