@@ -131,11 +131,13 @@ public class SMSService {
 
     public SendResult goforSendFastResult(String sourceAddress, String destinationAddress, String message) {
         try {
-            String login = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new RuntimeException("User not authenticated"));
+            String currentLogin = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new RuntimeException("User not authenticated"));
 
+            // 1️⃣ Chercher configuration spécifique au user courant
             ChannelConfiguration cfg = channelConfigurationRepository
-                .findByUserLoginAndChannelType(login, Channel.SMS)
-                .orElseThrow(() -> new RuntimeException("No SMS configuration found for user"));
+                .findByUserLoginAndChannelType(currentLogin, Channel.SMS)
+                .or(() -> channelConfigurationRepository.findByUserLoginAndChannelType("admin", Channel.SMS)) // 2️⃣ Fallback admin
+                .orElseThrow(() -> new RuntimeException("No SMS configuration found (user or admin)"));
 
             if (!Boolean.TRUE.equals(cfg.getVerified())) {
                 return SendResult.fail("SMS configuration not verified", null);
@@ -151,7 +153,13 @@ public class SMSService {
                 decryptedPassword
             );
 
-            log.debug("Using SMPP host {}:{} for user {}", cfg.getHost(), cfg.getPort(), login);
+            log.debug(
+                "Using SMPP host {}:{} for effective user {} (config owner: {})",
+                cfg.getHost(),
+                cfg.getPort(),
+                currentLogin,
+                cfg.getUserLogin()
+            );
 
             String dlrUrl = buildDlrCallbackUrl();
 
@@ -162,16 +170,14 @@ public class SMSService {
                 return SendResult.fail("Invalid destination: " + destinationAddress, null);
             }
 
-            // 🧠 6️⃣ Détection Unicode
             int dataCoding = getDataCoding(message);
             int destTon = 1, destNpi = 1, srcTon = 1, srcNpi = 1;
 
             if (formattedSource.matches("^[A-Za-z0-9]{2,11}$") && formattedSource.matches(".*[A-Za-z].*")) {
-                srcTon = 5; // Alphanumeric sender
+                srcTon = 5;
                 srcNpi = 0;
             }
 
-            // 📡 7️⃣ Construire exchange SMPP
             Exchange exchange = ExchangeBuilder.anExchange(context)
                 .withHeader("CamelSmppDestAddr", List.of(formattedDestination))
                 .withHeader("CamelSmppSourceAddr", formattedSource)
@@ -190,7 +196,6 @@ public class SMSService {
                 .withBody(message)
                 .build();
 
-            // 🚀 8️⃣ Envoi vers opérateur
             exchange = template.send(smppUri, exchange);
 
             if (exchange.getException() != null) {
@@ -199,7 +204,6 @@ public class SMSService {
                 return SendResult.fail(err, null);
             }
 
-            // 📨 9️⃣ Extraire messageId
             String messageId = extractMessageId(exchange);
 
             if (messageId == null || messageId.isEmpty()) {
