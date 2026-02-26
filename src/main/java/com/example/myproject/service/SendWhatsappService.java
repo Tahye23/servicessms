@@ -722,6 +722,78 @@ public class SendWhatsappService {
     }
 
     /**
+     * Upload binaire → media_id (messages directs / envoi de template avec header media).
+     */
+    private String uploadRawMedia(byte[] bytes, String mimeType, Configuration cfg, String phoneId) throws IOException {
+        String normalized = normalizeMimeTypeForMeta(mimeType);
+
+        String filename = getFilenameForMimeType(normalized);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(cfg.getAccessToken());
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        ByteArrayResource fileResource = new ByteArrayResource(bytes) {
+            @Override
+            public String getFilename() {
+                return filename;
+            }
+        };
+
+        HttpHeaders filePartHeaders = new HttpHeaders();
+        filePartHeaders.setContentType(MediaType.parseMediaType(normalized));
+        HttpEntity<ByteArrayResource> filePart = new HttpEntity<>(fileResource, filePartHeaders);
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("messaging_product", "whatsapp");
+        body.add("type", normalized);
+        body.add("file", filePart); //  Utiliser la part avec headers
+
+        String url = GRAPH_URL + "/" + phoneId + "/media";
+
+        try {
+            ResponseEntity<String> response = restTemplate.postForEntity(url, new HttpEntity<>(body, headers), String.class);
+
+            if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+                throw new RuntimeException("Meta media upload failed: " + response.getStatusCode() + " - " + response.getBody());
+            }
+
+            String mediaId = objectMapper.readTree(response.getBody()).path("id").asText();
+
+            return mediaId;
+        } catch (HttpClientErrorException e) {
+            log.error("## Erreur HTTP lors de l'upload: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
+            throw new RuntimeException("Meta media upload failed: " + e.getResponseBodyAsString(), e);
+        }
+    }
+
+    /**
+     * ✅ NOUVELLE MÉTHODE: Retourne un nom de fichier avec extension selon le type MIME
+     */
+    private String getFilenameForMimeType(String mimeType) {
+        return switch (mimeType.toLowerCase()) {
+            case "application/pdf" -> "document.pdf";
+            case "text/plain" -> "document.txt";
+            case "image/jpeg" -> "image.jpg";
+            case "image/png" -> "image.png";
+            case "image/webp" -> "image.webp";
+            case "video/mp4" -> "video.mp4";
+            case "video/3gpp" -> "video.3gp";
+            case "audio/mpeg" -> "audio.mp3";
+            case "audio/mp4" -> "audio.m4a";
+            case "audio/ogg" -> "audio.ogg";
+            case "audio/aac" -> "audio.aac";
+            case "application/vnd.openxmlformats-officedocument.wordprocessingml.document" -> "document.docx";
+            case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" -> "document.xlsx";
+            case "application/vnd.openxmlformats-officedocument.presentationml.presentation" -> "document.pptx";
+            case "application/msword" -> "document.doc";
+            case "application/vnd.ms-excel" -> "document.xls";
+            case "application/vnd.ms-powerpoint" -> "document.ppt";
+            default -> "file";
+        };
+    }
+
+    /**
      * Upload fichier vers session
      */
     private String uploadFileToSession(String sessionId, byte[] fileBytes, Configuration cfg) throws IOException {
@@ -1422,19 +1494,6 @@ public class SendWhatsappService {
         templateNode.put("components", components);
         payload.put("template", templateNode);
         return payload;
-    }
-
-    /**
-     * Upload binaire → media_id (messages directs / envoi de template avec header media).
-     * Réutilise la logique session upload → handle → /media (déjà présente).
-     */
-    private String uploadRawMedia(byte[] bytes, String mimeType, Configuration cfg, String phoneId) throws IOException {
-        // Créer session
-        String sessionId = createUploadSession(bytes.length, mimeType, cfg);
-        // Uploader le binaire
-        String handle = uploadFileToSession(sessionId, bytes, cfg);
-        // Enregistrer le média sur le numéro WA voulu
-        return registerMediaForPhone(handle, mimeType, cfg, phoneId);
     }
 
     /**
