@@ -133,10 +133,10 @@ public class SMSService {
         try {
             String currentLogin = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new RuntimeException("User not authenticated"));
 
-            // 1️⃣ Chercher configuration spécifique au user courant
+            //  Chercher configuration spécifique au user courant
             ChannelConfiguration cfg = channelConfigurationRepository
                 .findByUserLoginAndChannelType(currentLogin, Channel.SMS)
-                .or(() -> channelConfigurationRepository.findByUserLoginAndChannelType("admin", Channel.SMS)) // 2️⃣ Fallback admin
+                .or(() -> channelConfigurationRepository.findByUserLoginAndChannelType("admin", Channel.SMS)) // 2 Fallback admin
                 .orElseThrow(() -> new RuntimeException("No SMS configuration found (user or admin)"));
 
             if (!Boolean.TRUE.equals(cfg.getVerified())) {
@@ -325,17 +325,112 @@ public class SMSService {
         };
     }
 
+    // ==============================
+    // 1️⃣ Nouvelle méthode utilitaire pour déterminer l'opérateur et la config
+    // ==============================
+    private ChannelConfiguration getSmsConfigForNumber(String destinationNumber) {
+        String currentUser = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new RuntimeException("User not authenticated"));
+
+        // Extraire le vrai numéro mauritanien (8 chiffres après 222)
+        String cleanedNumber = destinationNumber.startsWith("222") ? destinationNumber.substring(3) : destinationNumber;
+
+        String operator;
+        if (cleanedNumber.startsWith("2")) {
+            operator = "Chinguitel";
+        } else if (cleanedNumber.startsWith("3") || cleanedNumber.startsWith("4")) {
+            operator = "Mattel";
+        } else {
+            throw new RuntimeException("Numéro invalide pour les opérateurs définis: " + destinationNumber);
+        }
+
+        // Chercher config utilisateur → fallback admin
+        return channelConfigurationRepository
+            .findByUserLoginAndChannelTypeAndSmsOperator(currentUser, Channel.SMS, operator)
+            .or(() -> channelConfigurationRepository.findByUserLoginAndChannelTypeAndSmsOperator("admin", Channel.SMS, operator))
+            .orElseThrow(() -> new RuntimeException("Pas de configuration SMS trouvée pour l'opérateur " + operator));
+    }
+
+    // ==============================
+    // 2️⃣ Méthode d’envoi SMS avec routage automatique
+    // ==============================
+    public SendResult sendSmsWithRouting(String sourceAddress, String destinationAddress, String message) {
+        try {
+            // Récupérer la config selon le numéro
+            ChannelConfiguration cfg = getSmsConfigForNumber(destinationAddress);
+
+            if (!Boolean.TRUE.equals(cfg.getVerified())) {
+                return SendResult.fail("SMS configuration not verified", null);
+            }
+
+            String decryptedPassword = channelConfigurationService.decryptPassword(cfg);
+
+            // Construire l'URI SMPP
+            String smppUri = String.format(
+                "smpp://%s:%d?systemId=%s&password=%s&enquireLinkTimer=5000&transactionTimer=10000",
+                cfg.getHost(),
+                cfg.getPort(),
+                cfg.getUsername(),
+                decryptedPassword
+            );
+
+            String formattedSource = formatPhoneNumber(sourceAddress);
+            String formattedDestination = formatPhoneNumber(destinationAddress);
+            String dlrUrl = buildDlrCallbackUrl();
+            int dataCoding = getDataCoding(message);
+
+            Exchange exchange = ExchangeBuilder.anExchange(context)
+                .withHeader("CamelSmppDestAddr", List.of(formattedDestination))
+                .withHeader("CamelSmppSourceAddr", formattedSource)
+                .withHeader("CamelSmppDestAddrTon", 1)
+                .withHeader("CamelSmppDestAddrNpi", 1)
+                .withHeader("CamelSmppSourceAddrTon", 1)
+                .withHeader("CamelSmppSourceAddrNpi", 1)
+                .withHeader("CamelSmppDataCoding", dataCoding)
+                .withHeader("CamelSmppAlphabet", dataCoding == 8 ? 8 : 0)
+                .withHeader("CamelSmppRegisteredDelivery", 1)
+                .withHeader("CamelSmppDlrUrl", dlrUrl)
+                .withPattern(ExchangePattern.InOnly)
+                .withBody(message)
+                .build();
+
+            exchange = template.send(smppUri, exchange);
+
+            if (exchange.getException() != null) {
+                return SendResult.fail(exchange.getException().getMessage(), null);
+            }
+
+            String messageId = extractMessageId(exchange);
+            return SendResult.ok(messageId);
+        } catch (Exception e) {
+            log.error("Erreur envoi SMS vers {} : {}", destinationAddress, e.getMessage(), e);
+            return SendResult.fail(e.getMessage(), null);
+        }
+    }
+
+    // ==============================
+    // 3️⃣ Modifier executeAndLog pour utiliser le routage
+    // ==============================
     public boolean executeAndLog(Sms sendSms, String numero) {
         try {
-            boolean ok = goforSend(sendSms.getSender(), numero, sendSms.getMsgdata());
+            // Déterminer la config et l'opérateur utilisé
+            ChannelConfiguration cfg = getSmsConfigForNumber(numero);
+            String operator = cfg.getSmsOperator(); // Assurez-vous que ChannelConfiguration a ce champ
+
+            log.info("Envoi du SMS #{} à {} via l'opérateur {}", sendSms.getId(), numero, operator);
+
+            // Envoyer le SMS
+            SendResult result = sendSmsWithRouting(sendSms.getSender(), numero, sendSms.getMsgdata());
+            boolean ok = result.isSuccess();
+
             if (ok) {
-                log.debug("SMS #{} envoyé à {}", sendSms.getId(), numero); // Réduire niveau de log
+                log.debug("SMS #{} envoyé à {} avec succès via {}", sendSms.getId(), numero, operator);
             } else {
-                log.error("Échec envoi de SMS #{} vers {}", sendSms.getId(), numero);
+                log.error("Échec de l'envoi du SMS #{} à {} via {}: {}", sendSms.getId(), numero, operator, result.getError());
             }
+
             return ok;
         } catch (Exception ex) {
-            log.error("Exception lors de l'envoi de SMS #{} à {}: {}", sendSms.getId(), numero, ex.getMessage());
+            log.error("Exception lors de l'envoi de SMS #{} à {}: {}", sendSms.getId(), numero, ex.getMessage(), ex);
             return false;
         }
     }
