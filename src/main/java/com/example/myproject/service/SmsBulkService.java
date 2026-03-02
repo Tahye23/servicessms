@@ -78,7 +78,7 @@ public class SmsBulkService {
     private RateLimiter rateLimiter;
     private ScheduledExecutorService batchUpdateScheduler;
     private final ConcurrentHashMap<Long, CampaignContext> activeCampaigns = new ConcurrentHashMap<>();
-    private final BlockingQueue<SmsUpdateResult> updateQueue = new LinkedBlockingQueue<>(100000);
+    private final BlockingQueue<SmsUpdateResult> updateQueue = new LinkedBlockingQueue<>(100_000);
 
     @PostConstruct
     public void init() {
@@ -115,7 +115,6 @@ public class SmsBulkService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void processBulkByBatch(String bulkId, boolean test, Long sendSmsId, Long templateId, String login) {
         Instant startTime = Instant.now();
-
         log.info("Starting campaign - SendSms ID: {}, Bulk ID: {}, Mode: {}", sendSmsId, bulkId, test ? "TEST" : "PROD");
 
         CampaignContext ctx = new CampaignContext(sendSmsId, bulkId, startTime);
@@ -146,7 +145,7 @@ public class SmsBulkService {
             ExecutorService workerPool = Executors.newFixedThreadPool(parallelWorkers, r -> new Thread(r, "worker-" + sendSmsId));
 
             try {
-                processAllBatches(ctx, sendSmsId, test, workerPool);
+                processAllBatches(ctx, sendSmsId, test, workerPool, login);
             } finally {
                 workerPool.shutdown();
                 try {
@@ -193,7 +192,7 @@ public class SmsBulkService {
         }
     }
 
-    private void processAllBatches(CampaignContext ctx, Long sendSmsId, boolean test, ExecutorService workerPool) {
+    private void processAllBatches(CampaignContext ctx, Long sendSmsId, boolean test, ExecutorService workerPool, String login) {
         int offset = 0;
         int batchNum = 0;
 
@@ -207,8 +206,7 @@ public class SmsBulkService {
             }
 
             log.info("Batch #{} - {} SMS (offset {})", batchNum, batch.size(), offset);
-
-            processSingleBatch(ctx, batch, test, workerPool);
+            processSingleBatch(ctx, batch, test, workerPool, login);
             logProgress(ctx);
 
             offset += batchSize;
@@ -219,7 +217,7 @@ public class SmsBulkService {
         }
     }
 
-    private void processSingleBatch(CampaignContext ctx, List<SmsData> batch, boolean test, ExecutorService workerPool) {
+    private void processSingleBatch(CampaignContext ctx, List<SmsData> batch, boolean test, ExecutorService workerPool, String login) {
         List<CompletableFuture<Void>> futures = new ArrayList<>();
 
         for (SmsData sms : batch) {
@@ -230,7 +228,7 @@ public class SmsBulkService {
                     rateLimiter.acquire();
                     if (ctx.stopRequested.get()) return;
 
-                    SmsUpdateResult result = sendSingleSms(sms, test);
+                    SmsUpdateResult result = sendSingleSms(sms, test, login);
 
                     boolean added = updateQueue.offer(result);
                     if (!added) {
@@ -258,7 +256,7 @@ public class SmsBulkService {
         }
     }
 
-    private SmsUpdateResult sendSingleSms(SmsData sms, boolean test) {
+    private SmsUpdateResult sendSingleSms(SmsData sms, boolean test, String login) {
         SmsUpdateResult result = new SmsUpdateResult();
         result.smsId = sms.id;
         result.timestamp = Instant.now();
@@ -277,7 +275,8 @@ public class SmsBulkService {
                 return result;
             }
 
-            SendResult sendResult = smsService.goforSendFastResult(sms.sender, sms.receiver, sms.message);
+            // ⚡ Important : passer le login ici
+            SendResult sendResult = smsService.goforSendFastResult(sms.sender, sms.receiver, sms.message, login);
 
             result.success = sendResult.isSuccess();
             result.messageId = sendResult.getMessageId();

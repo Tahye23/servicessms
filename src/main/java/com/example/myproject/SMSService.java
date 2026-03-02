@@ -1,37 +1,30 @@
 package com.example.myproject;
 
-import com.example.myproject.domain.ChannelConfiguration;
-import com.example.myproject.domain.Chat;
-import com.example.myproject.domain.SendSms;
-import com.example.myproject.domain.Sms;
+import com.example.myproject.domain.*;
 import com.example.myproject.domain.enumeration.Channel;
-import com.example.myproject.repository.ChannelConfigurationRepository;
-import com.example.myproject.repository.ChatRepository;
-import com.example.myproject.repository.SendSmsRepository;
-import com.example.myproject.repository.SmsRepository;
+import com.example.myproject.repository.*;
 import com.example.myproject.security.SecurityUtils;
 import com.example.myproject.service.ChannelConfigurationService;
 import com.example.myproject.web.rest.dto.SendResult;
 import com.example.myproject.web.rest.dto.SmsSendResult;
 import com.example.myproject.web.rest.dto.SmsStatusResult;
 import jakarta.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import org.apache.camel.CamelContext;
-import org.apache.camel.Exchange;
-import org.apache.camel.ExchangePattern;
-import org.apache.camel.ProducerTemplate;
+import java.util.Optional;
+import org.apache.camel.*;
 import org.apache.camel.builder.ExchangeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SMSService {
+
+    private final Logger log = LoggerFactory.getLogger(SMSService.class);
 
     @Autowired
     private CamelContext context;
@@ -45,12 +38,11 @@ public class SMSService {
     @Autowired
     private ChannelConfigurationService channelConfigurationService;
 
-    private final SmsRepository smsRepository;
-    private final SendSmsRepository sendSmsRepository;
-    private final Logger log = LoggerFactory.getLogger(SMSService.class);
-
     @Autowired
     private ChatRepository chatRepository;
+
+    private final SmsRepository smsRepository;
+    private final SendSmsRepository sendSmsRepository;
 
     @Value("${sms.fast-mode:true}")
     private boolean fastMode;
@@ -63,135 +55,125 @@ public class SMSService {
         this.sendSmsRepository = sendSmsRepository;
     }
 
+    //  UTILS
+
+    private String getCurrentUser() {
+        return SecurityUtils.getCurrentUserLogin().orElse("admin");
+    }
+
     private String formatPhoneNumber(String phoneNumber) {
-        if (phoneNumber == null || phoneNumber.isEmpty()) {
-            return phoneNumber;
-        }
-
-        String cleaned = phoneNumber.replaceAll("[\\s\\-\\(\\)\\+]", "");
-
-        if (cleaned.matches("^[A-Za-z0-9]{2,11}$") && cleaned.matches(".*[A-Za-z].*")) {
-            return cleaned;
-        }
-
-        if (cleaned.matches("^\\d+$")) {
-            if (cleaned.startsWith("0") && cleaned.length() == 10) {
-                cleaned = "33" + cleaned.substring(1);
-            } else if (cleaned.startsWith("0") && cleaned.length() == 9) {
-                cleaned = "221" + cleaned.substring(1);
-            } else if (
-                !cleaned.startsWith("33") &&
-                !cleaned.startsWith("221") &&
-                !cleaned.startsWith("1") &&
-                !cleaned.startsWith("44") &&
-                !cleaned.startsWith("49") &&
-                !cleaned.startsWith("39")
-            ) {
-                if (cleaned.length() == 8) {
-                    cleaned = "221" + cleaned;
-                } else if (cleaned.length() == 9) {
-                    cleaned = "33" + cleaned;
-                }
-            }
-        }
-
-        return cleaned;
+        if (phoneNumber == null) return null;
+        return phoneNumber.replaceAll("[\\s\\-\\(\\)\\+]", "");
     }
 
     private boolean containsUnicodeCharacters(String message) {
         if (message == null) return false;
-
-        for (int i = 0; i < message.length(); i++) {
-            char c = message.charAt(i);
-            if (c > 127) {
-                return true;
-            }
-        }
-        return false;
+        return message.chars().anyMatch(c -> c > 127);
     }
 
     private int getDataCoding(String message) {
-        if (containsUnicodeCharacters(message)) {
-            return 8;
-        }
-        return 0;
+        return containsUnicodeCharacters(message) ? 8 : 0;
     }
 
     private boolean isValidPhoneNumber(String phoneNumber) {
-        if (phoneNumber == null || phoneNumber.isEmpty()) {
-            return false;
-        }
-
-        return phoneNumber.matches("^[A-Za-z0-9]{2,15}$");
+        return phoneNumber != null && phoneNumber.matches("^[0-9]{8,15}$");
     }
 
     private String buildDlrCallbackUrl() {
-        return (dlrBaseUrl + "/api/sms-dlr/callback" + "?msgid=%I" + "&status=%d" + "&phone=%p" + "&ts=%t" + "&smsc=%A" + "&err=%e");
+        return dlrBaseUrl + "/api/sms-dlr/callback" + "?msgid=%I&status=%d&phone=%p&ts=%t&smsc=%A&err=%e";
     }
 
-    public SendResult goforSendFastResult(String sourceAddress, String destinationAddress, String message) {
-        try {
-            String currentLogin = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new RuntimeException("User not authenticated"));
+    private String extractMessageId(Exchange exchange) {
+        Object messageIdObj = exchange.getMessage().getHeader("CamelSmppId");
 
-            //  Chercher configuration spécifique au user courant
-            ChannelConfiguration cfg = channelConfigurationRepository
-                .findByUserLoginAndChannelType(currentLogin, Channel.SMS)
-                .or(() -> channelConfigurationRepository.findByUserLoginAndChannelType("admin", Channel.SMS)) // 2 Fallback admin
-                .orElseThrow(() -> new RuntimeException("No SMS configuration found (user or admin)"));
+        if (messageIdObj instanceof List<?> list) {
+            return list.isEmpty() ? null : list.get(0).toString();
+        }
+        return messageIdObj == null ? null : messageIdObj.toString();
+    }
 
-            if (!Boolean.TRUE.equals(cfg.getVerified())) {
-                return SendResult.fail("SMS configuration not verified", null);
+    //  ROUTING OPERATEUR
+
+    private ChannelConfiguration getSmsConfigForNumber(String destinationNumber, String login) {
+        String digitsOnly = destinationNumber.replaceAll("\\D", ""); // supprime tout sauf chiffres
+        String cleaned = digitsOnly.startsWith("222") ? digitsOnly.substring(3) : digitsOnly;
+
+        // Liste des opérateurs par priorité
+        List<String> preferredOperators = new ArrayList<>();
+
+        if (cleaned.startsWith("2")) {
+            preferredOperators.add("Chinguitel");
+            preferredOperators.add("Mattel"); // fallback
+        } else if (cleaned.startsWith("3") || cleaned.startsWith("4")) {
+            preferredOperators.add("Mattel");
+            preferredOperators.add("Chinguitel"); // fallback
+        } else {
+            throw new RuntimeException("Numéro non supporté: " + destinationNumber);
+        }
+
+        for (String operator : preferredOperators) {
+            log.debug("Tentative de routage {} -> opérateur {}", destinationNumber, operator);
+
+            Optional<ChannelConfiguration> cfg = channelConfigurationRepository.findByUserLoginAndChannelTypeAndSmsOperator(
+                login,
+                Channel.SMS,
+                operator
+            );
+
+            if (cfg.isEmpty()) {
+                cfg = channelConfigurationRepository.findByUserLoginAndChannelTypeAndSmsOperator("admin", Channel.SMS, operator);
             }
 
-            String decryptedPassword = channelConfigurationService.decryptPassword(cfg);
+            if (cfg.isPresent()) {
+                return cfg.get(); // retourne dès qu'une configuration est trouvée
+            }
+        }
+
+        throw new RuntimeException(
+            "Aucune config SMS disponible pour " + destinationNumber + " avec les opérateurs: " + preferredOperators
+        );
+    }
+
+    // ENVOI SMS
+
+    public SendResult sendSmsWithRouting(String sourceAddress, String destinationAddress, String message, String login) {
+        try {
+            ChannelConfiguration cfg = getSmsConfigForNumber(destinationAddress, login);
+
+            if (!Boolean.TRUE.equals(cfg.getVerified())) {
+                return SendResult.fail("Configuration non vérifiée", null);
+            }
+
+            String password = channelConfigurationService.decryptPassword(cfg);
 
             String smppUri = String.format(
                 "smpp://%s:%d?systemId=%s&password=%s&enquireLinkTimer=5000&transactionTimer=10000",
                 cfg.getHost(),
                 cfg.getPort(),
                 cfg.getUsername(),
-                decryptedPassword
+                password
             );
 
-            log.debug(
-                "Using SMPP host {}:{} for effective user {} (config owner: {})",
-                cfg.getHost(),
-                cfg.getPort(),
-                currentLogin,
-                cfg.getUserLogin()
-            );
+            String source = formatPhoneNumber(sourceAddress);
+            String dest = formatPhoneNumber(destinationAddress);
 
-            String dlrUrl = buildDlrCallbackUrl();
-
-            String formattedSource = formatPhoneNumber(sourceAddress);
-            String formattedDestination = formatPhoneNumber(destinationAddress);
-
-            if (!isValidPhoneNumber(formattedDestination)) {
-                return SendResult.fail("Invalid destination: " + destinationAddress, null);
+            if (!isValidPhoneNumber(dest)) {
+                return SendResult.fail("Numéro invalide: " + dest, null);
             }
 
             int dataCoding = getDataCoding(message);
-            int destTon = 1, destNpi = 1, srcTon = 1, srcNpi = 1;
-
-            if (formattedSource.matches("^[A-Za-z0-9]{2,11}$") && formattedSource.matches(".*[A-Za-z].*")) {
-                srcTon = 5;
-                srcNpi = 0;
-            }
 
             Exchange exchange = ExchangeBuilder.anExchange(context)
-                .withHeader("CamelSmppDestAddr", List.of(formattedDestination))
-                .withHeader("CamelSmppSourceAddr", formattedSource)
-                .withHeader("CamelSmppDestAddrTon", destTon)
-                .withHeader("CamelSmppDestAddrNpi", destNpi)
-                .withHeader("CamelSmppSourceAddrTon", srcTon)
-                .withHeader("CamelSmppSourceAddrNpi", srcNpi)
+                .withHeader("CamelSmppDestAddr", List.of(dest))
+                .withHeader("CamelSmppSourceAddr", source)
+                .withHeader("CamelSmppDestAddrTon", 1)
+                .withHeader("CamelSmppDestAddrNpi", 1)
+                .withHeader("CamelSmppSourceAddrTon", 1)
+                .withHeader("CamelSmppSourceAddrNpi", 1)
                 .withHeader("CamelSmppDataCoding", dataCoding)
                 .withHeader("CamelSmppAlphabet", dataCoding == 8 ? 8 : 0)
                 .withHeader("CamelSmppRegisteredDelivery", 1)
-                .withHeader("CamelSmppProtocolId", 0)
-                .withHeader("CamelSmppEsmClass", 0)
-                .withHeader("CamelSmppPriorityFlag", 0)
-                .withHeader("CamelSmppDlrUrl", dlrUrl)
+                .withHeader("CamelSmppDlrUrl", buildDlrCallbackUrl())
                 .withPattern(ExchangePattern.InOnly)
                 .withBody(message)
                 .build();
@@ -199,91 +181,48 @@ public class SMSService {
             exchange = template.send(smppUri, exchange);
 
             if (exchange.getException() != null) {
-                String err = exchange.getException().getMessage();
-                log.warn("SMPP send failed {} -> {}: {}", sourceAddress, destinationAddress, err);
-                return SendResult.fail(err, null);
+                return SendResult.fail(exchange.getException().getMessage(), null);
             }
 
             String messageId = extractMessageId(exchange);
 
-            if (messageId == null || messageId.isEmpty()) {
-                log.warn("No messageId returned by SMPP operator");
-                return SendResult.fail("No messageId returned", null);
-            }
-
-            log.debug("SMS sent successfully. MessageId={}", messageId);
-
             return SendResult.ok(messageId);
-        } catch (IllegalArgumentException e) {
-            return SendResult.fail(e.getMessage(), null);
         } catch (Exception e) {
-            log.error("SMS send error: {}", e.getMessage(), e);
+            log.error("Erreur envoi SMS {} -> {} : {}", sourceAddress, destinationAddress, e.getMessage(), e);
             return SendResult.fail(e.getMessage(), null);
         }
     }
 
-    private String extractMessageId(Exchange exchange) {
-        Object messageIdObj = exchange.getMessage().getHeader("CamelSmppId");
+    // COMPATIBILITE
 
-        if (messageIdObj instanceof java.util.List) {
-            java.util.List<?> list = (java.util.List<?>) messageIdObj;
-            return list.isEmpty() ? null : list.get(0).toString();
-        }
+    public SendResult sendSmsWithRouting(String sourceAddress, String destinationAddress, String message) {
+        return sendSmsWithRouting(sourceAddress, destinationAddress, message, getCurrentUser());
+    }
 
-        return messageIdObj == null ? null : messageIdObj.toString();
+    public SendResult goforSendFastResult(String sourceAddress, String destinationAddress, String message, String login) {
+        return sendSmsWithRouting(sourceAddress, destinationAddress, message, login);
+    }
+
+    public SendResult goforSendFastResult(String sourceAddress, String destinationAddress, String message) {
+        return sendSmsWithRouting(sourceAddress, destinationAddress, message);
     }
 
     public boolean goforSend(String sourceAddress, String destinationAddress, String message) {
-        SendResult result = goforSendFastResult(sourceAddress, destinationAddress, message);
-        return result.isSuccess();
+        return goforSendFastResult(sourceAddress, destinationAddress, message).isSuccess();
     }
 
     public SmsSendResult send(String sourceAddress, String destinationAddress, String message) {
-        SendResult result = goforSendFastResult(sourceAddress, destinationAddress, message);
+        SendResult result = sendSmsWithRouting(sourceAddress, destinationAddress, message);
 
-        SmsSendResult smsSendResult = new SmsSendResult();
-        smsSendResult.setSuccess(result.isSuccess());
-        smsSendResult.setMessageId(result.getMessageId());
-        smsSendResult.setError(result.getError());
+        SmsSendResult sms = new SmsSendResult();
+        sms.setSuccess(result.isSuccess());
+        sms.setMessageId(result.getMessageId());
+        sms.setError(result.getError());
 
-        return smsSendResult;
+        return sms;
     }
 
-    @PostConstruct
-    public void init() {
-        log.info("SMS SERVICE initialized - Fast mode: {}", fastMode);
-    }
-
-    public Sms createSms(Sms sms) {
-        sms.setSendDate(java.time.Instant.now());
-        sms.setSent(false);
-
-        if (sms.getChat() != null && sms.getChat().getId() != null) {
-            Chat chat = chatRepository.findById(sms.getChat().getId()).orElseThrow(() -> new RuntimeException("Chat not found"));
-            sms.setChat(chat);
-        }
-
-        if (sms.getBatch() != null && sms.getBatch().getId() != null) {
-            SendSms batch = sendSmsRepository.findById(sms.getBatch().getId()).orElseThrow(() -> new RuntimeException("Batch not found"));
-            sms.setBatch(batch);
-        }
-
-        return smsRepository.save(sms);
-    }
-
-    public Page<Sms> getMessagesByChatId(Long chatId, Pageable pageable) {
-        return smsRepository.findByChatIdOrderBySendDateAsc(chatId, pageable);
-    }
-
-    public Page<Sms> getAllSmsForUser(Pageable pageable, String login) {
-        return smsRepository.findAllByUser(login, pageable);
-    }
-
-    public Sms getSmsSecure(Long id, String login) {
-        return smsRepository
-            .findByIdAndUser(id, login)
-            .orElseThrow(() -> new org.springframework.security.access.AccessDeniedException("Access denied"));
-    }
+    // STATUS
 
     public SmsStatusResult queryMessageStatus(String messageId) {
         try {
@@ -299,10 +238,10 @@ public class SMSService {
                 return SmsStatusResult.unknown(result.getException().getMessage());
             }
 
-            Byte messageState = result.getMessage().getHeader("CamelSmppMessageState", Byte.class);
-            String errorCode = result.getMessage().getHeader("CamelSmppError", String.class);
+            Byte state = result.getMessage().getHeader("CamelSmppMessageState", Byte.class);
+            String error = result.getMessage().getHeader("CamelSmppError", String.class);
 
-            return new SmsStatusResult(mapMessageState(messageState), messageState, errorCode);
+            return new SmsStatusResult(mapMessageState(state), state, error);
         } catch (Exception e) {
             return SmsStatusResult.unknown(e.getMessage());
         }
@@ -325,95 +264,41 @@ public class SMSService {
         };
     }
 
-    // ==============================
-    // 1️⃣ Nouvelle méthode utilitaire pour déterminer l'opérateur et la config
-    // ==============================
-    private ChannelConfiguration getSmsConfigForNumber(String destinationNumber) {
-        String currentUser = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new RuntimeException("User not authenticated"));
-
-        // Extraire le vrai numéro mauritanien (8 chiffres après 222)
-        String cleanedNumber = destinationNumber.startsWith("222") ? destinationNumber.substring(3) : destinationNumber;
-
-        String operator;
-        if (cleanedNumber.startsWith("2")) {
-            operator = "Chinguitel";
-        } else if (cleanedNumber.startsWith("3") || cleanedNumber.startsWith("4")) {
-            operator = "Mattel";
-        } else {
-            throw new RuntimeException("Numéro invalide pour les opérateurs définis: " + destinationNumber);
-        }
-
-        // Chercher config utilisateur → fallback admin
-        return channelConfigurationRepository
-            .findByUserLoginAndChannelTypeAndSmsOperator(currentUser, Channel.SMS, operator)
-            .or(() -> channelConfigurationRepository.findByUserLoginAndChannelTypeAndSmsOperator("admin", Channel.SMS, operator))
-            .orElseThrow(() -> new RuntimeException("Pas de configuration SMS trouvée pour l'opérateur " + operator));
+    public Page<Sms> getMessagesByChatId(Long chatId, Pageable pageable) {
+        return smsRepository.findByChatIdOrderBySendDateAsc(chatId, pageable);
     }
 
-    // ==============================
-    // 2️⃣ Méthode d’envoi SMS avec routage automatique
-    // ==============================
-    public SendResult sendSmsWithRouting(String sourceAddress, String destinationAddress, String message) {
-        try {
-            // Récupérer la config selon le numéro
-            ChannelConfiguration cfg = getSmsConfigForNumber(destinationAddress);
+    public Sms createSms(Sms sms) {
+        sms.setSendDate(java.time.Instant.now());
+        sms.setSent(false);
 
-            if (!Boolean.TRUE.equals(cfg.getVerified())) {
-                return SendResult.fail("SMS configuration not verified", null);
-            }
-
-            String decryptedPassword = channelConfigurationService.decryptPassword(cfg);
-
-            // Construire l'URI SMPP
-            String smppUri = String.format(
-                "smpp://%s:%d?systemId=%s&password=%s&enquireLinkTimer=5000&transactionTimer=10000",
-                cfg.getHost(),
-                cfg.getPort(),
-                cfg.getUsername(),
-                decryptedPassword
-            );
-
-            String formattedSource = formatPhoneNumber(sourceAddress);
-            String formattedDestination = formatPhoneNumber(destinationAddress);
-            String dlrUrl = buildDlrCallbackUrl();
-            int dataCoding = getDataCoding(message);
-
-            Exchange exchange = ExchangeBuilder.anExchange(context)
-                .withHeader("CamelSmppDestAddr", List.of(formattedDestination))
-                .withHeader("CamelSmppSourceAddr", formattedSource)
-                .withHeader("CamelSmppDestAddrTon", 1)
-                .withHeader("CamelSmppDestAddrNpi", 1)
-                .withHeader("CamelSmppSourceAddrTon", 1)
-                .withHeader("CamelSmppSourceAddrNpi", 1)
-                .withHeader("CamelSmppDataCoding", dataCoding)
-                .withHeader("CamelSmppAlphabet", dataCoding == 8 ? 8 : 0)
-                .withHeader("CamelSmppRegisteredDelivery", 1)
-                .withHeader("CamelSmppDlrUrl", dlrUrl)
-                .withPattern(ExchangePattern.InOnly)
-                .withBody(message)
-                .build();
-
-            exchange = template.send(smppUri, exchange);
-
-            if (exchange.getException() != null) {
-                return SendResult.fail(exchange.getException().getMessage(), null);
-            }
-
-            String messageId = extractMessageId(exchange);
-            return SendResult.ok(messageId);
-        } catch (Exception e) {
-            log.error("Erreur envoi SMS vers {} : {}", destinationAddress, e.getMessage(), e);
-            return SendResult.fail(e.getMessage(), null);
+        if (sms.getChat() != null && sms.getChat().getId() != null) {
+            Chat chat = chatRepository.findById(sms.getChat().getId()).orElseThrow(() -> new RuntimeException("Chat not found"));
+            sms.setChat(chat);
         }
+
+        if (sms.getBatch() != null && sms.getBatch().getId() != null) {
+            SendSms batch = sendSmsRepository.findById(sms.getBatch().getId()).orElseThrow(() -> new RuntimeException("Batch not found"));
+            sms.setBatch(batch);
+        }
+
+        return smsRepository.save(sms);
     }
 
-    // ==============================
-    // 3️⃣ Modifier executeAndLog pour utiliser le routage
-    // ==============================
-    public boolean executeAndLog(Sms sendSms, String numero) {
+    public Page<Sms> getAllSmsForUser(Pageable pageable, String login) {
+        return smsRepository.findAllByUser(login, pageable);
+    }
+
+    public Sms getSmsSecure(Long id, String login) {
+        return smsRepository
+            .findByIdAndUser(id, login)
+            .orElseThrow(() -> new org.springframework.security.access.AccessDeniedException("Access denied"));
+    }
+
+    public boolean executeAndLog(Sms sendSms, String numero, String login) {
         try {
             // Déterminer la config et l'opérateur utilisé
-            ChannelConfiguration cfg = getSmsConfigForNumber(numero);
+            ChannelConfiguration cfg = getSmsConfigForNumber(numero, login);
             String operator = cfg.getSmsOperator(); // Assurez-vous que ChannelConfiguration a ce champ
 
             log.info("Envoi du SMS #{} à {} via l'opérateur {}", sendSms.getId(), numero, operator);
@@ -433,5 +318,10 @@ public class SMSService {
             log.error("Exception lors de l'envoi de SMS #{} à {}: {}", sendSms.getId(), numero, ex.getMessage(), ex);
             return false;
         }
+    }
+
+    @PostConstruct
+    public void init() {
+        log.info("SMS Service démarré - Fast mode: {}", fastMode);
     }
 }

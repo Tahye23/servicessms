@@ -10,9 +10,7 @@ public interface ChannelConfigurationRepository extends JpaRepository<ChannelCon
     // EMAIL → 1 seule
     Optional<ChannelConfiguration> findByUserLoginAndChannelType(String userLogin, Channel channelType);
 
-    // SMS → filtrer par opérateur
     Optional<ChannelConfiguration> findByUserLoginAndChannelTypeAndSmsOperator(String userLogin, Channel channelType, String smsOperator);
 
-    // Récupérer toutes les configs SMS d’un user
     List<ChannelConfiguration> findAllByUserLoginAndChannelType(String userLogin, Channel channelType);
 }

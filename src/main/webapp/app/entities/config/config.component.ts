@@ -103,7 +103,7 @@ export class ConfigComponent implements OnInit, OnDestroy {
    */
   private subscribeToConfigurations(): void {
     this.configService.configurations$.pipe(takeUntil(this.destroy$)).subscribe(configs => {
-      this.configurations = configs;
+      this.configurations = [...configs];
       this.applyFilters();
     });
   }
@@ -283,9 +283,8 @@ export class ConfigComponent implements OnInit, OnDestroy {
    * Applique les filtres de recherche et type
    */
   applyFilters(): void {
-    let filtered = this.configurations;
+    let filtered = [...this.configurations]; //  IMPORTANT: copie
 
-    // Filtre par searchTerm
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase();
       filtered = filtered.filter(
@@ -293,14 +292,13 @@ export class ConfigComponent implements OnInit, OnDestroy {
       );
     }
 
-    // Filtre par type de channel
     if (this.filterChannelType) {
       filtered = filtered.filter(c => c.channel === this.filterChannelType);
     }
 
-    this.filteredConfigurations = filtered;
+    // FORCER NOUVELLE REFERENCE
+    this.filteredConfigurations = [...filtered];
   }
-
   countByChannel(channel: ChannelType): number {
     return this.configurations.filter(c => c.channel === channel).length;
   }
@@ -317,6 +315,7 @@ export class ConfigComponent implements OnInit, OnDestroy {
 
   switchTab(tab: ChannelType): void {
     this.activeTab = tab;
+    this.applyFilters();
   }
 
   goToConfigAdmin(): void {
@@ -348,6 +347,7 @@ export class ConfigComponent implements OnInit, OnDestroy {
         this.toast.showToast(`${cfg.channel} supprimé `, 'success');
         // Mise à jour immédiate du state
         this.configService.removeConfigFromMemory(cfg.id, cfg.channel);
+        this.applyFilters();
       },
       error: err => {
         const message = typeof err.error === 'string' ? err.error : 'Erreur suppression';
@@ -378,6 +378,7 @@ export class ConfigComponent implements OnInit, OnDestroy {
           };
           this.configService.updateConfigInMemory(unifiedCfg);
           this.viewMode = 'LIST';
+          this.applyFilters();
         },
         error: err => {
           const message = typeof err.error === 'string' ? err.error : 'Erreur mise à jour';
@@ -400,6 +401,7 @@ export class ConfigComponent implements OnInit, OnDestroy {
           };
           this.configService.updateConfigInMemory(unifiedCfg);
           this.viewMode = 'LIST';
+          this.applyFilters();
         },
         error: err => {
           const message = typeof err.error === 'string' ? err.error : 'Erreur création';

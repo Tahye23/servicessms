@@ -326,7 +326,7 @@
             </thead>
             <tbody class="divide-y divide-gray-100">
               <tr
-                *ngFor="let cfg of filteredConfigurations; let i = index; trackBy: trackById"
+                *ngFor="let cfg of filteredConfigurations; trackBy: trackById; let i = index"
                 class="hover:bg-gray-50/80 transition-all duration-200 group"
                 [class]="i % 2 === 1 ? 'bg-gray-50/30' : ''"
               >

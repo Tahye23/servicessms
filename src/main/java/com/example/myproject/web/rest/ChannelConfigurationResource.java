@@ -67,9 +67,6 @@ public class ChannelConfigurationResource {
         }
     }
 
-    /**
-     * Test EMAIL sans sauvegarder
-     */
     @PostMapping("/test-email")
     public ResponseEntity<?> testEmail(@RequestBody ChannelConfiguration cfg, @RequestParam String password) {
         try {

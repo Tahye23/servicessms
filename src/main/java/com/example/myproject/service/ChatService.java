@@ -134,7 +134,7 @@ public class ChatService {
             sms.setMsgdata(contenu);
             int segments = templateService.calculateSmsSegments(contenu);
             sms.setTotalMessage(segments);
-            success = test || smsService.executeAndLog(sms, phone);
+            success = test || smsService.executeAndLog(sms, phone, login);
         } else {
             Map<String, String> extracted = builder.extractVariables(template, dest);
             List<VariableDTO> listeVars = templateService.buildListeVars(tplReq, extracted);
