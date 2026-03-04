@@ -95,24 +95,37 @@ public class SMSService {
     //  ROUTING OPERATEUR
 
     private ChannelConfiguration getSmsConfigForNumber(String destinationNumber, String login) {
-        String digitsOnly = destinationNumber.replaceAll("\\D", ""); // supprime tout sauf chiffres
-        String cleaned = digitsOnly.startsWith("222") ? digitsOnly.substring(3) : digitsOnly;
+        String digitsOnly = destinationNumber.replaceAll("\\D", "");
 
-        // Liste des opérateurs par priorité
+        // Normalisation (00222 -> 222)
+        if (digitsOnly.startsWith("00222")) {
+            digitsOnly = digitsOnly.substring(2);
+        }
+
+        // Enlever indicatif pays pour analyse
+        String localNumber = digitsOnly.startsWith("222") ? digitsOnly.substring(3) : digitsOnly;
+
+        if (localNumber.length() < 8) {
+            throw new RuntimeException("Numéro trop court: " + destinationNumber);
+        }
+
+        char prefix = localNumber.charAt(0);
+
         List<String> preferredOperators = new ArrayList<>();
 
-        if (cleaned.startsWith("2")) {
+        // ROUTING Mauritanie
+        if (prefix == '2') {
             preferredOperators.add("Chinguitel");
-            preferredOperators.add("Mattel"); // fallback
-        } else if (cleaned.startsWith("3") || cleaned.startsWith("4")) {
             preferredOperators.add("Mattel");
-            preferredOperators.add("Chinguitel"); // fallback
+        } else if (prefix == '3' || prefix == '4') {
+            preferredOperators.add("Mattel");
+            preferredOperators.add("Chinguitel");
         } else {
-            throw new RuntimeException("Numéro non supporté: " + destinationNumber);
+            throw new RuntimeException("Préfixe non supporté: " + destinationNumber);
         }
 
         for (String operator : preferredOperators) {
-            log.debug("Tentative de routage {} -> opérateur {}", destinationNumber, operator);
+            log.debug("Routing {} -> {}", destinationNumber, operator);
 
             Optional<ChannelConfiguration> cfg = channelConfigurationRepository.findByUserLoginAndChannelTypeAndSmsOperator(
                 login,
@@ -125,17 +138,14 @@ public class SMSService {
             }
 
             if (cfg.isPresent()) {
-                return cfg.get(); // retourne dès qu'une configuration est trouvée
+                return cfg.get();
             }
         }
 
-        throw new RuntimeException(
-            "Aucune config SMS disponible pour " + destinationNumber + " avec les opérateurs: " + preferredOperators
-        );
+        throw new RuntimeException("Aucune config SMS pour " + destinationNumber);
     }
 
     // ENVOI SMS
-
     public SendResult sendSmsWithRouting(String sourceAddress, String destinationAddress, String message, String login) {
         try {
             ChannelConfiguration cfg = getSmsConfigForNumber(destinationAddress, login);
@@ -154,39 +164,105 @@ public class SMSService {
                 password
             );
 
+            // FORMAT (ancienne logique conservée)
             String source = formatPhoneNumber(sourceAddress);
-            String dest = formatPhoneNumber(destinationAddress);
+            String destOriginal = formatPhoneNumber(destinationAddress);
 
-            if (!isValidPhoneNumber(dest)) {
-                return SendResult.fail("Numéro invalide: " + dest, null);
+            if (!isValidPhoneNumber(destOriginal)) {
+                return SendResult.fail("Numéro invalide: " + destOriginal, null);
             }
+
+            // =========================
+            // VARIANTS NUMERO (IMPORTANT)
+            // =========================
+            List<String> destVariants = new ArrayList<>();
+
+            String digits = destOriginal.replaceAll("\\D", "");
+
+            if (digits.startsWith("00222")) {
+                digits = digits.substring(2);
+            }
+
+            // priorité au format complet
+            if (digits.startsWith("222")) {
+                destVariants.add(digits); // 222XXXXXXXX
+                destVariants.add(digits.substring(3)); // XXXXXXXX
+            } else {
+                destVariants.add("222" + digits); // ajouter indicatif
+                destVariants.add(digits);
+            }
+
+            log.info("Envoi SMS vers {} via {} | variants={}", destinationAddress, cfg.getSmsOperator(), destVariants);
 
             int dataCoding = getDataCoding(message);
 
-            Exchange exchange = ExchangeBuilder.anExchange(context)
-                .withHeader("CamelSmppDestAddr", List.of(dest))
-                .withHeader("CamelSmppSourceAddr", source)
-                .withHeader("CamelSmppDestAddrTon", 1)
-                .withHeader("CamelSmppDestAddrNpi", 1)
-                .withHeader("CamelSmppSourceAddrTon", 1)
-                .withHeader("CamelSmppSourceAddrNpi", 1)
-                .withHeader("CamelSmppDataCoding", dataCoding)
-                .withHeader("CamelSmppAlphabet", dataCoding == 8 ? 8 : 0)
-                .withHeader("CamelSmppRegisteredDelivery", 1)
-                .withHeader("CamelSmppDlrUrl", buildDlrCallbackUrl())
-                .withPattern(ExchangePattern.InOnly)
-                .withBody(message)
-                .build();
+            // Source TON/NPI
+            int srcTon = 1, srcNpi = 1;
 
-            exchange = template.send(smppUri, exchange);
-
-            if (exchange.getException() != null) {
-                return SendResult.fail(exchange.getException().getMessage(), null);
+            if (source.matches("^[A-Za-z0-9]{2,11}$") && source.matches(".*[A-Za-z].*")) {
+                srcTon = 5;
+                srcNpi = 0;
             }
 
-            String messageId = extractMessageId(exchange);
+            // =========================
+            // TEST DES VARIANTS
+            // =========================
+            for (String dest : destVariants) {
+                try {
+                    int destTon;
+                    int destNpi = 1;
 
-            return SendResult.ok(messageId);
+                    // TON dynamique
+                    if (dest.startsWith("222")) {
+                        destTon = 1; // international
+                    } else {
+                        destTon = 0; // national
+                    }
+
+                    // Ajustement Mattel
+                    if ("Mattel".equalsIgnoreCase(cfg.getSmsOperator()) && !dest.startsWith("222")) {
+                        destTon = 0;
+                    }
+
+                    log.info("Tentative SMS -> {} (TON={},NPI={})", dest, destTon, destNpi);
+
+                    Exchange exchange = ExchangeBuilder.anExchange(context)
+                        .withHeader("CamelSmppDestAddr", List.of(dest))
+                        .withHeader("CamelSmppSourceAddr", source)
+                        .withHeader("CamelSmppDestAddrTon", destTon)
+                        .withHeader("CamelSmppDestAddrNpi", destNpi)
+                        .withHeader("CamelSmppSourceAddrTon", srcTon)
+                        .withHeader("CamelSmppSourceAddrNpi", srcNpi)
+                        .withHeader("CamelSmppDataCoding", dataCoding)
+                        .withHeader("CamelSmppAlphabet", dataCoding == 8 ? 8 : 0)
+                        .withHeader("CamelSmppRegisteredDelivery", 1)
+                        .withHeader("CamelSmppProtocolId", 0)
+                        .withHeader("CamelSmppEsmClass", 0)
+                        .withHeader("CamelSmppPriorityFlag", 0)
+                        .withHeader("CamelSmppDlrUrl", buildDlrCallbackUrl())
+                        .withPattern(ExchangePattern.InOnly)
+                        .withBody(message)
+                        .build();
+
+                    exchange = template.send(smppUri, exchange);
+
+                    if (exchange.getException() != null) {
+                        log.warn("Echec {} -> {}", dest, exchange.getException().getMessage());
+                        continue;
+                    }
+
+                    String messageId = extractMessageId(exchange);
+
+                    if (messageId != null && !messageId.isEmpty()) {
+                        log.info("SMS envoyé avec succès via {} -> {} (msgId={})", cfg.getSmsOperator(), dest, messageId);
+                        return SendResult.ok(messageId);
+                    }
+                } catch (Exception e) {
+                    log.warn("Erreur tentative {} : {}", dest, e.getMessage());
+                }
+            }
+
+            return SendResult.fail("Echec envoi sur tous les formats", null);
         } catch (Exception e) {
             log.error("Erreur envoi SMS {} -> {} : {}", sourceAddress, destinationAddress, e.getMessage(), e);
             return SendResult.fail(e.getMessage(), null);

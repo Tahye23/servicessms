@@ -206,7 +206,7 @@ public class SendSmsResource {
     }
 
     /**
-     *  BULK SMS -
+     *  BULK ]SMS -
      */
     public ResponseEntity<SendSmsResponseDTO> handleBulkSms(SendSms sendSms, Template template, boolean test, String login) {
         String bulkId = sendSms.getBulkId();
